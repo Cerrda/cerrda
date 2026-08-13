@@ -1,0 +1,227 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.9rem;
+  /* 浅色：柔和粉色系纸面，文字用玫瑰灰而非纯黑 */
+  --background: oklch(0.965 0.028 350);
+  --foreground: oklch(0.3 0.045 350);
+  --card: oklch(0.985 0.018 350);
+  --card-foreground: oklch(0.3 0.045 350);
+  --popover: oklch(0.985 0.018 350);
+  --popover-foreground: oklch(0.3 0.045 350);
+  --primary: oklch(0.58 0.17 350);
+  --primary-foreground: oklch(0.99 0.01 350);
+  --secondary: oklch(0.93 0.04 350);
+  --secondary-foreground: oklch(0.36 0.06 350);
+  --muted: oklch(0.945 0.03 350);
+  --muted-foreground: oklch(0.52 0.045 350);
+  --accent: oklch(0.92 0.055 350);
+  --accent-foreground: oklch(0.34 0.07 350);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.88 0.035 350);
+  --input: oklch(0.88 0.035 350);
+  --ring: oklch(0.68 0.13 350);
+  --surface-glow: oklch(0.86 0.08 350 / 0.42);
+  --hero-tint: oklch(0.84 0.1 350 / 0.36);
+  --panel-deep: oklch(0.28 0.055 350);
+}
+
+.dark {
+  --background: oklch(0.14 0.015 280);
+  --foreground: oklch(0.97 0.01 350);
+  --card: oklch(0.18 0.02 280);
+  --card-foreground: oklch(0.97 0.01 350);
+  --popover: oklch(0.18 0.02 280);
+  --popover-foreground: oklch(0.97 0.01 350);
+  --primary: oklch(0.82 0.1 350);
+  --primary-foreground: oklch(0.18 0.02 280);
+  --secondary: oklch(0.24 0.02 280);
+  --secondary-foreground: oklch(0.95 0.01 350);
+  --muted: oklch(0.24 0.02 280);
+  --muted-foreground: oklch(0.72 0.02 280);
+  --accent: oklch(0.28 0.04 350);
+  --accent-foreground: oklch(0.96 0.02 350);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.28 0.02 280);
+  --input: oklch(0.28 0.02 280);
+  --ring: oklch(0.7 0.1 350);
+  --surface-glow: oklch(0.45 0.1 350 / 0.25);
+  --hero-tint: oklch(0.4 0.08 350 / 0.3);
+  --panel-deep: oklch(0.16 0.03 350);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-panel-deep: var(--panel-deep);
+  --font-sans: 'Sora', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces', 'Instrument Serif', ui-serif, Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% -10%, var(--hero-tint), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 90% 0%, var(--surface-glow), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* SmoothCursor 挂载时隐藏原生光标，避免按钮/链接的 pointer 盖过自定义光标 */
+  @media (hover: hover) and (pointer: fine) {
+    html.hide-native-cursor,
+    html.hide-native-cursor * {
+      cursor: none !important;
+    }
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--primary) 35%, transparent);
+  }
+
+  /* 主题切换：View Transitions 圆形扩散 / 收拢 */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  html[data-theme-vt]::view-transition-group(root) {
+    animation-duration: var(--theme-toggle-vt-duration);
+  }
+
+  /* 浅色：新帧在上，由内向外扩散 */
+  html[data-theme-vt='expand']::view-transition-old(root) {
+    z-index: 1;
+  }
+
+  html[data-theme-vt='expand']::view-transition-new(root) {
+    z-index: 2147483646;
+    clip-path: var(--theme-vt-clip-from);
+  }
+
+  /* 切回暗色：旧帧在上，由外向内收拢 */
+  html[data-theme-vt='collapse']::view-transition-old(root) {
+    z-index: 2147483646;
+    clip-path: var(--theme-vt-clip-from);
+  }
+
+  html[data-theme-vt='collapse']::view-transition-new(root) {
+    z-index: 1;
+  }
+}
+
+/* OverlayScrollbars 主题必须在 @layer 外，否则会被库的非 layer 默认 --os-* 盖掉 */
+.os-scrollbar.os-theme-cerrda {
+  --os-size: 11px;
+  --os-padding-perpendicular: 3px;
+  --os-padding-axis: 4px;
+  --os-track-border-radius: 999px;
+  --os-track-bg: color-mix(in oklch, var(--muted) 55%, transparent);
+  --os-track-bg-hover: color-mix(in oklch, var(--muted) 75%, transparent);
+  --os-track-bg-active: color-mix(in oklch, var(--muted) 85%, transparent);
+  --os-track-border: none;
+  --os-handle-border-radius: 999px;
+  --os-handle-bg: color-mix(in oklch, var(--primary) 52%, transparent);
+  --os-handle-bg-hover: color-mix(in oklch, var(--primary) 72%, transparent);
+  --os-handle-bg-active: color-mix(in oklch, var(--primary) 88%, transparent);
+  --os-handle-border: none;
+  --os-handle-min-size: 40px;
+  --os-handle-perpendicular-size: 5px;
+  --os-handle-perpendicular-size-hover: 7px;
+  --os-handle-perpendicular-size-active: 7px;
+  --os-handle-interactive-area-offset: 4px;
+}
+
+.os-scrollbar.os-theme-cerrda.os-scrollbar-horizontal {
+  --os-size: 10px;
+  --os-padding-perpendicular: 2px;
+}
+
+.dark .os-scrollbar.os-theme-cerrda {
+  --os-track-bg: color-mix(in oklch, var(--muted) 40%, transparent);
+  --os-track-bg-hover: color-mix(in oklch, var(--muted) 58%, transparent);
+  --os-track-bg-active: color-mix(in oklch, var(--muted) 70%, transparent);
+  --os-handle-bg: color-mix(in oklch, var(--primary) 45%, transparent);
+  --os-handle-bg-hover: color-mix(in oklch, var(--primary) 68%, transparent);
+  --os-handle-bg-active: color-mix(in oklch, var(--primary) 85%, transparent);
+}
+
+.os-scrollbar.os-theme-cerrda .os-scrollbar-track,
+.os-scrollbar.os-theme-cerrda .os-scrollbar-handle {
+  transition:
+    background-color 420ms ease,
+    opacity 220ms ease;
+}
+
+/* 主题切换动画期间隐藏滚动条，避免 VT 快照边缘闪一下 */
+html[data-theme-vt] .os-scrollbar {
+  opacity: 0 !important;
+  transition: none !important;
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+  }
+
+  .font-display.tracking-tight {
+    letter-spacing: -0.04em;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .section-pad {
+    @apply px-4 py-24 md:px-8 md:py-32;
+  }
+
+  .eyebrow {
+    @apply rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground;
+    background: color-mix(in oklch, var(--primary) 12%, transparent);
+  }
+}

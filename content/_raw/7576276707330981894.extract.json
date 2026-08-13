@@ -1,0 +1,9 @@
+{
+  "slug": "fnm-windows",
+  "title": "Windows系统中使用fnm自动管理node版本",
+  "brief": "Windows系统中使用fnm自动管理node版本，当你打开 项目时，fnm会自动设置好项目需要的node版本。",
+  "tags": [
+    "前端"
+  ],
+  "mark_content": "## 1. 安装 fnm\n\n-   使用 Windows 包管理器 Winget：\n    ```\n    winget install Schniz.fnm\n    ```\n安装完成后，fnm 的可执行文件大致已在你的系统中，但 **还没完全“生效”** ，因为还要做 Shell 配置。\n* * *\n## 2. 配置 PowerShell\n允许执行脚本 & 在配置文件里载入 fnm 环境命令。\n### 2.1 允许执行脚本\n打开 PowerShell（可用管理员权限，但一般「当前用户」级别就够）然后执行：\n```\nSet-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser\n```\n这样可以让你的用户可以执行脚本。\n### 2.2 编辑 PowerShell 配置文件（Profile）\n在 PowerShell 中运行以下命令以打开（或创建）你的 profile 文件：\n```\nif (!(Test-Path -Path $PROFILE)) { New-Item -ItemType File -Path $PROFILE -Force }\nInvoke-Item $PROFILE\n```\n然后在这个文件末尾添加下面这行：\n```\nfnm env --use-on-cd --shell --resolve-engines powershell | Out-String | Invoke-Expression\n```\n这样做的目的：当你打开 PowerShell 或切换目录时，fnm 会设置好环境变量，以便 `node`/`npm` 路径正确并且切换版本生效。将 `package.json#engines#node` 视为有效的 Node.js 版本文件。然后关闭 PowerShell，再重新打开一个新窗口以让配置生效。\n其他配置可见：https://github.com/Schniz/fnm/blob/master/docs/configuration.md\n* * *\n## 3. 使用 fnm 来安装 &切换 Node.js 版本\n配置完毕后，就可以开始使用 fnm 来管理版本。下面是常用命令：\n-   安装某个版本：\n    ```\n    fnm install 18.20.4\n    # 或安装最新 LTS：\n    fnm install --lts\n    ```\n-   切换使用某个版本（当前 shell 会话立即生效）：\n    ```\n    fnm use 18.20.4\n    ```\n-   查看当前使用的 Node 版本：\n    ```\n    fnm current\n    ```\n-   列出已安装版本：\n    ```\n    fnm ls\n    ```\n-   列出可安装的远程版本：\n    ```\n    fnm ls-remote\n    ```\n-   设置某个版本为默认：\n    ```\n    fnm default 22.13.1\n    ```\n-   在项目中指定版本：在项目根目录创建一个 `.node-version`（或 `.nvmrc`）文件，内容是版本号，例如 `v18.20.4`，然后每次进入该目录时 fnm 会自动切换（前提你配置了 `--use-on-cd`）\n* * *\n\n"
+}

@@ -66,6 +66,12 @@
       "sourceType": "github",
       "skillPath": "skills/minimalist-skill/SKILL.md",
       "computedHash": "08873a3131d3be27bef9bf3304b310b16b44ca6e3561aebe532797be3443f6bd"
+    },
+    "photo-abstract-editorial": {
+      "source": "zzzlc0405/photo-abstract-editorial",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "d79b2c0ea961df437ebaa6def607038a4e13ba15bcc57a8e321585d8e970d878"
     }
   }
 }
