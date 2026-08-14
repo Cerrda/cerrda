@@ -34,7 +34,7 @@ const loopItems = computed(() => [...props.items, ...props.items])
       <div
         v-for="(item, index) in loopItems"
         :key="`${item.title}-${index}`"
-        class="w-56 shrink-0 rounded-2xl border border-border/50 bg-background/55 p-4 backdrop-blur-md md:w-64 dark:border-border/40 dark:bg-background/35"
+        class="w-56 shrink-0 rounded-2xl border border-border/50 bg-background/80 p-4 md:w-64 dark:border-border/40 dark:bg-background/55"
       >
         <p class="text-[10px] uppercase tracking-[0.18em] text-primary dark:text-pink-200/80">
           {{ item.tag || 'Project' }}
@@ -53,6 +53,8 @@ const loopItems = computed(() => [...props.items, ...props.items])
 <style scoped>
 .infinite-track {
   animation: infinite-scroll 28s linear infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes infinite-scroll {
@@ -61,6 +63,13 @@ const loopItems = computed(() => [...props.items, ...props.items])
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .infinite-track {
+    animation: none;
+    will-change: auto;
   }
 }
 </style>

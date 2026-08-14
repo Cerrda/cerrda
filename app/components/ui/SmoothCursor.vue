@@ -28,6 +28,7 @@ const props = withDefaults(defineProps<SmoothCursorProps>(), {
   }),
 })
 
+const { ready } = useAppBoot()
 const isMoving = ref(false)
 const lastMousePos = ref<Position>({ x: 0, y: 0 })
 const velocity = ref<Position>({ x: 0, y: 0 })
@@ -105,8 +106,15 @@ function throttledMouseMove(e: MouseEvent) {
   })
 }
 
-document.documentElement.classList.add('hide-native-cursor')
+if (ready.value) {
+  document.documentElement.classList.add('hide-native-cursor')
+}
 useEventListener(window, 'mousemove', throttledMouseMove)
+
+watch(ready, (value) => {
+  if (value) document.documentElement.classList.add('hide-native-cursor')
+  else document.documentElement.classList.remove('hide-native-cursor')
+})
 
 onUnmounted(() => {
   if (rafId) cancelAnimationFrame(rafId)
@@ -116,6 +124,7 @@ onUnmounted(() => {
 
 <template>
   <Motion
+    v-if="ready"
     as="div"
     :style="{
       position: 'fixed',

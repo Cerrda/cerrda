@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from "vue";
-import type { MouseMode } from "./InspiraShaderToy";
-import { cn } from "~/lib/utils";
-import { computed, onMounted, onUnmounted, shallowRef, watch } from "vue";
-import { InspiraShaderToy } from "./InspiraShaderToy";
+import type { HTMLAttributes } from 'vue'
+import type { MouseMode } from './InspiraShaderToy'
+import { cn } from '~/lib/utils'
+import { computed, onMounted, onUnmounted, shallowRef, watch } from 'vue'
+import { InspiraShaderToy } from './InspiraShaderToy'
 
 interface NoiseConfig {
-  opacity: number;
-  scale: number;
+  opacity: number
+  scale: number
 }
 
 interface Props {
-  mouseMode?: MouseMode;
-  class?: HTMLAttributes["class"];
-  shaderCode: string;
-  hue?: number;
-  saturation?: number;
-  brightness?: number;
-  speed?: number;
-  mouseSensitivity?: number;
-  damping?: number;
-  frameRate?: number;
-  pixelRatio?: number;
-  paused?: boolean;
-  autoPause?: boolean;
-  interactive?: boolean;
-  noise?: NoiseConfig;
+  mouseMode?: MouseMode
+  class?: HTMLAttributes['class']
+  shaderCode: string
+  hue?: number
+  saturation?: number
+  brightness?: number
+  speed?: number
+  mouseSensitivity?: number
+  damping?: number
+  frameRate?: number
+  pixelRatio?: number
+  paused?: boolean
+  autoPause?: boolean
+  interactive?: boolean
+  noise?: NoiseConfig
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  mouseMode: "click",
+  mouseMode: 'click',
   hue: 0,
   saturation: 1,
   brightness: 1,
@@ -41,185 +41,178 @@ const props = withDefaults(defineProps<Props>(), {
   paused: false,
   autoPause: true,
   interactive: true,
-});
+})
 
 const emit = defineEmits<{
-  ready: [];
-  error: [message: string];
-}>();
+  ready: []
+  error: [message: string]
+}>()
 
-const containerRef = useTemplateRef("containerRef");
-const isInViewport = shallowRef(true);
-const isDocumentVisible = shallowRef(true);
+const containerRef = useTemplateRef('containerRef')
+const isInViewport = shallowRef(true)
+const isDocumentVisible = shallowRef(true)
 
-let shader: InspiraShaderToy | undefined;
-let intersectionObserver: IntersectionObserver | undefined;
+let shader: InspiraShaderToy | undefined
+let intersectionObserver: IntersectionObserver | undefined
 
-const backgroundSize = computed(() => `${(props.noise?.scale || 0) * 200}%`);
-const noiseOpacity = computed(() => Math.min(1, Math.max(0, (props.noise?.opacity ?? 0) / 2)));
-const shouldPlay = computed(
-  () => !props.paused && (!props.autoPause || (isInViewport.value && isDocumentVisible.value)),
-);
+const backgroundSize = computed(() => `${(props.noise?.scale || 0) * 200}%`)
+const noiseOpacity = computed(() => Math.min(1, Math.max(0, (props.noise?.opacity ?? 0) / 2)))
+const shouldPlay = computed(() => !props.paused && isDocumentVisible.value && (!props.autoPause || isInViewport.value))
 
 function updatePlayback() {
-  if (!shader) return;
+  if (!shader) return
 
   if (shouldPlay.value) {
-    shader.play();
+    shader.play()
   } else {
-    shader.pause();
+    shader.pause()
   }
 }
 
 function setShaderSource(source: string) {
-  if (!shader) return;
+  if (!shader) return
 
-  const success = shader.setShader({ source });
+  const success = shader.setShader({ source })
 
   if (!success) {
-    emit("error", "Failed to compile shader");
-    return;
+    emit('error', 'Failed to compile shader')
+    return
   }
 
-  emit("ready");
-  updatePlayback();
+  emit('ready')
+  updatePlayback()
 }
 
 function handleVisibilityChange() {
-  isDocumentVisible.value = document.visibilityState === "visible";
+  isDocumentVisible.value = document.visibilityState === 'visible'
 }
 
 onMounted(() => {
-  if (!containerRef.value) return;
+  if (!containerRef.value) return
 
   try {
-    shader = new InspiraShaderToy(
-      containerRef.value,
-      props.mouseMode,
-      props.frameRate,
-      props.pixelRatio,
-    );
+    shader = new InspiraShaderToy(containerRef.value, props.mouseMode, props.frameRate, props.pixelRatio)
   } catch (error) {
-    emit("error", error instanceof Error ? error.message : "Failed to initialize WebGL");
-    return;
+    emit('error', error instanceof Error ? error.message : 'Failed to initialize WebGL')
+    return
   }
 
   shader.setHSV({
     hue: props.hue,
     saturation: props.saturation,
     brightness: props.brightness,
-  });
-  shader.setSpeed(props.speed);
-  shader.setMouseSensitivity(props.mouseSensitivity);
-  shader.setMouseDamping(props.damping);
-  setShaderSource(props.shaderCode);
+  })
+  shader.setSpeed(props.speed)
+  shader.setMouseSensitivity(props.mouseSensitivity)
+  shader.setMouseDamping(props.damping)
+  setShaderSource(props.shaderCode)
 
   if (props.autoPause) {
     intersectionObserver = new IntersectionObserver(([entry]) => {
-      isInViewport.value = entry?.isIntersecting ?? true;
-    });
-    intersectionObserver.observe(containerRef.value);
+      isInViewport.value = entry?.isIntersecting ?? true
+    })
+    intersectionObserver.observe(containerRef.value)
   }
 
-  document.addEventListener("visibilitychange", handleVisibilityChange);
-  handleVisibilityChange();
-  updatePlayback();
-});
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+  handleVisibilityChange()
+  updatePlayback()
+})
 
 onUnmounted(() => {
-  document.removeEventListener("visibilitychange", handleVisibilityChange);
-  intersectionObserver?.disconnect();
-  shader?.dispose();
-  shader = undefined;
-});
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+  intersectionObserver?.disconnect()
+  shader?.dispose()
+  shader = undefined
+})
 
 watch(
   () => props.shaderCode,
   (v) => setShaderSource(v),
-);
+)
 
 watch(
   () => props.mouseMode,
   (v) => {
     if (shader) {
-      shader.mouseMode = v;
+      shader.mouseMode = v
     }
   },
-);
+)
 
 watch(
   () => props.hue,
   (v) => {
     if (v !== undefined && shader) {
-      shader.setHue(v);
+      shader.setHue(v)
     }
   },
-);
+)
 
 watch(
   () => props.saturation,
   (v) => {
     if (v !== undefined && shader) {
-      shader.setSaturation(v);
+      shader.setSaturation(v)
     }
   },
-);
+)
 
 watch(
   () => props.brightness,
   (v) => {
     if (v !== undefined && shader) {
-      shader.setBrightness(v);
+      shader.setBrightness(v)
     }
   },
-);
+)
 
 watch(
   () => props.speed,
   (v) => {
     if (v !== undefined && shader) {
-      shader.setSpeed(v);
+      shader.setSpeed(v)
     }
   },
-);
+)
 
 watch(
   () => props.mouseSensitivity,
   (v) => {
     if (v !== undefined && shader) {
-      shader.setMouseSensitivity(v);
+      shader.setMouseSensitivity(v)
     }
   },
-);
+)
 
 watch(
   () => props.damping,
   (v) => {
     if (v !== undefined && shader) {
-      shader.setMouseDamping(v);
+      shader.setMouseDamping(v)
     }
   },
-);
+)
 
 watch(
   () => props.frameRate,
   (v) => {
     if (v !== undefined && shader) {
-      shader.setFrameRate(v);
+      shader.setFrameRate(v)
     }
   },
-);
+)
 
 watch(
   () => props.pixelRatio,
   (v) => {
     if (v !== undefined && shader) {
-      shader.setPixelRatio(v);
+      shader.setPixelRatio(v)
     }
   },
-);
+)
 
-watch(shouldPlay, updatePlayback);
+watch(shouldPlay, updatePlayback)
 </script>
 
 <template>

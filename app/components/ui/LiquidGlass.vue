@@ -46,14 +46,16 @@ const dimensions = reactive({
   width: 0,
   height: 0,
 })
+const isVisible = ref(true)
 
 let observer: ResizeObserver | null = null
+let visibilityObserver: IntersectionObserver | null = null
 
 const baseStyle = computed(() => {
   return {
     '--frost': props.frost,
     'border-radius': `${props.radius}px`,
-    'backdrop-filter': `url(#${filterId})`,
+    'backdrop-filter': isVisible.value ? `url(#${filterId})` : 'none',
   }
 })
 
@@ -101,6 +103,7 @@ onMounted(() => {
   if (!liquidGlassRoot.value) return
 
   observer = new ResizeObserver((entries) => {
+    if (!isVisible.value) return
     const entry = entries[0]
     if (!entry) return
 
@@ -120,10 +123,19 @@ onMounted(() => {
   })
 
   observer.observe(liquidGlassRoot.value)
+
+  visibilityObserver = new IntersectionObserver(
+    ([entry]) => {
+      isVisible.value = entry?.isIntersecting ?? true
+    },
+    { rootMargin: '140px' },
+  )
+  visibilityObserver.observe(liquidGlassRoot.value)
 })
 
 onUnmounted(() => {
   observer?.disconnect()
+  visibilityObserver?.disconnect()
 })
 </script>
 
@@ -133,7 +145,7 @@ onUnmounted(() => {
       <slot />
     </div>
 
-    <svg class="filter" xmlns="http://www.w3.org/2000/svg">
+    <svg v-show="isVisible" class="filter" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter :id="filterId" color-interpolation-filters="sRGB">
           <feImage x="0" y="0" width="100%" height="100%" :href="displacementDataUri" result="map" />

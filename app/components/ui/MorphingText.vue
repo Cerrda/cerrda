@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { cn } from '~/lib/utils'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 const props = withDefaults(defineProps<Props>(), {
   morphTime: 1.5,
@@ -66,7 +66,20 @@ function doCoolDown() {
   }
 }
 
+function seedInitialText() {
+  if (!text1Ref.value || !text2Ref.value) return
+  text1Ref.value.textContent = props.texts[0] ?? ''
+  text2Ref.value.textContent = props.texts[1] ?? props.texts[0] ?? ''
+  text1Ref.value.style.filter = 'none'
+  text1Ref.value.style.opacity = '100%'
+  text2Ref.value.style.filter = 'none'
+  text2Ref.value.style.opacity = '0%'
+}
+
+const { ready } = useAppBoot()
 let animationFrameId: number = 0
+let started = false
+
 function animate() {
   animationFrameId = requestAnimationFrame(animate)
 
@@ -83,8 +96,27 @@ function animate() {
   }
 }
 
-onMounted(() => {
+function start() {
+  if (started) return
+  started = true
+  seedInitialText()
+  time.value = new Date()
   animate()
+}
+
+onMounted(() => {
+  seedInitialText()
+
+  if (ready.value) {
+    start()
+    return
+  }
+
+  const stop = watch(ready, (value) => {
+    if (!value) return
+    start()
+    stop()
+  })
 })
 
 onUnmounted(() => {

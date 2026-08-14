@@ -93,6 +93,14 @@
   html {
     scroll-behavior: smooth;
     color-scheme: light;
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   html.dark {
@@ -102,10 +110,44 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
+  }
+
+  /* 固定层绘制渐变，避免 background-attachment:fixed 随滚动整页重绘 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background-color: var(--background);
     background-image:
       radial-gradient(ellipse 80% 50% at 10% -10%, var(--hero-tint), transparent 55%),
       radial-gradient(ellipse 60% 40% at 90% 0%, var(--surface-glow), transparent 50%);
-    background-attachment: fixed;
+  }
+
+  html.booting,
+  html.booting body {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  /* 首屏盖住页面：head 脚本立刻加 booting，避免先看到内容再出 loader */
+  html.booting::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 199;
+    background-color: var(--background);
+    pointer-events: none;
+  }
+
+  .app-shell {
+    opacity: 1;
+  }
+
+  html.booting .app-shell {
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* SmoothCursor 挂载时隐藏原生光标，避免按钮/链接的 pointer 盖过自定义光标 */
@@ -152,51 +194,12 @@
   }
 }
 
-/* OverlayScrollbars 主题必须在 @layer 外，否则会被库的非 layer 默认 --os-* 盖掉 */
-.os-scrollbar.os-theme-cerrda {
-  --os-size: 11px;
-  --os-padding-perpendicular: 3px;
-  --os-padding-axis: 4px;
-  --os-track-border-radius: 999px;
-  --os-track-bg: color-mix(in oklch, var(--muted) 55%, transparent);
-  --os-track-bg-hover: color-mix(in oklch, var(--muted) 75%, transparent);
-  --os-track-bg-active: color-mix(in oklch, var(--muted) 85%, transparent);
-  --os-track-border: none;
-  --os-handle-border-radius: 999px;
-  --os-handle-bg: color-mix(in oklch, var(--primary) 52%, transparent);
-  --os-handle-bg-hover: color-mix(in oklch, var(--primary) 72%, transparent);
-  --os-handle-bg-active: color-mix(in oklch, var(--primary) 88%, transparent);
-  --os-handle-border: none;
-  --os-handle-min-size: 40px;
-  --os-handle-perpendicular-size: 5px;
-  --os-handle-perpendicular-size-hover: 7px;
-  --os-handle-perpendicular-size-active: 7px;
-  --os-handle-interactive-area-offset: 4px;
-}
-
-.os-scrollbar.os-theme-cerrda.os-scrollbar-horizontal {
-  --os-size: 10px;
-  --os-padding-perpendicular: 2px;
-}
-
-.dark .os-scrollbar.os-theme-cerrda {
-  --os-track-bg: color-mix(in oklch, var(--muted) 40%, transparent);
-  --os-track-bg-hover: color-mix(in oklch, var(--muted) 58%, transparent);
-  --os-track-bg-active: color-mix(in oklch, var(--muted) 70%, transparent);
-  --os-handle-bg: color-mix(in oklch, var(--primary) 45%, transparent);
-  --os-handle-bg-hover: color-mix(in oklch, var(--primary) 68%, transparent);
-  --os-handle-bg-active: color-mix(in oklch, var(--primary) 85%, transparent);
-}
-
-.os-scrollbar.os-theme-cerrda .os-scrollbar-track,
-.os-scrollbar.os-theme-cerrda .os-scrollbar-handle {
-  transition:
-    background-color 420ms ease,
-    opacity 220ms ease;
+html.is-overlay-scrollbar-dragging {
+  user-select: none;
 }
 
 /* 主题切换动画期间隐藏滚动条，避免 VT 快照边缘闪一下 */
-html[data-theme-vt] .os-scrollbar {
+html[data-theme-vt] .overlay-scrollbar {
   opacity: 0 !important;
   transition: none !important;
 }

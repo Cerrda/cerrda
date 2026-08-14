@@ -31,46 +31,60 @@ const emit = defineEmits<{
 
 const currentState = ref(0)
 const isLastStepComplete = ref(false)
+const ranAction = new Set<number>()
 let currentTimer: ReturnType<typeof setTimeout> | null = null
+let runId = 0
 
-async function executeStepAction(step: MultiStepLoaderStep) {
-  if (typeof step.action === 'function') {
-    await step.action()
+async function executeStepAction(index: number) {
+  if (ranAction.has(index)) return
+  ranAction.add(index)
+  const step = props.steps[index]
+  try {
+    if (typeof step?.action === 'function') {
+      await step.action()
+    }
+  } catch {
+    /* 预加载失败也不要卡住开机流程 */
   }
 }
 
-async function proceedToNextStep() {
-  const currentStep = props.steps[currentState.value]
-  if (!currentStep) return
-
-  await executeStepAction(currentStep)
-
+async function advance() {
   if (currentState.value < props.steps.length - 1) {
     currentState.value++
     emit('state-change', currentState.value)
-    processCurrentStep()
+    await processCurrentStep()
   } else {
     isLastStepComplete.value = true
     emit('complete')
   }
 }
 
-function processCurrentStep() {
+async function processCurrentStep() {
+  const id = ++runId
   if (currentTimer) {
     clearTimeout(currentTimer)
     currentTimer = null
   }
 
-  const currentStep = props.steps[currentState.value]
+  const index = currentState.value
+  const currentStep = props.steps[index]
   if (!currentStep) return
 
   const duration = currentStep.duration ?? props.defaultDuration
+  const work = executeStepAction(index)
 
-  if (!currentStep.async) {
-    currentTimer = setTimeout(() => {
-      void proceedToNextStep()
-    }, duration)
+  if (currentStep.async) {
+    await work
+    return
   }
+
+  const minTime = new Promise<void>((resolve) => {
+    currentTimer = setTimeout(resolve, duration)
+  })
+
+  await Promise.all([minTime, work])
+  if (id !== runId) return
+  await advance()
 }
 
 function close() {
@@ -85,7 +99,7 @@ watch(
       if (!currentStep) return
       const duration = currentStep.duration ?? props.defaultDuration
       currentTimer = setTimeout(() => {
-        void proceedToNextStep()
+        void advance()
       }, duration)
     }
   },
@@ -97,12 +111,16 @@ watch(
     if (newLoading) {
       currentState.value = 0
       isLastStepComplete.value = false
-      processCurrentStep()
+      ranAction.clear()
+      if (import.meta.client) {
+        void processCurrentStep()
+      }
     } else if (currentTimer) {
       clearTimeout(currentTimer)
       currentTimer = null
     }
   },
+  { immediate: true },
 )
 
 onUnmounted(() => {
@@ -115,13 +133,13 @@ onUnmounted(() => {
     enter-active-class="transition-opacity duration-300"
     enter-from-class="opacity-0"
     enter-to-class="opacity-100"
-    leave-active-class="transition-opacity duration-300"
+    leave-active-class="transition-opacity duration-500"
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
     <div
       v-if="loading && steps.length > 0"
-      class="fixed inset-0 z-[100] flex size-full items-center justify-center backdrop-blur-2xl"
+      class="fixed inset-0 z-[200] flex size-full items-center justify-center backdrop-blur-2xl"
       data-theme-burn="loader"
     >
       <button
@@ -147,7 +165,7 @@ onUnmounted(() => {
           <div v-for="(step, index) in steps" :key="index">
             <div
               v-if="step"
-              class="mb-4 flex items-center gap-2 text-left transition-all duration-300 ease-in-out"
+              class="mb-4 flex items-center gap-2 text-left transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
               :style="{
                 opacity: index === currentState ? 1 : Math.max(1 - Math.abs(index - currentState) * 0.2, 0),
                 transform: `translateY(${-(currentState * 40)}px)`,
@@ -160,7 +178,7 @@ onUnmounted(() => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                class="size-6 text-primary"
+                class="size-6 shrink-0 text-primary"
               >
                 <path
                   fill-rule="evenodd"
@@ -173,7 +191,7 @@ onUnmounted(() => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                class="size-6 animate-spin text-primary"
+                class="size-6 shrink-0 animate-spin text-primary"
               >
                 <path
                   fill-rule="evenodd"
@@ -188,7 +206,7 @@ onUnmounted(() => {
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
                 stroke="currentColor"
-                class="size-6 text-black opacity-50 dark:text-white"
+                class="size-6 shrink-0 text-black opacity-50 dark:text-white"
               >
                 <path
                   stroke-linecap="round"
@@ -197,34 +215,16 @@ onUnmounted(() => {
                 />
               </svg>
 
-              <div class="flex flex-col">
-                <span :class="cn('text-lg text-black dark:text-white', index > currentState && 'opacity-50')">
-                  {{ step.text }}
-                </span>
-                <Transition
-                  enter-active-class="transition-all duration-300"
-                  enter-from-class="opacity-0 -translate-y-1"
-                  enter-to-class="opacity-100 translate-y-0"
-                >
-                  <span
-                    v-if="
-                      step.afterText &&
-                      (index < currentState ||
-                        (index === steps.length - 1 && index === currentState && isLastStepComplete))
-                    "
-                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-                  >
-                    {{ step.afterText }}
-                  </span>
-                </Transition>
-              </div>
+              <span :class="cn('text-lg text-black dark:text-white', index > currentState && 'opacity-50')">
+                {{ step.text }}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       <div
-        class="pointer-events-none absolute inset-x-0 bottom-0 z-[-1] h-full bg-white mask-[radial-gradient(900px_at_center,white_30%,transparent)] dark:bg-black"
+        class="pointer-events-none absolute inset-x-0 bottom-0 z-[-1] h-full bg-white mask-[radial-gradient(900px_at_center,transparent_30%,white)] dark:bg-black"
       />
     </div>
   </Transition>

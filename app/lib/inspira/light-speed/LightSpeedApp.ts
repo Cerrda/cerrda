@@ -67,6 +67,7 @@ export interface LightSpeedOptions {
   carFloorSeparation: [number, number];
   colors: Colors;
   isHyper?: boolean;
+  pixelRatio?: number;
 }
 
 export interface LightSpeedProps {
@@ -109,6 +110,7 @@ export const defaultOptions: LightSpeedOptions = {
     rightCars: [0x03b3c3, 0x0e5ea5, 0x324555],
     sticks: 0x03b3c3,
   },
+  pixelRatio: 1.25,
 };
 
 function nsin(val: number) {
@@ -779,6 +781,9 @@ export class LightSpeedApp {
   speedUpTarget: number;
   speedUp: number;
   timeOffset: number;
+  paused: boolean;
+  private raf = 0;
+  private boundResize!: () => void;
 
   constructor(container: HTMLElement, options: LightSpeedOptions) {
     this.options = options;
@@ -793,9 +798,13 @@ export class LightSpeedApp {
     this.renderer = new THREE.WebGLRenderer({
       antialias: false,
       alpha: true,
+      powerPreference: "high-performance",
+      stencil: false,
     });
     this.renderer.setSize(container.offsetWidth, container.offsetHeight, false);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setPixelRatio(
+      Math.min(options.pixelRatio ?? 1.25, window.devicePixelRatio || 1),
+    );
 
     this.renderer.domElement.style.setProperty("height", "100%");
     this.renderer.domElement.style.setProperty("width", "100%");
@@ -855,13 +864,15 @@ export class LightSpeedApp {
     this.speedUp = 0;
     this.timeOffset = 0;
 
+    this.paused = false;
     this.tick = this.tick.bind(this);
     this.init = this.init.bind(this);
     this.setSize = this.setSize.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
+    this.boundResize = this.onWindowResize.bind(this);
 
-    window.addEventListener("resize", this.onWindowResize.bind(this));
+    window.addEventListener("resize", this.boundResize, { passive: true });
   }
 
   onWindowResize() {
@@ -881,7 +892,7 @@ export class LightSpeedApp {
       new BloomEffect({
         luminanceThreshold: 0.2,
         luminanceSmoothing: 0,
-        resolutionScale: 1,
+        resolutionScale: 0.5,
       }),
     );
 
@@ -1013,8 +1024,39 @@ export class LightSpeedApp {
     this.composer.render(delta);
   }
 
+  pause() {
+    this.paused = true;
+    if (this.raf) {
+      cancelAnimationFrame(this.raf);
+      this.raf = 0;
+    }
+    this.clock.stop();
+  }
+
+  resume() {
+    if (this.disposed) return;
+    if (!this.paused && this.raf) return;
+    this.paused = false;
+    this.clock.start();
+    this.tick();
+  }
+
   dispose() {
     this.disposed = true;
+    this.paused = true;
+    if (this.raf) {
+      cancelAnimationFrame(this.raf);
+      this.raf = 0;
+    }
+    window.removeEventListener("resize", this.boundResize);
+    this.container.removeEventListener("mousedown", this.onMouseDown);
+    this.container.removeEventListener("mouseup", this.onMouseUp);
+    this.container.removeEventListener("mouseout", this.onMouseUp);
+    this.container.removeEventListener("touchstart", this.onTouchStart);
+    this.container.removeEventListener("touchend", this.onTouchEnd);
+    this.composer?.dispose();
+    this.renderer.dispose();
+    this.renderer.domElement.remove();
   }
 
   setSize(width: number, height: number, updateStyles: boolean) {
@@ -1022,7 +1064,7 @@ export class LightSpeedApp {
   }
 
   tick() {
-    if (this.disposed || !this) return;
+    if (this.disposed || this.paused || !this) return;
     if (resizeRendererToDisplaySize(this.renderer, this.setSize)) {
       const canvas = this.renderer.domElement;
       this.camera.aspect = canvas.clientWidth / canvas.clientHeight;
@@ -1031,6 +1073,6 @@ export class LightSpeedApp {
     const delta = this.clock.getDelta();
     this.render(delta);
     this.update(delta);
-    requestAnimationFrame(this.tick);
+    this.raf = requestAnimationFrame(this.tick);
   }
 }

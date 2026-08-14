@@ -28,6 +28,11 @@ watch(computedY2, (newY2) => {
   spring.y2 = newY2
 })
 
+let ticking = false
+let inView = true
+let resizeObserver: ResizeObserver | undefined
+let intersectionObserver: IntersectionObserver | undefined
+
 function updateScrollYProgress() {
   if (!tracingBeamRef.value) return
 
@@ -41,23 +46,47 @@ function updateScrollYProgress() {
   scrollYProgress.value = progress
 }
 
+function onScroll() {
+  if (!inView || ticking) return
+  ticking = true
+  requestAnimationFrame(() => {
+    updateScrollYProgress()
+    ticking = false
+  })
+}
+
 onMounted(() => {
-  window.addEventListener('scroll', updateScrollYProgress)
-  window.addEventListener('resize', updateScrollYProgress)
+  window.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('resize', onScroll, { passive: true })
   updateScrollYProgress()
 
-  const resizeObserver = new ResizeObserver(() => {
+  resizeObserver = new ResizeObserver(() => {
     updateSVGHeight()
   })
 
-  resizeObserver.observe(tracingBeamContentRef.value!)
+  if (tracingBeamContentRef.value) {
+    resizeObserver.observe(tracingBeamContentRef.value)
+  }
+
+  if (tracingBeamRef.value) {
+    intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        inView = entry?.isIntersecting ?? true
+        if (inView) updateScrollYProgress()
+      },
+      { rootMargin: '160px' },
+    )
+    intersectionObserver.observe(tracingBeamRef.value)
+  }
 
   updateSVGHeight()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', updateScrollYProgress)
-  window.removeEventListener('resize', updateScrollYProgress)
+  window.removeEventListener('scroll', onScroll)
+  window.removeEventListener('resize', onScroll)
+  resizeObserver?.disconnect()
+  intersectionObserver?.disconnect()
 })
 
 function updateSVGHeight() {

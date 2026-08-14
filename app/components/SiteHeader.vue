@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import NumberFlow from '@number-flow/vue'
 import { brandEditorial } from '~/data/editorial'
 import { navItems, siteProfile } from '~/data/site'
 
 const route = useRoute()
-const colorMode = useColorMode()
-const isDark = computed(() => colorMode.value === 'dark')
-const scrollPercentage = ref(0)
 
 const links = computed(() =>
   navItems.map((item) => ({
@@ -14,25 +10,6 @@ const links = computed(() =>
     href: route.path === '/' ? `#${item.id}` : `/#${item.id}`,
   })),
 )
-
-function updatePageScroll() {
-  const max = document.documentElement.scrollHeight - window.innerHeight
-  if (max <= 0) {
-    scrollPercentage.value = 0
-    return
-  }
-  // Clamp so elastic/subpixel scroll near the bottom cannot overshoot and re-animate the gauge.
-  scrollPercentage.value = Math.min(1, Math.max(0, window.scrollY / max))
-}
-
-onMounted(() => {
-  window.addEventListener('scroll', updatePageScroll, { passive: true })
-  updatePageScroll()
-})
-
-onUnmounted(() => {
-  window.removeEventListener('scroll', updatePageScroll)
-})
 </script>
 
 <template>
@@ -69,32 +46,6 @@ onUnmounted(() => {
           </nav>
 
           <div class="flex items-center gap-1">
-            <div
-              class="flex shrink-0 items-center gap-2 pr-1"
-              role="meter"
-              aria-label="页面阅读进度"
-              :aria-valuenow="Math.round(scrollPercentage * 100)"
-              aria-valuemin="0"
-              aria-valuemax="100"
-            >
-              <AnimatedCircularProgressBar
-                :value="scrollPercentage * 100"
-                :min="0"
-                :max="100"
-                :circle-stroke-width="10"
-                class="!size-5 !text-[0px]"
-                :show-percentage="false"
-                :duration="0.3"
-                :gauge-secondary-color="isDark ? 'oklch(0.45 0.04 350 / 0.35)' : 'oklch(0.75 0.06 350 / 0.45)'"
-                :gauge-primary-color="isDark ? '#f9a8d4' : '#db2777'"
-              />
-              <NumberFlow
-                :value="scrollPercentage"
-                :format="{ style: 'percent' }"
-                locales="en-US"
-                class="hidden w-8 shrink-0 text-right text-xs tabular-nums text-muted-foreground sm:block"
-              />
-            </div>
             <ThemeToggle />
           </div>
         </div>

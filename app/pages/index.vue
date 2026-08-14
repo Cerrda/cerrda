@@ -23,12 +23,6 @@ const timelineItems = careerTimeline.map((item) => ({
   label: item.title,
 }))
 
-const colorMode = useColorMode()
-const isDark = computed(() => colorMode.value === 'dark')
-const silkHue = computed(() => (isDark.value ? 310 : 350))
-const silkSaturation = computed(() => (isDark.value ? 0.45 : 0.22))
-const silkBrightness = computed(() => (isDark.value ? 0.85 : 0.98))
-
 const copiedChannelId = ref<string | null>(null)
 let copiedResetTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -60,13 +54,6 @@ onBeforeUnmount(() => {
 <template>
   <div class="relative min-h-[100dvh] overflow-x-hidden">
     <ClientOnly>
-      <SilkBackground
-        class="pointer-events-none fixed inset-0 -z-10 opacity-40 dark:opacity-55"
-        :hue="silkHue"
-        :saturation="silkSaturation"
-        :brightness="silkBrightness"
-        :speed="0.55"
-      />
       <SmoothCursor />
     </ClientOnly>
 

@@ -4,14 +4,35 @@ import { defaultOptions, distortions, LightSpeedApp } from '~/lib/inspira/light-
 
 const props = defineProps<LightSpeedProps>()
 const containerRef = useTemplateRef<HTMLElement>('lightSpeedRef')
-let app: LightSpeedApp | null = null
+const { ready, gpuProfile } = useAppBoot()
 
-onMounted(() => {
-  if (!containerRef.value) return
+let app: LightSpeedApp | null = null
+let intersectionObserver: IntersectionObserver | undefined
+let started = false
+
+function syncPlayback() {
+  if (!app) return
+  const node = containerRef.value
+  if (!node) return
+  const visible = document.visibilityState === 'visible'
+  const rect = node.getBoundingClientRect()
+  const inView = rect.bottom > 0 && rect.top < window.innerHeight
+  if (visible && inView) app.resume()
+  else app.pause()
+}
+
+function handleVisibility() {
+  syncPlayback()
+}
+
+async function start() {
+  if (started || !containerRef.value || !ready.value) return
+  started = true
 
   const mergedOptions = {
     ...defaultOptions,
     ...props.effectOptions,
+    pixelRatio: gpuProfile.value.lightSpeedPixelRatio,
   }
 
   if (typeof mergedOptions.distortion === 'string') {
@@ -19,21 +40,43 @@ onMounted(() => {
   }
 
   app = new LightSpeedApp(containerRef.value, mergedOptions)
-  app.loadAssets().then(() => {
-    app?.init()
-    const canvas = containerRef.value?.querySelector('canvas')
-    if (canvas) {
-      canvas.style.width = '100%'
-      canvas.style.height = '100%'
-      canvas.style.display = 'block'
-      canvas.style.cursor = 'pointer'
-    }
-  })
+  await app.loadAssets()
+  if (!app) return
+  app.init()
+
+  const canvas = containerRef.value.querySelector('canvas')
+  if (canvas) {
+    canvas.style.width = '100%'
+    canvas.style.height = '100%'
+    canvas.style.display = 'block'
+    canvas.style.cursor = 'pointer'
+  }
+
+  intersectionObserver = new IntersectionObserver(
+    ([entry]) => {
+      if (!app) return
+      if (entry?.isIntersecting && document.visibilityState === 'visible') app.resume()
+      else app.pause()
+    },
+    { rootMargin: '120px' },
+  )
+  intersectionObserver.observe(containerRef.value)
+  document.addEventListener('visibilitychange', handleVisibility)
+  syncPlayback()
+}
+
+watch(ready, (value) => {
+  if (value) void start()
+})
+
+onMounted(() => {
+  void start()
 })
 
 onBeforeUnmount(() => {
-  const canvas = containerRef.value?.querySelector('canvas')
-  canvas?.remove()
+  document.removeEventListener('visibilitychange', handleVisibility)
+  intersectionObserver?.disconnect()
+  app?.dispose()
   app = null
 })
 </script>

@@ -29,15 +29,6 @@ const juejinUrl = computed(() => `https://juejin.cn/post/${meta.value?.id}`)
 
 <template>
   <div class="relative min-h-[100dvh]">
-    <ClientOnly>
-      <SilkBackground
-        class="pointer-events-none fixed inset-0 -z-10 opacity-40 dark:opacity-40"
-        :hue="350"
-        :saturation="0.35"
-        :brightness="1.04"
-        :speed="0.4"
-      />
-    </ClientOnly>
     <SiteHeader />
 
     <article class="section-pad mx-auto max-w-3xl pt-32">

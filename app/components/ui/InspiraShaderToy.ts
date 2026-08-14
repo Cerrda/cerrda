@@ -147,7 +147,7 @@ export class InspiraShaderToy {
       alpha: true,
       depth: false,
       stencil: false,
-      antialias: true,
+      antialias: false,
       // 主题燃烧切换需要 drawImage 丝绸 canvas；默认 false 会读到空白
       preserveDrawingBuffer: true,
       powerPreference: 'high-performance',

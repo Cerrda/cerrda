@@ -28,7 +28,7 @@ export default defineNuxtConfig({
     head: {
       title: 'Cerrda — Frontend & Agent Engineer',
       htmlAttrs: {
-        lang: 'zh-CN',
+        'lang': 'zh-CN',
         'data-overlayscrollbars-initialize': '',
       },
       bodyAttrs: {
@@ -41,11 +41,22 @@ export default defineNuxtConfig({
         },
         { name: 'theme-color', content: '#1a1520' },
       ],
+      script: [
+        {
+          key: 'cerrda-boot-gate',
+          innerHTML:
+            '(function(){try{document.documentElement.classList.add("booting")}catch(e){}})()',
+          tagPosition: 'head',
+        },
+      ],
       link: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' },
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap',
         },
+        { rel: 'preload', href: '/editorial/sheer-descent-subject.png', as: 'image' },
       ],
     },
   },
