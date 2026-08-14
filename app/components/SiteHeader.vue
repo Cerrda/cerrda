@@ -10,6 +10,20 @@ const links = computed(() =>
     href: route.path === '/' ? `#${item.id}` : `/#${item.id}`,
   })),
 )
+
+const brandAriaLabel = computed(() => (route.path === '/' ? '回到顶部' : `${siteProfile.name} 首页`))
+
+function onBrandClick(event: MouseEvent) {
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  if (route.path !== '/') return
+
+  event.preventDefault()
+  if (route.hash) {
+    history.replaceState(history.state, '', route.path)
+  }
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
+}
 </script>
 
 <template>
@@ -29,7 +43,8 @@ const links = computed(() =>
           <NuxtLink
             to="/"
             class="group inline-flex items-center rounded-full outline-none transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:ring-2 focus-visible:ring-primary/40"
-            :aria-label="`${siteProfile.name} home`"
+            :aria-label="brandAriaLabel"
+            @click="onBrandClick"
           >
             <PhotoAbstractEditorial :artwork="brandEditorial" :name="siteProfile.name" />
           </NuxtLink>

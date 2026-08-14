@@ -18,6 +18,7 @@ const isDark = computed(() => colorMode.value === 'dark')
     </NuxtLayout>
     <ClientOnly>
       <BackToTop />
+      <SmoothCursor />
     </ClientOnly>
   </div>
 </template>

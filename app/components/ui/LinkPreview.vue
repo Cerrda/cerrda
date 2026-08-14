@@ -23,6 +23,12 @@ function preloadImage(src: string): Promise<boolean> {
   return promise
 }
 
+/** skills.sh 等站用 html.dark 而不是 prefers-color-scheme，必须在截图前改 class */
+function themeForceScript(colorScheme: string) {
+  const dark = colorScheme === 'dark'
+  return `document.documentElement.classList.toggle('dark',${dark});document.documentElement.classList.toggle('light',${!dark})`
+}
+
 function buildPreviewSrc(options: {
   isStatic: boolean
   imageSrc: string
@@ -39,6 +45,7 @@ function buildPreviewSrc(options: {
     'meta': 'false',
     'embed': 'screenshot.url',
     'colorScheme': options.colorScheme,
+    'scripts': themeForceScript(options.colorScheme),
     'viewport.isMobile': 'true',
     'viewport.deviceScaleFactor': '1',
     'viewport.width': String(options.width * 3),
@@ -83,7 +90,15 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const colorMode = useColorMode()
-const colorScheme = computed(() => (colorMode.value === 'dark' ? 'dark' : 'light'))
+const htmlDark = ref(colorMode.value === 'dark')
+
+function syncHtmlTheme() {
+  if (!import.meta.client) return
+  htmlDark.value = document.documentElement.classList.contains('dark')
+}
+
+/** 跟页面 html.dark 走，避免 View Transition 期间 colorMode 滞后 */
+const colorScheme = computed(() => (htmlDark.value ? 'dark' : 'light'))
 
 const isVisible = ref(false)
 const isReady = ref(false)
@@ -191,13 +206,20 @@ function hidePreview() {
 }
 
 let observer: IntersectionObserver | null = null
+let themeObserver: MutationObserver | null = null
 
 watch(previewSrc, (src) => {
   isReady.value = false
   void ensurePreloaded(src, true)
 })
 
+watch(() => colorMode.value, syncHtmlTheme)
+
 onMounted(() => {
+  syncHtmlTheme()
+  themeObserver = new MutationObserver(syncHtmlTheme)
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+
   const el = triggerRef.value
   if (!el || !('IntersectionObserver' in window)) {
     void ensurePreloaded(previewSrc.value, true)
@@ -220,20 +242,25 @@ onMounted(() => {
 onUnmounted(() => {
   observer?.disconnect()
   observer = null
+  themeObserver?.disconnect()
+  themeObserver = null
 })
 </script>
 
 <template>
-  <div ref="triggerRef" :class="cn('relative inline-block', props.class)">
+  <div
+    ref="triggerRef"
+    :class="cn('relative inline-block', props.class)"
+    @mousemove="handleMouseMove"
+    @mouseenter="showPreview"
+    @mouseleave="hidePreview"
+  >
     <NuxtLink
       :to="url"
       :external="url.startsWith('http')"
       :target="url.startsWith('http') ? '_blank' : undefined"
       rel="noopener noreferrer"
       :class="cn('text-foreground', props.linkClass)"
-      @mousemove="handleMouseMove"
-      @mouseenter="showPreview"
-      @mouseleave="hidePreview"
     >
       <slot />
     </NuxtLink>

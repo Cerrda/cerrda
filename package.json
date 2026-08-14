@@ -12,6 +12,7 @@
     "predev": "node scripts/generate-articles.mjs"
   },
   "dependencies": {
+    "@chenglou/pretext": "^0.0.8",
     "@iconify/vue": "^5.0.1",
     "@number-flow/vue": "^0.5.2",
     "@phosphor-icons/vue": "^2.2.1",

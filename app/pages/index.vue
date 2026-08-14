@@ -53,10 +53,6 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="relative min-h-[100dvh] overflow-x-hidden">
-    <ClientOnly>
-      <SmoothCursor />
-    </ClientOnly>
-
     <SiteHeader />
 
     <!-- Hero -->
@@ -179,7 +175,7 @@ onBeforeUnmount(() => {
           <BentoGridItem
             v-for="(project, index) in projects"
             :key="project.id"
-            :class="['bg-card/70 dark:bg-card/60', index === 0 || index === 3 ? 'md:col-span-2' : '']"
+            :class="['bg-card/70 dark:bg-card/60', [0, 3, 4].includes(index) ? 'md:col-span-2' : '']"
           >
             <template #header>
               <div class="flex items-center justify-between gap-3">
@@ -299,7 +295,8 @@ onBeforeUnmount(() => {
               :url="siteProfile.links.skills"
               :width="240"
               :height="150"
-              link-class="font-mono text-sm text-muted-foreground underline decoration-primary/30 underline-offset-4 transition hover:text-primary hover:decoration-primary"
+              class="-mx-3 -my-2"
+              link-class="inline-flex min-h-11 items-center rounded-lg px-3 py-2.5 font-mono text-sm text-muted-foreground underline decoration-primary/30 underline-offset-4 transition hover:bg-accent/60 hover:text-primary hover:decoration-primary"
             >
               skills.sh/cerrda
             </LinkPreview>
@@ -688,7 +685,7 @@ onBeforeUnmount(() => {
     </section>
 
     <footer class="border-t border-border/50 px-4 py-10 text-center text-sm text-muted-foreground">
-      © {{ new Date().getFullYear() }} {{ siteProfile.name }} · Built with Nuxt & Inspira UI
+      © {{ new Date().getFullYear() }} {{ siteProfile.name }} · Built with Nuxt
     </footer>
   </div>
 </template>

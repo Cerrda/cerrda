@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PhArrowLeft } from '@phosphor-icons/vue'
 import { getArticleMetaBySlug } from '~/utils/articles'
 
 const route = useRoute()
@@ -32,12 +33,26 @@ const juejinUrl = computed(() => `https://juejin.cn/post/${meta.value?.id}`)
     <SiteHeader />
 
     <article class="section-pad mx-auto max-w-3xl pt-32">
-      <NuxtLink to="/#articles" class="text-sm text-muted-foreground transition hover:text-primary">
-        ← 返回文章列表
-      </NuxtLink>
+      <BlurReveal :delay="0.04" :duration="0.7" :y-offset="10" blur="8px">
+        <nav aria-label="文章导航">
+          <NuxtLink
+            to="/#articles"
+            class="group inline-flex items-center gap-3 rounded-full border border-border/50 bg-card/55 py-1.5 pr-4 pl-1.5 text-sm text-muted-foreground outline-none transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-primary/40 hover:bg-primary/8 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
+            aria-label="返回文章列表"
+          >
+            <span
+              class="inline-flex size-8 items-center justify-center rounded-full border border-border/50 bg-background/70 text-foreground/80 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-x-0.5 group-hover:border-primary/45 group-hover:bg-primary/12 group-hover:text-primary motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+              aria-hidden="true"
+            >
+              <PhArrowLeft :size="16" weight="bold" />
+            </span>
+            <span class="tracking-tight">文章列表</span>
+          </NuxtLink>
+        </nav>
+      </BlurReveal>
 
       <BlurReveal>
-        <h1 class="mt-6 font-display text-3xl leading-tight md:text-5xl">
+        <h1 class="mt-8 font-display text-3xl leading-tight md:text-5xl">
           {{ meta?.title }}
         </h1>
         <p class="mt-4 text-sm text-muted-foreground">
@@ -50,12 +65,18 @@ const juejinUrl = computed(() => `https://juejin.cn/post/${meta.value?.id}`)
         </div>
       </BlurReveal>
 
-      <div v-if="html" class="prose-article mt-10 space-y-4 text-base leading-8 text-foreground/90" v-html="html" />
+      <ClientOnly v-if="html">
+        <PretextArticle class="mt-10" :html="html" />
+        <template #fallback>
+          <div class="prose-article mt-10 space-y-4 text-base leading-8 text-foreground/90" v-html="html" />
+        </template>
+      </ClientOnly>
       <p v-else class="mt-10 text-muted-foreground">
         正文暂不可用。可先阅读
-        <a class="text-primary underline-offset-4 hover:underline" :href="juejinUrl" target="_blank" rel="noreferrer"
-          >掘金原文</a
-        >。
+        <a class="text-primary underline-offset-4 hover:underline" :href="juejinUrl" target="_blank" rel="noreferrer">
+          掘金原文
+        </a>
+        。
       </p>
 
       <div class="mt-12 border-t border-border/60 pt-6 text-sm text-muted-foreground">

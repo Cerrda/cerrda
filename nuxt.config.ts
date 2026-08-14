@@ -68,6 +68,9 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ['@chenglou/pretext', '@chenglou/pretext/rich-inline'],
+    },
   },
   nitro: {
     preset: 'static',
