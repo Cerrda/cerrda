@@ -132,7 +132,6 @@ function updateSVGHeight() {
           fill="none"
           stroke="url(#tracing-beam-gradient)"
           stroke-width="1.25"
-          class="motion-reduce:hidden"
         />
         <defs>
           <linearGradient

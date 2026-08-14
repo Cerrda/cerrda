@@ -51,6 +51,7 @@ const isVisible = ref(true)
 let observer: ResizeObserver | null = null
 let visibilityObserver: IntersectionObserver | null = null
 
+const chromatic = computed(() => props.rOffset !== 0 || props.gOffset !== 0 || props.bOffset !== 0)
 const backdropValue = computed(() => (isVisible.value ? `url(#${filterId})` : 'none'))
 
 const baseStyle = computed(() => {
@@ -121,6 +122,10 @@ onMounted(() => {
       height = entry.contentRect.height
     }
 
+    width = Math.round(width)
+    height = Math.round(height)
+    if (width === dimensions.width && height === dimensions.height) return
+
     dimensions.width = width
     dimensions.height = height
   })
@@ -132,9 +137,11 @@ onMounted(() => {
       isVisible.value = entry?.isIntersecting ?? true
       if (isVisible.value && liquidGlassRoot.value) {
         const rect = liquidGlassRoot.value.getBoundingClientRect()
-        if (rect.width > 0 && rect.height > 0) {
-          dimensions.width = rect.width
-          dimensions.height = rect.height
+        const width = Math.round(rect.width)
+        const height = Math.round(rect.height)
+        if (width > 0 && height > 0 && (width !== dimensions.width || height !== dimensions.height)) {
+          dimensions.width = width
+          dimensions.height = height
         }
       }
     },
@@ -159,39 +166,54 @@ onUnmounted(() => {
       <defs>
         <filter :id="filterId" color-interpolation-filters="sRGB">
           <feImage x="0" y="0" width="100%" height="100%" :href="displacementDataUri" result="map" />
+          <template v-if="chromatic">
+            <feDisplacementMap
+              id="redchannel"
+              in="SourceGraphic"
+              in2="map"
+              :xChannelSelector="xChannel"
+              :yChannelSelector="yChannel"
+              :scale="scale + rOffset"
+              result="dispRed"
+            />
+            <feColorMatrix in="dispRed" type="matrix" values="1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" result="red" />
+            <feDisplacementMap
+              id="greenchannel"
+              in="SourceGraphic"
+              in2="map"
+              :xChannelSelector="xChannel"
+              :yChannelSelector="yChannel"
+              :scale="scale + gOffset"
+              result="dispGreen"
+            />
+            <feColorMatrix
+              in="dispGreen"
+              type="matrix"
+              values="0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0"
+              result="green"
+            />
+            <feDisplacementMap
+              id="bluechannel"
+              in="SourceGraphic"
+              in2="map"
+              :xChannelSelector="xChannel"
+              :yChannelSelector="yChannel"
+              :scale="scale + bOffset"
+              result="dispBlue"
+            />
+            <feColorMatrix in="dispBlue" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0" result="blue" />
+            <feBlend in="red" in2="green" mode="screen" result="rg" />
+            <feBlend in="rg" in2="blue" mode="screen" result="output" />
+          </template>
           <feDisplacementMap
-            id="redchannel"
+            v-else
             in="SourceGraphic"
             in2="map"
             :xChannelSelector="xChannel"
             :yChannelSelector="yChannel"
-            :scale="scale + rOffset"
-            result="dispRed"
+            :scale="scale"
           />
-          <feColorMatrix in="dispRed" type="matrix" values="1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" result="red" />
-          <feDisplacementMap
-            id="greenchannel"
-            in="SourceGraphic"
-            in2="map"
-            :xChannelSelector="xChannel"
-            :yChannelSelector="yChannel"
-            :scale="scale + gOffset"
-            result="dispGreen"
-          />
-          <feColorMatrix in="dispGreen" type="matrix" values="0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0" result="green" />
-          <feDisplacementMap
-            id="bluechannel"
-            in="SourceGraphic"
-            in2="map"
-            :xChannelSelector="xChannel"
-            :yChannelSelector="yChannel"
-            :scale="scale + bOffset"
-            result="dispBlue"
-          />
-          <feColorMatrix in="dispBlue" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0" result="blue" />
-          <feBlend in="red" in2="green" mode="screen" result="rg" />
-          <feBlend in="rg" in2="blue" mode="screen" result="output" />
-          <feGaussianBlur :stdDeviation="displace" />
+          <feGaussianBlur v-if="displace" :stdDeviation="displace" />
         </filter>
       </defs>
     </svg>

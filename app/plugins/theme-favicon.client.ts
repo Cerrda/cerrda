@@ -4,6 +4,10 @@ export default defineNuxtPlugin(() => {
   const colorMode = useColorMode()
   const { app } = useRuntimeConfig()
 
+  if (colorMode.preference === 'system') {
+    colorMode.preference = 'dark'
+  }
+
   watch(
     () => colorMode.value,
     (mode) => {

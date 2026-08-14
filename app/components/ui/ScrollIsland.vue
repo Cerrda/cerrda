@@ -65,6 +65,7 @@ onUnmounted(() => {
           <NumberFlow
             :value="scrollPercentage"
             :format="{ style: 'percent' }"
+            :respect-motion-preference="false"
             locales="en-US"
             class="text-xs text-muted-foreground"
           />

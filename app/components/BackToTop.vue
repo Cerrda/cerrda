@@ -24,7 +24,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const colorMode = useColorMode()
 const isDark = computed(() => colorMode.value === 'dark')
-const reducedMotion = ref(false)
 const scrollPercentage = ref(0)
 
 const visible = computed(() => scrollPercentage.value >= props.threshold)
@@ -59,12 +58,10 @@ function onScroll() {
 }
 
 function onActivate() {
-  const behavior: ScrollBehavior = reducedMotion.value ? 'auto' : 'smooth'
-  window.scrollTo({ top: 0, behavior })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 onMounted(() => {
-  reducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   updateScroll()
 })
 
@@ -83,10 +80,10 @@ useEventListener(window, 'scrollend', updateScroll)
       <Motion
         v-if="visible"
         as="div"
-        :initial="reducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 18, scale: 0.94 }"
+        :initial="{ opacity: 0, y: 18, scale: 0.94 }"
         :animate="{ opacity: 1, y: 0, scale: 1 }"
-        :exit="reducedMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.96 }"
-        :transition="reducedMotion ? { duration: 0.12 } : { type: 'spring', stiffness: 280, damping: 22, mass: 0.72 }"
+        :exit="{ opacity: 0, y: 12, scale: 0.96 }"
+        :transition="{ type: 'spring', stiffness: 280, damping: 22, mass: 0.72 }"
         :class="cn('pointer-events-none fixed inset-x-0 bottom-6 z-40 sm:bottom-8', props.class)"
       >
         <div class="section-pad !py-0">
@@ -136,6 +133,7 @@ useEventListener(window, 'scrollend', updateScroll)
                         <NumberFlow
                           :value="scrollPercentInt"
                           :format="{ maximumFractionDigits: 0, useGrouping: false }"
+                          :respect-motion-preference="false"
                           locales="en-US"
                           class="[--number-flow-mask-width:0em]"
                         />

@@ -88,11 +88,6 @@ export function detectGpuProfile(): GpuProfile {
   }
 }
 
-export function prefersReducedMotion() {
-  if (!import.meta.client) return false
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
-
 export function readBootSession() {
   if (!import.meta.client) return false
   try {

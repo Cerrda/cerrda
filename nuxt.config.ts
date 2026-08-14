@@ -1,5 +1,5 @@
 import tailwindcss from '@tailwindcss/vite'
-import { faviconBootScript } from './app/data/favicon'
+import { faviconBootScript, themeClassBootScript } from './app/data/favicon'
 import { withAppBase } from './app/utils/withAppBase'
 
 const baseURL = process.env.NUXT_APP_BASE_URL || '/'
@@ -31,12 +31,15 @@ export default defineNuxtConfig({
       title: 'Cerrda — Frontend & Agent Engineer',
       htmlAttrs: {
         'lang': 'zh-CN',
+        'style': 'color-scheme:dark;background-color:#1a1520',
         'data-overlayscrollbars-initialize': '',
       },
       bodyAttrs: {
+        'style': 'background-color:#1a1520',
         'data-overlayscrollbars-initialize': '',
       },
       meta: [
+        { key: 'color-scheme', name: 'color-scheme', content: 'dark', tagPriority: 'critical' },
         {
           name: 'description',
           content: '前端开发工程师 Cerrda 的个人主页：Vue/Nuxt 工程化、Agent Skill、开源工具与技术文章。',
@@ -45,23 +48,33 @@ export default defineNuxtConfig({
       ],
       script: [
         {
+          key: 'cerrda-theme-class',
+          innerHTML: themeClassBootScript(),
+          tagPosition: 'head',
+          tagPriority: 'critical',
+        },
+        {
           key: 'cerrda-favicon',
           innerHTML: faviconBootScript(baseURL),
           tagPosition: 'head',
-        },
-        {
-          key: 'cerrda-boot-gate',
-          innerHTML: '(function(){try{document.documentElement.classList.add("booting")}catch(e){}})()',
-          tagPosition: 'head',
+          tagPriority: 'critical',
         },
       ],
       link: [
-        { key: 'apple-touch-icon', rel: 'apple-touch-icon', sizes: '180x180', href: withAppBase('/apple-touch-icon.png', baseURL) },
+        {
+          key: 'apple-touch-icon',
+          rel: 'apple-touch-icon',
+          sizes: '180x180',
+          href: withAppBase('/apple-touch-icon.png', baseURL),
+        },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' },
         {
+          key: 'cerrda-fonts',
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap',
+          media: 'print',
+          onload: 'this.media="all"',
         },
         { rel: 'preload', href: withAppBase('/editorial/sheer-descent-subject.png', baseURL), as: 'image' },
       ],

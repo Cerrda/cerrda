@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useEventListener, useMediaQuery } from '@vueuse/core'
+import { useEventListener } from '@vueuse/core'
 import { PretextArticleEngine } from '~/lib/pretext/engine'
 import type { OverlaySpec } from '~/lib/pretext/types'
 
@@ -7,8 +7,6 @@ const props = defineProps<{
   html: string
 }>()
 
-const colorMode = useColorMode()
-const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 const wrapRef = ref<HTMLElement | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const ready = ref(false)
@@ -19,7 +17,7 @@ let engine: PretextArticleEngine | null = null
 let overlayObserver: ResizeObserver | undefined
 let wrapObserver: ResizeObserver | undefined
 
-const useCanvas = computed(() => !reducedMotion.value && !failed.value)
+const useCanvas = computed(() => !failed.value)
 
 async function boot() {
   const wrap = wrapRef.value

@@ -22,8 +22,7 @@ function onBrandClick(event: MouseEvent) {
   if (route.hash) {
     history.replaceState(history.state, '', route.path)
   }
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 

@@ -37,11 +37,11 @@ const juejinUrl = computed(() => `https://juejin.cn/post/${meta.value?.id}`)
         <nav aria-label="文章导航">
           <NuxtLink
             to="/#articles"
-            class="group inline-flex items-center gap-3 rounded-full border border-border/50 bg-card/55 py-1.5 pr-4 pl-1.5 text-sm text-muted-foreground outline-none transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-primary/40 hover:bg-primary/8 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
+            class="group inline-flex items-center gap-3 rounded-full border border-border/50 bg-card/55 py-1.5 pr-4 pl-1.5 text-sm text-muted-foreground outline-none transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-primary/40 hover:bg-primary/8 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-[0.98]"
             aria-label="返回文章列表"
           >
             <span
-              class="inline-flex size-8 items-center justify-center rounded-full border border-border/50 bg-background/70 text-foreground/80 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-x-0.5 group-hover:border-primary/45 group-hover:bg-primary/12 group-hover:text-primary motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+              class="inline-flex size-8 items-center justify-center rounded-full border border-border/50 bg-background/70 text-foreground/80 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-x-0.5 group-hover:border-primary/45 group-hover:bg-primary/12 group-hover:text-primary"
               aria-hidden="true"
             >
               <PhArrowLeft :size="16" weight="bold" />

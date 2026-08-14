@@ -55,6 +55,31 @@ export function applyThemeFavicon(theme: FaviconTheme, baseURL = '/') {
     document.head.appendChild(themeColor)
   }
   themeColor.setAttribute('content', assets.themeColor)
+
+  const colorScheme = document.querySelector('meta[name="color-scheme"]')
+  if (colorScheme) colorScheme.setAttribute('content', theme)
+}
+
+const darkCanvas = faviconAssets.dark.themeColor
+const lightCanvas = faviconAssets.light.themeColor
+
+/** 主 CSS 到达前先铺暗色画布，并盖住未样式化内容。 */
+export const themeBootStyle = [
+  `html{color-scheme:dark;background-color:${darkCanvas}}`,
+  `html,body,#__nuxt{background-color:${darkCanvas}}`,
+  `html.light,html.light body,html.light #__nuxt{color-scheme:light;background-color:${lightCanvas}}`,
+  `html.booting::after{content:"";position:fixed;inset:0;z-index:199;background-color:${darkCanvas};pointer-events:none}`,
+  `html.light.booting::after{background-color:${lightCanvas}}`,
+].join('')
+
+function themeFromStorageExpr(keyJson: string) {
+  return `var p=localStorage.getItem(${keyJson});if(p!=="light"&&p!=="dark"){p="dark";try{localStorage.setItem(${keyJson},"dark")}catch(e){}}var d=p!=="light";`
+}
+
+/** 阻塞脚本：立刻打上 dark/light + booting，并改 color-scheme，避免浏览器默认白底。 */
+export function themeClassBootScript() {
+  const key = JSON.stringify(faviconStorageKey)
+  return `(function(){try{var el=document.documentElement;el.classList.add("booting");${themeFromStorageExpr(key)}el.classList.remove(d?"light":"dark");el.classList.add(d?"dark":"light");el.style.colorScheme=d?"dark":"light";el.style.backgroundColor=d?"${darkCanvas}":"${lightCanvas}";var m=document.querySelector('meta[name="color-scheme"]');if(m)m.setAttribute("content",d?"dark":"light")}catch(e){try{document.documentElement.classList.add("booting","dark")}catch(e2){}}})();`
 }
 
 /** 阻塞脚本：在 hydration 前按 localStorage 摆好图标，避免浅色用户先闪暗色 tab。 */
@@ -64,5 +89,5 @@ export function faviconBootScript(baseURL = '/') {
   const dark = JSON.stringify(faviconAssets.dark)
   const light = JSON.stringify(faviconAssets.light)
 
-  return `(function(){try{var b=${base};var p=localStorage.getItem(${key});var d=p!=="light";if(p==="system")d=matchMedia("(prefers-color-scheme: dark)").matches;var a=d?${dark}:${light};document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"]').forEach(function(n){n.remove()});function add(t,s,h){var l=document.createElement("link");l.rel="icon";l.type=t;if(s)l.setAttribute("sizes",s);l.href=b+h;document.head.appendChild(l)}add("image/png","32x32",a.png32);add("image/png","16x16",a.png16);add("image/x-icon","",a.ico);var apple=document.querySelector('link[rel="apple-touch-icon"]');if(apple)apple.setAttribute("href",b+a.apple);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",a.themeColor)}catch(e){}})();`
+  return `(function(){try{var b=${base};${themeFromStorageExpr(key)}var a=d?${dark}:${light};document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"]').forEach(function(n){n.remove()});function add(t,s,h){var l=document.createElement("link");l.rel="icon";l.type=t;if(s)l.setAttribute("sizes",s);l.href=b+h;document.head.appendChild(l)}add("image/png","32x32",a.png32);add("image/png","16x16",a.png16);add("image/x-icon","",a.ico);var apple=document.querySelector('link[rel="apple-touch-icon"]');if(apple)apple.setAttribute("href",b+a.apple);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",a.themeColor)}catch(e){}})();`
 }

@@ -208,11 +208,4 @@ useEventListener(window, 'resize', scheduleMetrics)
     display: none;
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .overlay-scrollbar,
-  .overlay-scrollbar-thumb {
-    transition: none;
-  }
-}
 </style>

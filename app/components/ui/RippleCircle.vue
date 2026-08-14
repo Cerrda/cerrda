@@ -28,7 +28,15 @@ const circleStyle = computed(() => ({
 </script>
 
 <template>
-  <div :class="cn('animate-ripple-circle absolute rounded-full border shadow-xl', props.class)" :style="circleStyle" />
+  <div
+    :class="
+      cn(
+        'animate-ripple-circle absolute rounded-full border border-black/15 bg-black/[0.02] shadow-xl dark:border-white/15 dark:bg-white/[0.02]',
+        props.class,
+      )
+    "
+    :style="circleStyle"
+  />
 </template>
 
 <style scoped>
@@ -48,12 +56,6 @@ const circleStyle = computed(() => ({
 
   50% {
     transform: translate(-50%, -50%) scale(0.9);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-ripple-circle {
-    animation: none;
   }
 }
 </style>

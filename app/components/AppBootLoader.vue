@@ -2,7 +2,6 @@
 import { nextTick, onMounted, ref } from 'vue'
 import type { MultiStepLoaderStep } from '~/components/ui/MultiStepLoader.vue'
 import {
-  prefersReducedMotion,
   useAppBoot,
   waitForFlag,
   waitForSilkCompiled,
@@ -21,7 +20,7 @@ let finishing = false
 let bundle: PreloadBundle | null = null
 
 function stepDuration() {
-  return prefersReducedMotion() ? 120 : 420
+  return 420
 }
 
 function markDocumentBooted() {

@@ -1,6 +1,22 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core'
 import Ripple from '~/components/ui/Ripple.vue'
 import { cn } from '~/lib/utils'
+
+const RIPPLE_CIRCLES = 12
+const { width, height } = useWindowSize({ initialWidth: 1920, initialHeight: 1080 })
+const rippleLayout = computed(() => {
+  const w = Number.isFinite(width.value) && width.value > 0 ? width.value : 1920
+  const h = Number.isFinite(height.value) && height.value > 0 ? height.value : 1080
+  const inner = Math.min(w, h) * 0.28
+  const outer = Math.hypot(w, h) * 1.12
+  const space = (outer - inner) / (RIPPLE_CIRCLES - 1)
+  return {
+    base: inner - space,
+    space,
+    opacityStep: (0.24 - 0.025) / RIPPLE_CIRCLES,
+  }
+})
 
 export interface MultiStepLoaderStep {
   text: string
@@ -152,14 +168,16 @@ onUnmounted(() => {
     <div
       v-if="loading && steps.length > 0"
       class="fixed inset-0 z-[200] flex size-full items-center justify-center overflow-hidden bg-background"
+      style="background-color: var(--background, #1a1520)"
       data-theme-burn="loader"
     >
       <Ripple
-        fill
-        :base-circle-opacity="0.28"
-        :number-of-circles="12"
+        :base-circle-size="rippleLayout.base"
+        :base-circle-opacity="0.24"
+        :circle-opacity-downgrade-ratio="rippleLayout.opacityStep"
+        :space-between-circle="rippleLayout.space"
+        :number-of-circles="RIPPLE_CIRCLES"
         :wave-speed="90"
-        circle-class="border-primary/40 bg-primary/8"
       />
 
       <button

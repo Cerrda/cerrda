@@ -29,6 +29,14 @@ let copiedResetTimer: ReturnType<typeof setTimeout> | undefined
 const featuredArticle = computed(() => articleMeta[0])
 const archiveArticles = computed(() => articleMeta.slice(1))
 
+const contentGlass = {
+  scale: -56,
+  blur: 6,
+  gOffset: 0,
+  bOffset: 0,
+  frost: 0.76,
+}
+
 function articleIndex(n: number) {
   return String(n).padStart(2, '0')
 }
@@ -227,7 +235,15 @@ onBeforeUnmount(() => {
         <div class="mt-10 grid gap-6 lg:grid-cols-2">
           <div v-for="pkg in packages" :key="pkg.name">
             <ClientOnly>
-              <LiquidGlass class="rounded-[1.75rem]" :radius="28" :frost="0.72">
+              <LiquidGlass
+                class="rounded-[1.75rem]"
+                :radius="28"
+                :frost="contentGlass.frost"
+                :scale="contentGlass.scale"
+                :blur="contentGlass.blur"
+                :g-offset="contentGlass.gOffset"
+                :b-offset="contentGlass.bOffset"
+              >
                 <div class="rounded-[1.5rem] p-6 md:p-7">
                   <div class="flex flex-wrap items-center gap-2">
                     <span
@@ -307,8 +323,8 @@ onBeforeUnmount(() => {
           <Motion
             v-for="(skill, index) in skills"
             :key="skill.name"
-            :initial="{ opacity: 0, y: 24, filter: 'blur(8px)' }"
-            :while-in-view="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
+            :initial="{ opacity: 0, y: 24 }"
+            :while-in-view="{ opacity: 1, y: 0 }"
             :transition="{ delay: Math.min(index * 0.08, 0.2), duration: 0.7, ease: [0.32, 0.72, 0, 1] }"
             :viewport="{ once: true, amount: 0.25 }"
           >
@@ -317,7 +333,11 @@ onBeforeUnmount(() => {
                 class="h-full rounded-[1.75rem]"
                 container-class="h-full rounded-[1.75rem]"
                 :radius="28"
-                :frost="0.72"
+                :frost="contentGlass.frost"
+                :scale="contentGlass.scale"
+                :blur="contentGlass.blur"
+                :g-offset="contentGlass.gOffset"
+                :b-offset="contentGlass.bOffset"
               >
                 <article class="flex h-full flex-col p-6 md:p-7">
                   <div class="flex items-center justify-between gap-3">
@@ -405,7 +425,16 @@ onBeforeUnmount(() => {
           class="mt-12"
         >
           <ClientOnly>
-            <LiquidGlass class="rounded-[2rem]" container-class="rounded-[2rem]" :radius="32" :frost="0.7">
+            <LiquidGlass
+              class="rounded-[2rem]"
+              container-class="rounded-[2rem]"
+              :radius="32"
+              :frost="contentGlass.frost"
+              :scale="contentGlass.scale"
+              :blur="contentGlass.blur"
+              :g-offset="contentGlass.gOffset"
+              :b-offset="contentGlass.bOffset"
+            >
               <NuxtLink
                 :to="`/articles/${featuredArticle.slug}`"
                 class="group relative block overflow-hidden p-6 md:p-9 lg:p-10"
@@ -569,7 +598,16 @@ onBeforeUnmount(() => {
         </BlurReveal>
 
         <ClientOnly>
-          <LiquidGlass class="h-full" container-class="mt-10 rounded-[2rem]" :radius="32" :frost="0.72">
+          <LiquidGlass
+            class="h-full"
+            container-class="mt-10 rounded-[2rem]"
+            :radius="32"
+            :frost="contentGlass.frost"
+            :scale="contentGlass.scale"
+            :blur="contentGlass.blur"
+            :g-offset="contentGlass.gOffset"
+            :b-offset="contentGlass.bOffset"
+          >
             <div
               class="relative flex h-full min-h-[16rem] flex-col justify-center overflow-hidden p-8 md:min-h-[18rem] md:p-10"
             >

@@ -65,11 +65,4 @@ const loopItems = computed(() => [...props.items, ...props.items])
     transform: translateX(-50%);
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .infinite-track {
-    animation: none;
-    will-change: auto;
-  }
-}
 </style>

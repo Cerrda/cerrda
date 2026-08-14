@@ -68,10 +68,4 @@ const buttonRef = ref<HTMLButtonElement>()
 .group:hover .ihb-dot {
   scale: 100.8;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .ihb-dot {
-    transition: none;
-  }
-}
 </style>

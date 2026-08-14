@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "nxui": {
-      "type": "http",
-      "url": "https://nxui.geoql.in/mcp"
-    }
-  }
-}

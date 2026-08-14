@@ -64,7 +64,12 @@ function toggle() {
   const direction: 'expand' | 'collapse' = next === 'light' ? 'expand' : 'collapse'
 
   const applyTheme = () => {
-    document.documentElement.classList.toggle('dark', next === 'dark')
+    const root = document.documentElement
+    root.classList.toggle('dark', next === 'dark')
+    root.classList.toggle('light', next === 'light')
+    root.style.colorScheme = next
+    root.style.backgroundColor = next === 'dark' ? '#1a1520' : '#f7dce6'
+    document.body.style.backgroundColor = next === 'dark' ? '#1a1520' : '#f7dce6'
     colorMode.preference = next
     applyThemeFavicon(next, app.baseURL)
     try {
@@ -72,11 +77,6 @@ function toggle() {
     } catch {
       // private mode
     }
-  }
-
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    applyTheme()
-    return
   }
 
   if (typeof document.startViewTransition !== 'function') {

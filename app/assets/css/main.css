@@ -3,7 +3,50 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
+/* 统一播放动画，不跟随系统 prefers-reduced-motion */
+@custom-variant motion-reduce {
+  &:is(.never-match-reduced-motion *) {
+    @slot;
+  }
+}
+
+/* 默认暗色：主 CSS 或 .dark class 尚未就绪时也不要先画出浅色画布 */
+:root,
+html.dark {
+  --radius: 0.9rem;
+  --background: oklch(0.14 0.015 280);
+  --foreground: oklch(0.97 0.01 350);
+  --card: oklch(0.18 0.02 280);
+  --card-foreground: oklch(0.97 0.01 350);
+  --popover: oklch(0.18 0.02 280);
+  --popover-foreground: oklch(0.97 0.01 350);
+  --primary: oklch(0.82 0.1 350);
+  --primary-foreground: oklch(0.18 0.02 280);
+  --secondary: oklch(0.24 0.02 280);
+  --secondary-foreground: oklch(0.95 0.01 350);
+  --muted: oklch(0.24 0.02 280);
+  --muted-foreground: oklch(0.72 0.02 280);
+  --accent: oklch(0.28 0.04 350);
+  --accent-foreground: oklch(0.96 0.02 350);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.28 0.02 280);
+  --input: oklch(0.28 0.02 280);
+  --ring: oklch(0.7 0.1 350);
+  --surface-glow: oklch(0.45 0.1 350 / 0.25);
+  --hero-tint: oklch(0.4 0.08 350 / 0.3);
+  --bloom-warm: oklch(0.45 0.1 350 / 0.22);
+  --panel-deep: oklch(0.16 0.03 350);
+  --shadow-bloom: oklch(0 0 0 / 0.35);
+}
+
+html {
+  color-scheme: dark;
+  background-color: var(--background);
+}
+
+html.light {
+  color-scheme: light;
   --radius: 0.9rem;
   /* 浅色：花瓣粉（色相 8），避开发浊的洋红灰 */
   --background: oklch(0.952 0.056 8);
@@ -30,33 +73,6 @@
   --bloom-warm: oklch(0.92 0.06 12 / 0.3);
   --panel-deep: oklch(0.32 0.06 350);
   --shadow-bloom: oklch(0.62 0.08 8 / 0.12);
-}
-
-.dark {
-  --background: oklch(0.14 0.015 280);
-  --foreground: oklch(0.97 0.01 350);
-  --card: oklch(0.18 0.02 280);
-  --card-foreground: oklch(0.97 0.01 350);
-  --popover: oklch(0.18 0.02 280);
-  --popover-foreground: oklch(0.97 0.01 350);
-  --primary: oklch(0.82 0.1 350);
-  --primary-foreground: oklch(0.18 0.02 280);
-  --secondary: oklch(0.24 0.02 280);
-  --secondary-foreground: oklch(0.95 0.01 350);
-  --muted: oklch(0.24 0.02 280);
-  --muted-foreground: oklch(0.72 0.02 280);
-  --accent: oklch(0.28 0.04 350);
-  --accent-foreground: oklch(0.96 0.02 350);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.28 0.02 280);
-  --input: oklch(0.28 0.02 280);
-  --ring: oklch(0.7 0.1 350);
-  --surface-glow: oklch(0.45 0.1 350 / 0.25);
-  --hero-tint: oklch(0.4 0.08 350 / 0.3);
-  --bloom-warm: oklch(0.45 0.1 350 / 0.22);
-  --panel-deep: oklch(0.16 0.03 350);
-  --shadow-bloom: oklch(0 0 0 / 0.35);
 }
 
 @theme inline {
@@ -96,8 +112,13 @@
 
   html {
     scroll-behavior: smooth;
-    color-scheme: light;
+    color-scheme: dark;
+    background-color: var(--background);
     scrollbar-width: none;
+  }
+
+  html.light {
+    color-scheme: light;
   }
 
   html::-webkit-scrollbar,

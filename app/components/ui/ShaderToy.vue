@@ -220,7 +220,7 @@ watch(shouldPlay, updatePlayback)
     ref="containerRef"
     :class="
       cn(
-        'relative isolate block h-full w-full overflow-hidden [&>canvas]:block [&>canvas]:h-full [&>canvas]:w-full [&>canvas]:max-w-full',
+        'relative isolate block h-full w-full overflow-hidden bg-[#1a1520] [&>canvas]:block [&>canvas]:h-full [&>canvas]:w-full [&>canvas]:max-w-full',
         props.interactive ? '[&>canvas]:cursor-pointer' : 'pointer-events-none',
         props.class,
       )
