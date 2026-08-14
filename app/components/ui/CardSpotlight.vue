@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
 import { cn } from '~/lib/utils'
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -21,57 +21,67 @@ const props = withDefaults(
 )
 
 const colorMode = useColorMode()
-const mouseX = ref(-props.gradientSize * 10)
-const mouseY = ref(-props.gradientSize * 10)
 
 const resolvedGradientColor = computed(() => {
   if (props.gradientColor) return props.gradientColor
   return colorMode.value === 'dark' ? 'oklch(0.72 0.12 350 / 0.45)' : 'oklch(0.82 0.1 350 / 0.28)'
 })
 
-function handleMouseMove(e: MouseEvent) {
-  const target = e.currentTarget as HTMLElement
-  const rect = target.getBoundingClientRect()
-  mouseX.value = e.clientX - rect.left
-  mouseY.value = e.clientY - rect.top
+const rootStyle = computed(() => ({
+  '--spot-color': resolvedGradientColor.value,
+  '--spot-size': `${props.gradientSize}px`,
+  '--spot-opacity': String(props.gradientOpacity),
+}))
+
+function handlePointerMove(e: PointerEvent) {
+  const el = e.currentTarget as HTMLElement
+  const rect = el.getBoundingClientRect()
+  el.style.setProperty('--spot-x', `${e.clientX - rect.left}px`)
+  el.style.setProperty('--spot-y', `${e.clientY - rect.top}px`)
 }
 
-function handleMouseLeave() {
-  mouseX.value = -props.gradientSize * 10
-  mouseY.value = -props.gradientSize * 10
+function handlePointerLeave(e: PointerEvent) {
+  const el = e.currentTarget as HTMLElement
+  el.style.setProperty('--spot-x', `-${props.gradientSize * 10}px`)
+  el.style.setProperty('--spot-y', `-${props.gradientSize * 10}px`)
 }
-
-onMounted(() => {
-  mouseX.value = -props.gradientSize * 10
-  mouseY.value = -props.gradientSize * 10
-})
-
-const backgroundStyle = computed(
-  () =>
-    `radial-gradient(circle ${props.gradientSize}px at ${mouseX.value}px ${mouseY.value}px, ${resolvedGradientColor.value} 0%, transparent 70%)`,
-)
 </script>
 
 <template>
   <div
     :class="
       cn(
-        'group relative flex size-full overflow-hidden rounded-[1.5rem] border border-border/55 bg-card/55 text-foreground backdrop-blur-sm dark:bg-card/45',
+        'group relative flex w-full overflow-hidden rounded-[1.5rem] border border-border/60 bg-card/70 text-card-foreground shadow-[0_10px_28px_-16px_var(--shadow-bloom)] dark:border-white/15 dark:bg-card/60 dark:shadow-none',
         props.class,
       )
     "
-    @mousemove="handleMouseMove"
-    @mouseleave="handleMouseLeave"
+    :style="rootStyle"
+    @pointermove="handlePointerMove"
+    @pointerleave="handlePointerLeave"
   >
-    <div
-      class="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-      :style="{
-        background: backgroundStyle,
-        opacity: gradientOpacity,
-      }"
-    />
-    <div :class="cn('relative z-10 size-full', props.slotClass)">
+    <div class="card-spotlight-glow" />
+    <div :class="cn('relative z-10 w-full', props.slotClass)">
       <slot />
     </div>
   </div>
 </template>
+
+<style scoped>
+.card-spotlight-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  background: radial-gradient(
+    circle var(--spot-size) at var(--spot-x, -999px) var(--spot-y, -999px),
+    var(--spot-color) 0%,
+    transparent 70%
+  );
+  transition: opacity 0.5s ease;
+}
+
+.group:hover .card-spotlight-glow {
+  opacity: var(--spot-opacity, 0.55);
+}
+</style>

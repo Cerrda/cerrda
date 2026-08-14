@@ -36,6 +36,7 @@ interface Props {
   imageFit?: 'contain' | 'cover'
   coverFocusX?: number
   coverFocusY?: number
+  accentPaletteLight?: string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -53,6 +54,7 @@ const props = withDefaults(defineProps<Props>(), {
   responsiveWidth: false,
 })
 
+const colorMode = useColorMode()
 const { particlesReady } = useAppBoot()
 const wrapperRef = useTemplateRef<HTMLElement>('wrapperRef')
 const imageParticleRef = useTemplateRef<HTMLImageElement>('imageParticleRef')
@@ -60,6 +62,25 @@ const imageParticleRef = useTemplateRef<HTMLImageElement>('imageParticleRef')
 let particles: ImageParticle | undefined
 let started = false
 let sizeFrame = 0
+let offscreen = false
+let themeObserver: MutationObserver | undefined
+let viewObserver: IntersectionObserver | undefined
+
+function currentTheme(): 'dark' | 'light' {
+  if (import.meta.client && document.documentElement.classList.contains('dark')) return 'dark'
+  if (colorMode.value === 'dark') return 'dark'
+  return 'light'
+}
+
+function applyParticleTheme() {
+  particles?.setTheme(currentTheme())
+}
+
+function syncPlayback() {
+  if (!particles) return
+  if (offscreen) particles.pauseLoop()
+  else particles.resumeLoop()
+}
 
 function measure() {
   const node = wrapperRef.value
@@ -113,7 +134,11 @@ function start() {
     imageFit: props.imageFit,
     coverFocusX: props.coverFocusX,
     coverFocusY: props.coverFocusY,
+    theme: currentTheme(),
+    accentPaletteLight: props.accentPaletteLight,
   })
+  applyParticleTheme()
+  syncPlayback()
   requestAnimationFrame(() => {
     particlesReady.value = true
   })
@@ -121,9 +146,28 @@ function start() {
 
 onMounted(() => {
   start()
+  themeObserver = new MutationObserver(applyParticleTheme)
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+
+  if (wrapperRef.value) {
+    viewObserver = new IntersectionObserver(
+      ([entry]) => {
+        offscreen = !(entry?.isIntersecting ?? true)
+        syncPlayback()
+      },
+      { rootMargin: '120px', threshold: 0 },
+    )
+    viewObserver.observe(wrapperRef.value)
+  }
 })
 
+watch(() => colorMode.value, applyParticleTheme)
+
 onBeforeUnmount(() => {
+  themeObserver?.disconnect()
+  themeObserver = undefined
+  viewObserver?.disconnect()
+  viewObserver = undefined
   cancelAnimationFrame(sizeFrame)
   particles?.stop({ fadePosition: 'none' })
   particles = undefined
@@ -132,8 +176,16 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="wrapperRef" :class="cn('relative size-full overflow-hidden', props.class)">
-    <img ref="imageParticleRef" :src="imageSrc" :alt="alt" class="hidden" decoding="async" draggable="false" />
+  <div ref="wrapperRef" :class="cn('relative size-full overflow-visible', props.class)">
+    <img
+      ref="imageParticleRef"
+      :src="imageSrc"
+      :alt="alt"
+      class="pointer-events-none absolute size-0 overflow-hidden opacity-0"
+      decoding="async"
+      draggable="false"
+      aria-hidden="true"
+    />
   </div>
 </template>
 
@@ -142,5 +194,9 @@ onBeforeUnmount(() => {
   display: block !important;
   width: 100%;
   height: 100%;
+  border: 0 !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 </style>

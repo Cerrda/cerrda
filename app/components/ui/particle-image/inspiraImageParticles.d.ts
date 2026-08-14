@@ -28,6 +28,8 @@ interface InspiraImageParticleOptions {
   imageFit?: 'contain' | 'cover'
   coverFocusX?: number
   coverFocusY?: number
+  theme?: 'dark' | 'light'
+  accentPaletteLight?: string[]
   layerCount?: number
   depth?: number
   rotationDuration?: number
@@ -140,6 +142,9 @@ export declare class InspiraImageParticle implements InspiraImageParticleProps, 
 
   start(options?: Partial<InspiraImageParticleOptions>): void
   stop(options?: Partial<InspiraImageParticleOptions>): void
+  pauseLoop(): void
+  resumeLoop(): void
+  setTheme(theme: 'dark' | 'light'): void
 
   // Private Methods
   private _animate(): void

@@ -383,7 +383,7 @@ onBeforeUnmount(() => {
     <!-- Articles -->
     <section id="articles" class="section-pad">
       <div class="mx-auto max-w-6xl">
-        <BlurReveal>
+        <BlurReveal :blur="'0px'" :y-offset="16">
           <div class="flex flex-wrap items-end justify-between gap-6">
             <div>
               <p class="eyebrow w-fit">Writing</p>
@@ -401,8 +401,8 @@ onBeforeUnmount(() => {
         <!-- Featured -->
         <Motion
           v-if="featuredArticle"
-          :initial="{ opacity: 0, y: 28, filter: 'blur(10px)' }"
-          :while-in-view="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
+          :initial="{ opacity: 0, y: 28 }"
+          :while-in-view="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.85, ease: [0.32, 0.72, 0, 1] }"
           :viewport="{ once: true, amount: 0.25 }"
           class="mt-12"
@@ -413,14 +413,8 @@ onBeforeUnmount(() => {
                 :to="`/articles/${featuredArticle.slug}`"
                 class="group relative block overflow-hidden p-6 md:p-9 lg:p-10"
               >
-                <div
-                  class="pointer-events-none absolute -right-10 -top-16 size-56 rounded-full bg-primary/20 blur-3xl transition duration-700 group-hover:bg-primary/30"
-                  aria-hidden="true"
-                />
-                <div
-                  class="pointer-events-none absolute -bottom-20 left-1/4 size-64 rounded-full bg-accent/50 blur-3xl dark:bg-primary/15"
-                  aria-hidden="true"
-                />
+                <div class="article-orb article-orb-tr" aria-hidden="true" />
+                <div class="article-orb article-orb-bl" aria-hidden="true" />
 
                 <div class="relative grid gap-8 lg:grid-cols-[auto_1fr_auto] lg:items-end">
                   <span
@@ -484,18 +478,18 @@ onBeforeUnmount(() => {
           <Motion
             v-for="(article, index) in archiveArticles"
             :key="article.id"
-            :initial="{ opacity: 0, y: 20, filter: 'blur(8px)' }"
-            :while-in-view="{ opacity: 1, y: 0, filter: 'blur(0px)' }"
+            :initial="{ y: 16 }"
+            :while-in-view="{ y: 0 }"
             :transition="{ delay: Math.min(index * 0.04, 0.32), duration: 0.65, ease: [0.32, 0.72, 0, 1] }"
-            :viewport="{ once: true, amount: 0.2 }"
+            :viewport="{ once: true, amount: 0.15 }"
           >
-            <CardSpotlight class="transition duration-500 hover:border-primary/35" :gradient-size="320">
+            <CardSpotlight class="transition duration-500 hover:border-primary/30" :gradient-size="320">
               <NuxtLink
                 :to="`/articles/${article.slug}`"
                 class="flex flex-col gap-4 p-5 md:flex-row md:items-center md:gap-6 md:p-6"
               >
                 <span
-                  class="font-display text-3xl leading-none text-primary/25 transition duration-500 group-hover:text-primary/50 md:w-14 md:shrink-0 md:text-4xl"
+                  class="font-display text-3xl leading-none text-primary/45 transition duration-500 group-hover:text-primary/70 md:w-14 md:shrink-0 md:text-4xl"
                 >
                   {{ articleIndex(index + 2) }}
                 </span>
@@ -505,7 +499,7 @@ onBeforeUnmount(() => {
                     <span
                       v-for="tag in article.tags"
                       :key="tag"
-                      class="rounded-full bg-secondary/80 px-2.5 py-1 text-[11px] text-muted-foreground"
+                      class="rounded-full bg-primary/12 px-2.5 py-1 text-[11px] text-foreground/75"
                     >
                       {{ tag }}
                     </span>

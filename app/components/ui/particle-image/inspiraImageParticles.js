@@ -37,8 +37,21 @@ export const inspiraImageParticles = () => {
       }
       this.state = 'stopped'
       this.touches = []
+      this._frozen = false
       this.on('imageLoaded', this._onImageLoaded)
       this._initImage(options)
+    }
+
+    pauseLoop() {
+      this._frozen = true
+    }
+
+    resumeLoop() {
+      if (!this._frozen) return
+      this._frozen = false
+      if (this.state === 'running') {
+        this._animate()
+      }
     }
 
     on(event, fn) {
@@ -132,14 +145,68 @@ export const inspiraImageParticles = () => {
       }
     }
 
-    _animate() {
-      if (this.state !== 'stopped') {
-        this._calculate()
-        this._draw()
-        _requestAnimationFrame(() => this._animate())
-      } else {
-        this.emit('stopped')
+    setTheme(theme) {
+      const next = theme === 'light' ? 'light' : 'dark'
+      if (this.theme === next && this._themeApplied) return
+      this.theme = next
+      this._themeApplied = true
+      if (!this.origins) return
+      for (index = 0; index < this.origins.length; index++) {
+        this._tintOrigin(this.origins[index])
       }
+    }
+
+    _tintOrigin(origin) {
+      if (!origin || !origin.baseColor) return
+      const r = origin.baseColor[0]
+      const g = origin.baseColor[1]
+      const b = origin.baseColor[2]
+      const a = origin.baseColor[3]
+      const luma = (r + g + b) / 765
+      let cr
+      let cg
+      let cb
+      if (this.theme === 'light') {
+        // Map the B&W figure into ink / dusty-rose so it reads on the petal background.
+        cr = Math.round(48 + (176 - 48) * luma)
+        cg = Math.round(32 + (112 - 32) * luma)
+        cb = Math.round(38 + (122 - 38) * luma)
+      } else {
+        cr = r
+        cg = g
+        cb = b
+      }
+      const palette = this.theme === 'light' ? this.accentPaletteLight : this.accentPalette
+      if (origin.accentT > 0 && palette && palette.length) {
+        const pink = palette[origin.accentIndex % palette.length]
+        const mix = this.theme === 'light' ? Math.min(0.42, origin.accentT * 1.65) : origin.accentT
+        cr = Math.round(cr * (1 - mix) + pink[0] * mix)
+        cg = Math.round(cg * (1 - mix) + pink[1] * mix)
+        cb = Math.round(cb * (1 - mix) + pink[2] * mix)
+      }
+      origin.color[0] = cr
+      origin.color[1] = cg
+      origin.color[2] = cb
+      origin.color[3] = a
+      if (origin.vertexColors) {
+        origin.vertexColors[0] = cr / 255
+        origin.vertexColors[1] = cg / 255
+        origin.vertexColors[2] = cb / 255
+        origin.vertexColors[3] = a / 255
+      }
+    }
+
+    _animate() {
+      if (this.state === 'stopped') {
+        this.emit('stopped')
+        return
+      }
+      if (this._frozen) {
+        return
+      }
+      this._calculate()
+      this._draw()
+      _requestAnimationFrame(() => this._animate())
     }
 
     get _mouseHandler() {
@@ -431,6 +498,18 @@ export const inspiraImageParticles = () => {
       this.imageFit = options.imageFit === 'cover' ? 'cover' : 'contain'
       this.coverFocusX = options.coverFocusX != null ? options.coverFocusX * 1 : 0.5
       this.coverFocusY = options.coverFocusY != null ? options.coverFocusY * 1 : 0.5
+      this.theme = options.theme === 'light' ? 'light' : 'dark'
+      this.accentPaletteLight = []
+      if (Array.isArray(options.accentPaletteLight)) {
+        this.accentPaletteLight = options.accentPaletteLight
+          .map((item) => (typeof item === 'string' ? this._parseColor(item) : item))
+          .filter((item) => Array.isArray(item) && item.length >= 3)
+      }
+      if (!this.accentPaletteLight.length) {
+        this.accentPaletteLight = ['#b44868', '#c45d78', '#a83d5c']
+          .map((item) => this._parseColor(item))
+          .filter((item) => Array.isArray(item) && item.length >= 3)
+      }
       this.layerCount = options.layerCount * 1 || 1
       this.depth = options.depth * 1 || 1
       this.rotationDuration = options.rotationDuration * 1 || 0
@@ -504,17 +583,10 @@ export const inspiraImageParticles = () => {
         particle.x += particle.vx
         particle.y += particle.vy
         particle.z += particle.vz
-        if (0 > particle.x || particle.x >= this.width || 0 > particle.y || particle.y >= this.height) {
-          particle.isHidden = true
-          if (this.state === 'stopping') {
-            particle.isDead = true
-          }
-        } else {
-          if (this.state === 'stopping' && !particle.isDead) {
-            renderCount++
-          }
-          particle.isHidden = false
+        if (this.state === 'stopping' && !particle.isDead) {
+          renderCount++
         }
+        particle.isHidden = false
         if (this.vertices) {
           x = particle.x - this.width / 2
           y = particle.y - this.height / 2
@@ -873,7 +945,7 @@ export const inspiraImageParticles = () => {
         for (y = 0; y < this.renderHeight; y += this.particleGap) {
           index = (x + y * this.renderWidth) * 4
           a = data[index + 3]
-          if (a > 0) {
+          if (a > 24) {
             r = data[index]
             g = data[index + 1]
             b = data[index + 2]
@@ -895,20 +967,15 @@ export const inspiraImageParticles = () => {
               if (Math.random() > keep) continue
             }
 
-            let cr = r
-            let cg = g
-            let cb = b
+            let accentT = 0
+            let accentIndex = 0
             if (this.accentChance > 0 && this.accentPalette.length) {
               const luma = (r + g + b) / 765
-              const ny = y / this.renderHeight
-              const inSky = ny < 0.46 && luma > 0.4
-              const chance = inSky ? this.accentChance * (0.35 + 0.65 * luma) : 0
+              const highlight = luma > 0.42
+              const chance = highlight ? this.accentChance * (0.4 + 0.6 * luma) : 0
               if (Math.random() < chance) {
-                const pink = this.accentPalette[Math.floor(Math.random() * this.accentPalette.length)]
-                const mix = 0.14 + Math.random() * 0.12
-                cr = Math.round(r * (1 - mix) + pink[0] * mix)
-                cg = Math.round(g * (1 - mix) + pink[1] * mix)
-                cb = Math.round(b * (1 - mix) + pink[2] * mix)
+                accentT = 0.14 + Math.random() * 0.12
+                accentIndex = Math.floor(Math.random() * 64)
               }
             }
 
@@ -930,15 +997,20 @@ export const inspiraImageParticles = () => {
               }
             } else {
               for (layerIndex = 0; layerIndex < this.layerCount; layerIndex++) {
-                this.origins.push({
+                const origin = {
                   x: ox,
                   y: oy,
                   z: layerIndex * this.layerDistance + 50,
-                  color: [cr, cg, cb, a],
+                  baseColor: [r, g, b, a],
+                  color: [r, g, b, a],
+                  accentT,
+                  accentIndex,
                   tick,
                   seed,
-                  vertexColors: [cr / 255, cg / 255, cb / 255, a / 255],
-                })
+                  vertexColors: [r / 255, g / 255, b / 255, a / 255],
+                }
+                this._tintOrigin(origin)
+                this.origins.push(origin)
               }
             }
           }

@@ -50,8 +50,7 @@ export default defineNuxtConfig({
         },
         {
           key: 'cerrda-boot-gate',
-          innerHTML:
-            '(function(){try{document.documentElement.classList.add("booting")}catch(e){}})()',
+          innerHTML: '(function(){try{document.documentElement.classList.add("booting")}catch(e){}})()',
           tagPosition: 'head',
         },
       ],
@@ -64,7 +63,6 @@ export default defineNuxtConfig({
           href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap',
         },
         { rel: 'preload', href: '/editorial/sheer-descent-subject.png', as: 'image' },
-        { rel: 'preload', href: '/hero/shoreline.png', as: 'image' },
       ],
     },
   },

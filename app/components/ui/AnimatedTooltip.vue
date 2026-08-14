@@ -86,18 +86,18 @@ onBeforeUnmount(() => {
           translateY: '-100%',
           rotate: `${rotation}deg`,
         }"
-        class="pointer-events-none fixed z-[10050] flex flex-col items-center justify-center rounded-md bg-black px-4 py-2 text-xs whitespace-nowrap shadow-xl"
+        class="pointer-events-none fixed z-[10050] flex flex-col items-center justify-center rounded-md border border-border bg-popover px-4 py-2 text-xs whitespace-nowrap text-popover-foreground shadow-[0_12px_32px_var(--shadow-bloom)]"
       >
         <div
-          class="absolute right-1/2 -bottom-px z-30 me-1 h-px w-2/5 translate-x-1/2 bg-linear-to-r from-transparent via-emerald-500 to-transparent"
+          class="absolute right-1/2 -bottom-px z-30 me-1 h-px w-2/5 translate-x-1/2 bg-linear-to-r from-transparent via-primary to-transparent"
         />
         <div
-          class="absolute -bottom-px left-1/2 z-30 ms-1 h-px w-2/5 -translate-x-1/2 bg-linear-to-r from-transparent via-sky-500 to-transparent"
+          class="absolute -bottom-px left-1/2 z-30 ms-1 h-px w-2/5 -translate-x-1/2 bg-linear-to-r from-transparent via-ring to-transparent"
         />
-        <div class="relative z-30 text-sm font-bold text-white">
+        <div class="relative z-30 text-sm font-bold text-popover-foreground">
           {{ title }}
         </div>
-        <div v-if="subtitle" class="relative z-30 max-w-[16rem] truncate text-xs text-white/80">
+        <div v-if="subtitle" class="relative z-30 max-w-[16rem] truncate text-xs text-muted-foreground">
           {{ subtitle }}
         </div>
       </Motion>

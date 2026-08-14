@@ -6,9 +6,9 @@ const isDark = computed(() => colorMode.value === 'dark')
 <template>
   <AppBootLoader />
   <SilkBackground
-    class="opacity-[0.32] dark:opacity-55"
-    :hue="isDark ? 310 : 350"
-    :saturation="isDark ? 0.45 : 0.38"
+    class="opacity-[0.36] dark:opacity-55"
+    :hue="isDark ? 310 : 8"
+    :saturation="isDark ? 0.45 : 0.4"
     :brightness="isDark ? 0.85 : 1.05"
     :speed="0.55"
   />

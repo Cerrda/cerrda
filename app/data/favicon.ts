@@ -13,7 +13,7 @@ export const faviconAssets = {
     png32: '/favicon-light-32x32.png',
     ico: '/favicon-light.ico',
     apple: '/apple-touch-icon-light.png',
-    themeColor: '#fae8ef',
+    themeColor: '#f7dce6',
   },
 } as const
 

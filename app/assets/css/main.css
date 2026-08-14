@@ -5,31 +5,31 @@
 
 :root {
   --radius: 0.9rem;
-  /* 浅色：高明度樱花粉。粉要看见，但不能脏 */
-  --background: oklch(0.962 0.042 355);
-  --foreground: oklch(0.3 0.04 350);
-  --card: oklch(0.992 0.014 355);
-  --card-foreground: oklch(0.3 0.04 350);
-  --popover: oklch(0.995 0.01 355);
-  --popover-foreground: oklch(0.3 0.04 350);
-  --primary: oklch(0.6 0.2 350);
-  --primary-foreground: oklch(0.995 0.008 355);
-  --secondary: oklch(0.945 0.038 355);
-  --secondary-foreground: oklch(0.34 0.05 350);
-  --muted: oklch(0.95 0.032 355);
-  --muted-foreground: oklch(0.5 0.04 350);
-  --accent: oklch(0.935 0.048 350);
-  --accent-foreground: oklch(0.32 0.06 350);
+  /* 浅色：花瓣粉（色相 8），避开发浊的洋红灰 */
+  --background: oklch(0.952 0.056 8);
+  --foreground: oklch(0.3 0.04 8);
+  --card: oklch(0.988 0.02 8);
+  --card-foreground: oklch(0.3 0.04 8);
+  --popover: oklch(0.992 0.014 8);
+  --popover-foreground: oklch(0.3 0.04 8);
+  --primary: oklch(0.58 0.2 350);
+  --primary-foreground: oklch(0.995 0.008 8);
+  --secondary: oklch(0.94 0.04 8);
+  --secondary-foreground: oklch(0.34 0.05 8);
+  --muted: oklch(0.945 0.036 8);
+  --muted-foreground: oklch(0.48 0.04 8);
+  --accent: oklch(0.93 0.048 8);
+  --accent-foreground: oklch(0.32 0.055 8);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.9 0.038 355);
-  --input: oklch(0.9 0.038 355);
-  --ring: oklch(0.68 0.14 350);
-  --surface-glow: oklch(0.9 0.08 350 / 0.38);
-  --hero-tint: oklch(0.88 0.1 350 / 0.4);
-  --bloom-warm: oklch(0.93 0.06 350 / 0.28);
+  --border: oklch(0.9 0.04 8);
+  --input: oklch(0.9 0.04 8);
+  --ring: oklch(0.66 0.15 350);
+  --surface-glow: oklch(0.9 0.08 8 / 0.36);
+  --hero-tint: oklch(0.88 0.1 8 / 0.4);
+  --bloom-warm: oklch(0.92 0.06 12 / 0.3);
   --panel-deep: oklch(0.32 0.06 350);
-  --shadow-bloom: oklch(0.62 0.08 350 / 0.12);
+  --shadow-bloom: oklch(0.62 0.08 8 / 0.12);
 }
 
 .dark {
@@ -238,13 +238,44 @@ html[data-theme-vt] .overlay-scrollbar {
   }
 
   .hero-particle-field {
-    -webkit-mask-image:
-      radial-gradient(ellipse 72% 86% at 58% 50%, #000 30%, transparent 76%),
-      linear-gradient(90deg, transparent 0%, #000 16%, #000 90%, transparent 100%);
-    mask-image:
-      radial-gradient(ellipse 72% 86% at 58% 50%, #000 30%, transparent 76%),
-      linear-gradient(90deg, transparent 0%, #000 16%, #000 90%, transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-composite: intersect;
+    overflow: visible;
+  }
+
+  .hero-particle-field canvas,
+  .hero-particle-field img {
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .article-orb {
+    pointer-events: none;
+    position: absolute;
+    border-radius: 9999px;
+  }
+
+  .article-orb-tr {
+    top: -4rem;
+    right: -2.5rem;
+    width: 14rem;
+    height: 14rem;
+    background: radial-gradient(circle, color-mix(in oklch, var(--primary) 22%, transparent) 0%, transparent 72%);
+    transition: opacity 0.7s ease;
+  }
+
+  .group:hover .article-orb-tr {
+    opacity: 0.92;
+  }
+
+  .article-orb-bl {
+    bottom: -5rem;
+    left: 25%;
+    width: 16rem;
+    height: 16rem;
+    background: radial-gradient(circle, color-mix(in oklch, var(--accent) 55%, transparent) 0%, transparent 70%);
+  }
+
+  html.dark .article-orb-bl {
+    background: radial-gradient(circle, color-mix(in oklch, var(--primary) 16%, transparent) 0%, transparent 70%);
   }
 }

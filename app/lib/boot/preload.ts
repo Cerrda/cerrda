@@ -64,10 +64,8 @@ export async function warmupLightSpeed(_profile: GpuProfile) {
 export async function preloadImages() {
   const sources = [
     brandEditorial.src,
-    '/hero/shoreline.png',
     '/editorial/sheer-descent.png',
     '/editorial/sheer-descent-abstract.png',
-    '/editorial/sheer-descent-subject.png',
     '/favicon.png',
     '/favicon-light-32x32.png',
     '/apple-touch-icon.png',
