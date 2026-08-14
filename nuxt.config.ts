@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite'
 import { faviconBootScript } from './app/data/favicon'
+import { withAppBase } from './app/utils/withAppBase'
 
 const baseURL = process.env.NUXT_APP_BASE_URL || '/'
 
@@ -55,14 +56,14 @@ export default defineNuxtConfig({
         },
       ],
       link: [
-        { key: 'apple-touch-icon', rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+        { key: 'apple-touch-icon', rel: 'apple-touch-icon', sizes: '180x180', href: withAppBase('/apple-touch-icon.png', baseURL) },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' },
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap',
         },
-        { rel: 'preload', href: '/editorial/sheer-descent-subject.png', as: 'image' },
+        { rel: 'preload', href: withAppBase('/editorial/sheer-descent-subject.png', baseURL), as: 'image' },
       ],
     },
   },

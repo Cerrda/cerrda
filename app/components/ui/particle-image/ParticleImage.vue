@@ -58,6 +58,7 @@ const colorMode = useColorMode()
 const { particlesReady } = useAppBoot()
 const wrapperRef = useTemplateRef<HTMLElement>('wrapperRef')
 const imageParticleRef = useTemplateRef<HTMLImageElement>('imageParticleRef')
+const resolvedSrc = useAppAsset(() => props.imageSrc)
 
 let particles: ImageParticle | undefined
 let started = false
@@ -179,7 +180,7 @@ onBeforeUnmount(() => {
   <div ref="wrapperRef" :class="cn('relative size-full overflow-visible', props.class)">
     <img
       ref="imageParticleRef"
-      :src="imageSrc"
+      :src="resolvedSrc"
       :alt="alt"
       class="pointer-events-none absolute size-0 overflow-hidden opacity-0"
       decoding="async"

@@ -9,7 +9,7 @@
       <ClientOnly>
         <ParticleImage
           v-if="!reduceMotion"
-          :image-src="brandEditorial.src"
+          :image-src="editorialSrc"
           :alt="brandEditorial.title"
           class="absolute inset-0"
           image-fit="contain"
@@ -33,13 +33,13 @@
         />
         <img
           v-else
-          :src="brandEditorial.src"
+          :src="editorialSrc"
           :alt="brandEditorial.title"
           class="absolute inset-0 size-full object-contain"
         />
         <template #fallback>
           <img
-            :src="brandEditorial.src"
+            :src="editorialSrc"
             :alt="brandEditorial.title"
             class="absolute inset-0 size-full object-contain"
           />
@@ -56,6 +56,7 @@ import { prefersReducedMotion, useAppBoot } from '~/composables/useAppBoot'
 import ParticleImage from '~/components/ui/particle-image/ParticleImage.vue'
 
 const { particlesReady } = useAppBoot()
+const editorialSrc = useAppAsset(() => brandEditorial.src)
 const reduceMotion = ref(import.meta.client && prefersReducedMotion())
 
 if (reduceMotion.value) {

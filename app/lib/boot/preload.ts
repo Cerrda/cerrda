@@ -62,6 +62,7 @@ export async function warmupLightSpeed(_profile: GpuProfile) {
 }
 
 export async function preloadImages() {
+  const baseURL = useRuntimeConfig().app.baseURL
   const sources = [
     brandEditorial.src,
     '/editorial/sheer-descent.png',
@@ -72,7 +73,7 @@ export async function preloadImages() {
     '/apple-touch-icon-light.png',
   ]
 
-  await Promise.all(sources.map((src) => decodeImage(src)))
+  await Promise.all(sources.map((src) => decodeImage(withAppBase(src, baseURL))))
 }
 
 export async function preloadPageModules() {

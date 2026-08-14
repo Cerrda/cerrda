@@ -1,3 +1,5 @@
+import { withAppBase } from '../utils/withAppBase'
+
 export const faviconStorageKey = 'cerrda-color-mode'
 
 export const faviconAssets = {
@@ -19,17 +21,12 @@ export const faviconAssets = {
 
 export type FaviconTheme = keyof typeof faviconAssets
 
-function withBase(baseURL: string, path: string) {
-  const base = baseURL === '/' ? '' : baseURL.replace(/\/$/, '')
-  return `${base}${path}`
-}
-
 /** 浏览器对 favicon 缓存很凶，改 href 不够，必须卸掉旧 link 再挂新的。 */
 export function applyThemeFavicon(theme: FaviconTheme, baseURL = '/') {
   if (typeof document === 'undefined') return
 
   const assets = faviconAssets[theme]
-  const href = (path: string) => withBase(baseURL, path)
+  const href = (path: string) => withAppBase(path, baseURL)
 
   document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach((node) => node.remove())
 

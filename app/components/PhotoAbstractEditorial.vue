@@ -8,13 +8,15 @@ const props = defineProps<{
   name?: string
   class?: string
 }>()
+
+const src = useAppAsset(() => props.artwork.src)
 </script>
 
 <template>
   <span :class="cn('inline-flex items-center gap-2.5', props.class)">
     <span class="relative flex size-8 shrink-0 items-center justify-center overflow-hidden md:size-9">
       <img
-        :src="artwork.src"
+        :src="src"
         :alt="artwork.alt"
         :title="artwork.title"
         class="block size-full select-none object-contain object-center"

@@ -3,11 +3,12 @@ import { brandEditorial } from '~/data/editorial'
 import { navItems, siteProfile } from '~/data/site'
 
 const route = useRoute()
+const { app } = useRuntimeConfig()
 
 const links = computed(() =>
   navItems.map((item) => ({
     ...item,
-    href: route.path === '/' ? `#${item.id}` : `/#${item.id}`,
+    href: route.path === '/' ? `#${item.id}` : withAppBase(`/#${item.id}`, app.baseURL),
   })),
 )
 
