@@ -123,30 +123,33 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Motion
-    v-if="ready"
-    as="div"
-    :style="{
-      position: 'fixed',
-      left: cursorX,
-      top: cursorY,
-      translateX: '-50%',
-      translateY: '-50%',
-      rotate: rotation,
-      scale,
-      zIndex: 100,
-      pointerEvents: 'none',
-      willChange: 'transform',
-    }"
-    :initial="{ scale: 0 }"
-    :animate="{ scale: 1 }"
-    :transition="{
-      type: 'spring',
-      stiffness: 400,
-      damping: 30,
-    }"
-  >
-    <component :is="props.cursor" />
-  </Motion>
+  <!-- Teleport 到 body，避免被 app-shell / modal overlay 的 stacking context 盖住 -->
+  <Teleport to="body">
+    <Motion
+      v-if="ready"
+      as="div"
+      :style="{
+        position: 'fixed',
+        left: cursorX,
+        top: cursorY,
+        translateX: '-50%',
+        translateY: '-50%',
+        rotate: rotation,
+        scale,
+        zIndex: 10060,
+        pointerEvents: 'none',
+        willChange: 'transform',
+      }"
+      :initial="{ scale: 0 }"
+      :animate="{ scale: 1 }"
+      :transition="{
+        type: 'spring',
+        stiffness: 400,
+        damping: 30,
+      }"
+    >
+      <component :is="props.cursor" />
+    </Motion>
+  </Teleport>
 </template>
 <style scoped></style>

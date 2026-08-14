@@ -198,9 +198,9 @@ onUnmounted(() => {
   overflow: hidden;
   background: color-mix(in oklch, var(--card) calc(var(--frost) * 100%), transparent);
   box-shadow:
-    0 0 2px 1px color-mix(in oklch, var(--foreground) 10%, transparent) inset,
-    0 0 10px 4px color-mix(in oklch, var(--foreground) 5%, transparent) inset,
-    0 16px 56px color-mix(in oklch, var(--foreground) 6%, transparent);
+    0 0 1px 1px color-mix(in oklch, var(--foreground) 6%, transparent) inset,
+    0 0 8px 3px color-mix(in oklch, var(--primary) 6%, transparent) inset,
+    0 18px 48px var(--shadow-bloom);
 }
 
 .slot-container {

@@ -64,11 +64,14 @@ export async function warmupLightSpeed(_profile: GpuProfile) {
 export async function preloadImages() {
   const sources = [
     brandEditorial.src,
+    '/hero/shoreline.png',
     '/editorial/sheer-descent.png',
     '/editorial/sheer-descent-abstract.png',
     '/editorial/sheer-descent-subject.png',
     '/favicon.png',
+    '/favicon-light-32x32.png',
     '/apple-touch-icon.png',
+    '/apple-touch-icon-light.png',
   ]
 
   await Promise.all(sources.map((src) => decodeImage(src)))
@@ -77,6 +80,7 @@ export async function preloadImages() {
 export async function preloadPageModules() {
   await Promise.all([
     import('~/components/ui/SilkBackground.vue'),
+    import('~/components/ui/particle-image/ParticleImage.vue'),
     import('~/components/ui/LightSpeed.vue'),
     import('~/components/ui/LiquidGlass.vue'),
     import('~/components/ui/SmoothCursor.vue'),
@@ -96,7 +100,11 @@ export type PreloadBundle = {
   all: Promise<void>
 }
 
+let bundle: PreloadBundle | null = null
+
 export function startPreloadBundle(): PreloadBundle {
+  if (bundle) return bundle
+
   const { gpuProfile } = useAppBoot()
   const profile = gpuProfile.value
   const fonts = preloadFonts().catch(() => {})
@@ -106,7 +114,8 @@ export function startPreloadBundle(): PreloadBundle {
   const modules = preloadPageModules().catch(() => {})
   const all = Promise.all([fonts, silk, engine, assets, modules]).then(() => undefined)
 
-  return { profile, fonts, silk, engine, assets, modules, all }
+  bundle = { profile, fonts, silk, engine, assets, modules, all }
+  return bundle
 }
 
 export async function settleFirstPaint() {

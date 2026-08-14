@@ -4,7 +4,7 @@ import { defaultOptions, distortions, LightSpeedApp } from '~/lib/inspira/light-
 
 const props = defineProps<LightSpeedProps>()
 const containerRef = useTemplateRef<HTMLElement>('lightSpeedRef')
-const { ready, gpuProfile } = useAppBoot()
+const { gpuProfile, lightSpeedCompiled } = useAppBoot()
 
 let app: LightSpeedApp | null = null
 let intersectionObserver: IntersectionObserver | undefined
@@ -26,7 +26,7 @@ function handleVisibility() {
 }
 
 async function start() {
-  if (started || !containerRef.value || !ready.value) return
+  if (started || !containerRef.value) return
   started = true
 
   const mergedOptions = {
@@ -52,6 +52,9 @@ async function start() {
     canvas.style.cursor = 'pointer'
   }
 
+  await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+  lightSpeedCompiled.value = true
+
   intersectionObserver = new IntersectionObserver(
     ([entry]) => {
       if (!app) return
@@ -64,10 +67,6 @@ async function start() {
   document.addEventListener('visibilitychange', handleVisibility)
   syncPlayback()
 }
-
-watch(ready, (value) => {
-  if (value) void start()
-})
 
 onMounted(() => {
   void start()

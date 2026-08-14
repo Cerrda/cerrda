@@ -1,4 +1,4 @@
-import { watch } from 'vue'
+import { watch, type Ref } from 'vue'
 
 export type GpuProfile = {
   /** Internal silk render scale. CSS still fills the viewport. */
@@ -11,6 +11,8 @@ export const defaultGpuProfile: GpuProfile = {
   lightSpeedPixelRatio: 1.25,
 }
 
+export const BOOT_SESSION_KEY = 'cerrda-boot-session'
+
 /**
  * Document-lifetime boot gate. False until the Multi Step Loader finishes
  * preloading fonts, shaders, and engine chunks. Survives SPA navigation.
@@ -19,14 +21,14 @@ export function useAppBoot() {
   const ready = useState('app-boot-ready', () => false)
   const gpuProfile = useState<GpuProfile>('app-gpu-profile', () => ({ ...defaultGpuProfile }))
   const silkCompiled = useState('app-silk-compiled', () => false)
+  const lightSpeedCompiled = useState('app-lightspeed-compiled', () => false)
+  const particlesReady = useState('app-particles-ready', () => false)
 
-  return { ready, gpuProfile, silkCompiled }
+  return { ready, gpuProfile, silkCompiled, lightSpeedCompiled, particlesReady }
 }
 
-/** Wait until the live silk WebGL program has compiled, so the loader covers real GPU work. */
-export function waitForSilkCompiled(timeoutMs = 5000) {
-  const { silkCompiled } = useAppBoot()
-  if (silkCompiled.value) return Promise.resolve()
+export function waitForFlag(flag: Ref<boolean>, timeoutMs = 8000) {
+  if (flag.value) return Promise.resolve()
 
   return new Promise<void>((resolve) => {
     let settled = false
@@ -37,11 +39,17 @@ export function waitForSilkCompiled(timeoutMs = 5000) {
       clearTimeout(timer)
       resolve()
     }
-    const stop = watch(silkCompiled, (value) => {
+    const stop = watch(flag, (value) => {
       if (value) finish()
     })
     const timer = setTimeout(finish, timeoutMs)
   })
+}
+
+/** Wait until the live silk WebGL program has compiled, so the loader covers real GPU work. */
+export function waitForSilkCompiled(timeoutMs = 8000) {
+  const { silkCompiled } = useAppBoot()
+  return waitForFlag(silkCompiled, timeoutMs)
 }
 
 export function detectGpuProfile(): GpuProfile {
@@ -83,4 +91,22 @@ export function detectGpuProfile(): GpuProfile {
 export function prefersReducedMotion() {
   if (!import.meta.client) return false
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+export function readBootSession() {
+  if (!import.meta.client) return false
+  try {
+    return sessionStorage.getItem(BOOT_SESSION_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function writeBootSession() {
+  if (!import.meta.client) return
+  try {
+    sessionStorage.setItem(BOOT_SESSION_KEY, '1')
+  } catch {
+    /* private mode */
+  }
 }

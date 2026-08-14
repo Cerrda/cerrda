@@ -5,6 +5,7 @@
  * 参考 Element Plus / Magic UI
  */
 import { PhMoon, PhSun } from '@phosphor-icons/vue'
+import { applyThemeFavicon } from '~/data/favicon'
 
 const props = withDefaults(
   defineProps<{
@@ -19,6 +20,7 @@ const props = withDefaults(
 )
 
 const colorMode = useColorMode()
+const { app } = useRuntimeConfig()
 const isDark = computed(() => colorMode.value === 'dark')
 const buttonRef = ref<HTMLButtonElement | null>(null)
 const isTransitioning = ref(false)
@@ -64,6 +66,7 @@ function toggle() {
   const applyTheme = () => {
     document.documentElement.classList.toggle('dark', next === 'dark')
     colorMode.preference = next
+    applyThemeFavicon(next, app.baseURL)
     try {
       localStorage.setItem('cerrda-color-mode', next)
     } catch {

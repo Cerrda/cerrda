@@ -26,7 +26,7 @@ const mouseY = ref(-props.gradientSize * 10)
 
 const resolvedGradientColor = computed(() => {
   if (props.gradientColor) return props.gradientColor
-  return colorMode.value === 'dark' ? 'oklch(0.72 0.12 350 / 0.45)' : 'oklch(0.78 0.12 350 / 0.55)'
+  return colorMode.value === 'dark' ? 'oklch(0.72 0.12 350 / 0.45)' : 'oklch(0.82 0.1 350 / 0.28)'
 })
 
 function handleMouseMove(e: MouseEvent) {

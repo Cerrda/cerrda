@@ -6,7 +6,7 @@
  */
 import { PhCaretUp } from '@phosphor-icons/vue'
 import NumberFlow from '@number-flow/vue'
-import { useThrottleFn } from '@vueuse/core'
+import { useEventListener } from '@vueuse/core'
 import { AnimatePresence, Motion } from 'motion-v'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { cn } from '~/lib/utils'
@@ -32,13 +32,31 @@ const scrollPercentInt = computed(() => Math.min(100, Math.round(scrollPercentag
 const primaryColor = computed(() => (isDark.value ? '#f9a8d4' : '#db2777'))
 const secondaryColor = computed(() => (isDark.value ? '#6b728055' : '#6b728099'))
 
-function updateScroll() {
-  const max = document.documentElement.scrollHeight - window.innerHeight
-  const y = window.scrollY
-  scrollPercentage.value = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0
+let raf = 0
+
+function readScrollProgress() {
+  const root = document.documentElement
+  const view = root.clientHeight
+  const total = Math.max(root.scrollHeight, document.body?.scrollHeight ?? 0)
+  const max = total - view
+  if (max <= 0) return 0
+  const y = window.scrollY || root.scrollTop
+  // 贴底容差：缩放 / 亚像素 / 浏览器工具栏会让 scrollY 永远略小于理论最大值
+  if (total - y - view <= 2) return 1
+  return Math.min(1, Math.max(0, y / max))
 }
 
-const onScroll = useThrottleFn(updateScroll, 120)
+function updateScroll() {
+  scrollPercentage.value = readScrollProgress()
+}
+
+function onScroll() {
+  if (raf) return
+  raf = requestAnimationFrame(() => {
+    raf = 0
+    updateScroll()
+  })
+}
 
 function onActivate() {
   const behavior: ScrollBehavior = reducedMotion.value ? 'auto' : 'smooth'
@@ -47,13 +65,16 @@ function onActivate() {
 
 onMounted(() => {
   reducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  window.addEventListener('scroll', onScroll, { passive: true })
   updateScroll()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', onScroll)
+  if (raf) cancelAnimationFrame(raf)
 })
+
+useEventListener(window, 'scroll', onScroll, { passive: true })
+useEventListener(window, 'resize', onScroll)
+useEventListener(window, 'scrollend', updateScroll)
 </script>
 
 <template>
@@ -82,10 +103,12 @@ onUnmounted(() => {
               >
                 <LiquidGlass
                   :radius="999"
-                  :frost="0.3"
-                  :border="0.4"
-                  :scale="-48"
+                  :frost="0.4"
+                  :border="0.08"
+                  :scale="-42"
                   :blur="6"
+                  :g-offset="2"
+                  :b-offset="4"
                   container-class="h-11 overflow-hidden rounded-full"
                 >
                   <span class="relative flex h-11 items-center gap-2 pr-3.5 pl-1 text-foreground">

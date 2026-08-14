@@ -60,9 +60,9 @@ onBeforeUnmount(() => {
     <SiteHeader />
 
     <!-- Hero -->
-    <section class="section-pad relative flex min-h-[100dvh] items-center pt-28">
-      <div class="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
-        <div>
+    <section class="section-pad relative flex min-h-[100dvh] items-center pt-24">
+      <div class="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+        <div class="relative z-10">
           <BlurReveal :delay="0.08" :duration="0.9">
             <p class="eyebrow w-fit">Frontend · Agent · DX</p>
           </BlurReveal>
@@ -96,30 +96,7 @@ onBeforeUnmount(() => {
           </BlurReveal>
         </div>
 
-        <ClientOnly>
-          <FloatingCard class="mx-auto w-full max-w-md">
-            <div
-              class="rounded-[1.6rem] border border-border/70 bg-card/80 p-6 shadow-[0_30px_80px_-40px_oklch(0.45_0.12_350/0.35)] backdrop-blur-xl"
-            >
-              <p class="text-xs uppercase tracking-[0.2em] text-muted-foreground">Online Resume</p>
-              <h2 class="mt-3 font-display text-2xl">
-                {{ siteProfile.role }}
-              </h2>
-              <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
-                {{ siteProfile.bio }}
-              </p>
-              <div class="mt-6 flex flex-wrap gap-2">
-                <span
-                  v-for="tag in ['Vue 3', 'Nuxt', 'TypeScript', 'Agent Skills', 'Vite']"
-                  :key="tag"
-                  class="rounded-full border border-border/70 px-3 py-1 text-xs text-muted-foreground"
-                >
-                  {{ tag }}
-                </span>
-              </div>
-            </div>
-          </FloatingCard>
-        </ClientOnly>
+        <HeroParticleCard />
       </div>
     </section>
 

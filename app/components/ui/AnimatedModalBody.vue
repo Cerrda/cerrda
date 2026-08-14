@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
           }"
           :class="
             cn(
-              `relative z-50 flex max-h-[85vh] w-[min(720px,calc(100vw-32px))] flex-col overflow-hidden rounded-2xl border border-transparent bg-white dark:border-neutral-800 dark:bg-neutral-950`,
+              `relative z-50 flex max-h-[85vh] w-[min(720px,calc(100vw-32px))] flex-col overflow-hidden rounded-2xl border border-border bg-card`,
               props.class,
             )
           "
@@ -184,7 +184,7 @@ onBeforeUnmount(() => {
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="h-4 w-4 text-black transition duration-200 group-hover:scale-125 group-hover:rotate-3 dark:text-white"
+              class="h-4 w-4 text-foreground transition duration-200 group-hover:scale-125 group-hover:rotate-3"
             >
               <path
                 stroke="none"

@@ -230,7 +230,7 @@ onUnmounted(() => {
       :external="url.startsWith('http')"
       :target="url.startsWith('http') ? '_blank' : undefined"
       rel="noopener noreferrer"
-      :class="cn('text-black dark:text-white', props.linkClass)"
+      :class="cn('text-foreground', props.linkClass)"
       @mousemove="handleMouseMove"
       @mouseenter="showPreview"
       @mouseleave="hidePreview"
@@ -242,7 +242,7 @@ onUnmounted(() => {
       <Teleport to="#teleports">
         <div v-show="isVisible" class="pointer-events-none fixed z-[9999]" :style="previewStyle">
           <div :class="cn('overflow-hidden rounded-xl shadow-xl', popClass, !props.isStatic && 'transform-gpu')">
-            <div class="block rounded-xl border-2 border-transparent bg-white p-1 shadow-lg dark:bg-gray-900">
+            <div class="block rounded-xl border-2 border-transparent bg-card p-1 shadow-lg">
               <div class="relative overflow-hidden rounded-lg" :style="imageStyle">
                 <div v-if="!isReady" class="absolute inset-0 animate-pulse bg-gradient-to-br from-secondary to-muted" />
                 <img

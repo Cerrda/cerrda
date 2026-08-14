@@ -1,3 +1,5 @@
+import { startPreloadBundle } from '~/lib/boot/preload'
+
 export default defineNuxtPlugin({
   name: 'boot-gate',
   enforce: 'pre',
@@ -7,6 +9,7 @@ export default defineNuxtPlugin({
     gpuProfile.value = detectGpuProfile()
     if (!ready.value) {
       document.documentElement.classList.add('booting')
+      startPreloadBundle()
     }
   },
 })

@@ -5,29 +5,31 @@
 
 :root {
   --radius: 0.9rem;
-  /* 浅色：柔和粉色系纸面，文字用玫瑰灰而非纯黑 */
-  --background: oklch(0.965 0.028 350);
-  --foreground: oklch(0.3 0.045 350);
-  --card: oklch(0.985 0.018 350);
-  --card-foreground: oklch(0.3 0.045 350);
-  --popover: oklch(0.985 0.018 350);
-  --popover-foreground: oklch(0.3 0.045 350);
-  --primary: oklch(0.58 0.17 350);
-  --primary-foreground: oklch(0.99 0.01 350);
-  --secondary: oklch(0.93 0.04 350);
-  --secondary-foreground: oklch(0.36 0.06 350);
-  --muted: oklch(0.945 0.03 350);
-  --muted-foreground: oklch(0.52 0.045 350);
-  --accent: oklch(0.92 0.055 350);
-  --accent-foreground: oklch(0.34 0.07 350);
+  /* 浅色：高明度樱花粉。粉要看见，但不能脏 */
+  --background: oklch(0.962 0.042 355);
+  --foreground: oklch(0.3 0.04 350);
+  --card: oklch(0.992 0.014 355);
+  --card-foreground: oklch(0.3 0.04 350);
+  --popover: oklch(0.995 0.01 355);
+  --popover-foreground: oklch(0.3 0.04 350);
+  --primary: oklch(0.6 0.2 350);
+  --primary-foreground: oklch(0.995 0.008 355);
+  --secondary: oklch(0.945 0.038 355);
+  --secondary-foreground: oklch(0.34 0.05 350);
+  --muted: oklch(0.95 0.032 355);
+  --muted-foreground: oklch(0.5 0.04 350);
+  --accent: oklch(0.935 0.048 350);
+  --accent-foreground: oklch(0.32 0.06 350);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.88 0.035 350);
-  --input: oklch(0.88 0.035 350);
-  --ring: oklch(0.68 0.13 350);
-  --surface-glow: oklch(0.86 0.08 350 / 0.42);
-  --hero-tint: oklch(0.84 0.1 350 / 0.36);
-  --panel-deep: oklch(0.28 0.055 350);
+  --border: oklch(0.9 0.038 355);
+  --input: oklch(0.9 0.038 355);
+  --ring: oklch(0.68 0.14 350);
+  --surface-glow: oklch(0.9 0.08 350 / 0.38);
+  --hero-tint: oklch(0.88 0.1 350 / 0.4);
+  --bloom-warm: oklch(0.93 0.06 350 / 0.28);
+  --panel-deep: oklch(0.32 0.06 350);
+  --shadow-bloom: oklch(0.62 0.08 350 / 0.12);
 }
 
 .dark {
@@ -52,7 +54,9 @@
   --ring: oklch(0.7 0.1 350);
   --surface-glow: oklch(0.45 0.1 350 / 0.25);
   --hero-tint: oklch(0.4 0.08 350 / 0.3);
+  --bloom-warm: oklch(0.45 0.1 350 / 0.22);
   --panel-deep: oklch(0.16 0.03 350);
+  --shadow-bloom: oklch(0 0 0 / 0.35);
 }
 
 @theme inline {
@@ -121,8 +125,8 @@
     pointer-events: none;
     background-color: var(--background);
     background-image:
-      radial-gradient(ellipse 80% 50% at 10% -10%, var(--hero-tint), transparent 55%),
-      radial-gradient(ellipse 60% 40% at 90% 0%, var(--surface-glow), transparent 50%);
+      radial-gradient(ellipse 70% 48% at 8% -8%, var(--hero-tint), transparent 58%),
+      radial-gradient(ellipse 48% 36% at 94% 0%, var(--bloom-warm), transparent 52%);
   }
 
   html.booting,
@@ -225,6 +229,22 @@ html[data-theme-vt] .overlay-scrollbar {
 
   .eyebrow {
     @apply rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground;
-    background: color-mix(in oklch, var(--primary) 12%, transparent);
+    background: color-mix(in oklch, var(--primary) 18%, transparent);
+    color: var(--primary);
+  }
+
+  .hero-particle-wrap {
+    z-index: 0;
+  }
+
+  .hero-particle-field {
+    -webkit-mask-image:
+      radial-gradient(ellipse 72% 86% at 58% 50%, #000 30%, transparent 76%),
+      linear-gradient(90deg, transparent 0%, #000 16%, #000 90%, transparent 100%);
+    mask-image:
+      radial-gradient(ellipse 72% 86% at 58% 50%, #000 30%, transparent 76%),
+      linear-gradient(90deg, transparent 0%, #000 16%, #000 90%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
   }
 }

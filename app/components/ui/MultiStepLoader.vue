@@ -49,17 +49,23 @@ async function executeStepAction(index: number) {
 }
 
 async function advance() {
+  if (!props.loading) return
   if (currentState.value < props.steps.length - 1) {
     currentState.value++
     emit('state-change', currentState.value)
     await processCurrentStep()
   } else {
     isLastStepComplete.value = true
+    await new Promise<void>((resolve) => {
+      currentTimer = setTimeout(resolve, 520)
+    })
+    if (!props.loading) return
     emit('complete')
   }
 }
 
 async function processCurrentStep() {
+  if (!props.loading) return
   const id = ++runId
   if (currentTimer) {
     clearTimeout(currentTimer)
@@ -78,12 +84,17 @@ async function processCurrentStep() {
     return
   }
 
-  const minTime = new Promise<void>((resolve) => {
-    currentTimer = setTimeout(resolve, duration)
-  })
+  if (duration > 0) {
+    const minTime = new Promise<void>((resolve) => {
+      currentTimer = setTimeout(resolve, duration)
+    })
+    await Promise.all([minTime, work])
+  } else {
+    await work
+  }
 
-  await Promise.all([minTime, work])
   if (id !== runId) return
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
   await advance()
 }
 
@@ -206,7 +217,7 @@ onUnmounted(() => {
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
                 stroke="currentColor"
-                class="size-6 shrink-0 text-black opacity-50 dark:text-white"
+                class="size-6 shrink-0 text-foreground/50"
               >
                 <path
                   stroke-linecap="round"
@@ -215,7 +226,7 @@ onUnmounted(() => {
                 />
               </svg>
 
-              <span :class="cn('text-lg text-black dark:text-white', index > currentState && 'opacity-50')">
+              <span :class="cn('text-lg text-foreground', index > currentState && 'opacity-50')">
                 {{ step.text }}
               </span>
             </div>
@@ -224,7 +235,7 @@ onUnmounted(() => {
       </div>
 
       <div
-        class="pointer-events-none absolute inset-x-0 bottom-0 z-[-1] h-full bg-white mask-[radial-gradient(900px_at_center,transparent_30%,white)] dark:bg-black"
+        class="pointer-events-none absolute inset-x-0 bottom-0 z-[-1] h-full bg-background mask-[radial-gradient(900px_at_center,transparent_30%,white)] dark:bg-background"
       />
     </div>
   </Transition>

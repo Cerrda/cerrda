@@ -13,7 +13,7 @@ const props = defineProps<Props>()
   <div
     :class="
       cn(
-        `group/bento row-span-1 flex flex-col justify-between space-y-4 rounded-xl border border-border/60 bg-card p-4 shadow-[0_12px_32px_-24px_oklch(0.4_0.08_350/0.35)] transition duration-200 hover:border-primary/30 hover:shadow-[0_18px_40px_-24px_oklch(0.45_0.1_350/0.4)] dark:border-white/15 dark:bg-card dark:shadow-none`,
+        `group/bento row-span-1 flex flex-col justify-between space-y-4 rounded-xl border border-border/60 bg-card p-4 shadow-[0_10px_28px_-16px_var(--shadow-bloom)] transition duration-200 hover:border-primary/30 hover:shadow-[0_14px_32px_-12px_var(--shadow-bloom)] dark:border-white/15 dark:bg-card dark:shadow-none`,
         props.class,
       )
     "

@@ -18,15 +18,13 @@ const buttonRef = ref<HTMLButtonElement>()
     ref="buttonRef"
     :class="
       cn(
-        `group bg-background relative w-auto cursor-pointer overflow-hidden rounded-full border p-2 px-6 text-center font-semibold`,
+        `group bg-card relative w-auto cursor-pointer overflow-hidden rounded-full border border-primary/25 p-2 px-6 text-center font-semibold`,
         props.class,
       )
     "
   >
     <div class="flex items-center gap-2">
-      <div
-        class="size-2 scale-100 rounded-full bg-primary transition-all duration-300 group-hover:scale-[100.8] group-[.bg-primary]:bg-primary-foreground group-[.bg-primary]:group-hover:bg-primary"
-      />
+      <div class="ihb-dot bg-primary size-2 rounded-lg group-[.bg-primary]:bg-primary-foreground" />
       <span
         class="inline-block whitespace-nowrap transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0"
       >
@@ -35,7 +33,7 @@ const buttonRef = ref<HTMLButtonElement>()
     </div>
 
     <div
-      class="text-primary-foreground absolute top-0 z-10 flex size-full translate-x-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 group-hover:-translate-x-5 group-hover:opacity-100"
+      class="text-primary-foreground absolute top-0 z-10 flex size-full translate-x-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 group-hover:-translate-x-5 group-hover:opacity-100 group-[.bg-primary]:text-primary"
     >
       <span class="whitespace-nowrap">{{ text }}</span>
       <svg
@@ -57,4 +55,23 @@ const buttonRef = ref<HTMLButtonElement>()
   </button>
 </template>
 
-<style></style>
+<style scoped>
+/*
+  Inspira / Magic UI 原意是 Tailwind v3 的 scale(100.8)（放大 100.8 倍）。
+  v4 里 scale-100 是 100%，scale-[100.8] 是无单位 100.8，无法插值，圆点几乎不放大。
+*/
+.ihb-dot {
+  scale: 1;
+  transition: scale 300ms;
+}
+
+.group:hover .ihb-dot {
+  scale: 100.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ihb-dot {
+    transition: none;
+  }
+}
+</style>
