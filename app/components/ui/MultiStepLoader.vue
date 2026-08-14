@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Ripple from '~/components/ui/Ripple.vue'
 import { cn } from '~/lib/utils'
 
 export interface MultiStepLoaderStep {
@@ -150,9 +151,17 @@ onUnmounted(() => {
   >
     <div
       v-if="loading && steps.length > 0"
-      class="fixed inset-0 z-[200] flex size-full items-center justify-center backdrop-blur-2xl"
+      class="fixed inset-0 z-[200] flex size-full items-center justify-center overflow-hidden bg-background"
       data-theme-burn="loader"
     >
+      <Ripple
+        fill
+        :base-circle-opacity="0.28"
+        :number-of-circles="12"
+        :wave-speed="90"
+        circle-class="border-primary/40 bg-primary/8"
+      />
+
       <button
         v-show="!preventClose"
         type="button"
@@ -171,7 +180,7 @@ onUnmounted(() => {
         </svg>
       </button>
 
-      <div class="relative h-96">
+      <div class="relative z-10 h-96">
         <div class="relative mx-auto mt-40 flex max-w-xl flex-col justify-start">
           <div v-for="(step, index) in steps" :key="index">
             <div
@@ -233,10 +242,6 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
-
-      <div
-        class="pointer-events-none absolute inset-x-0 bottom-0 z-[-1] h-full bg-background mask-[radial-gradient(900px_at_center,transparent_30%,white)] dark:bg-background"
-      />
     </div>
   </Transition>
 </template>

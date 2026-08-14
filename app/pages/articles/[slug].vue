@@ -29,7 +29,7 @@ const juejinUrl = computed(() => `https://juejin.cn/post/${meta.value?.id}`)
 </script>
 
 <template>
-  <div class="relative min-h-[100dvh]">
+  <div class="relative min-h-[100dvh] select-none [&_*]:select-none" @selectstart.prevent>
     <SiteHeader />
 
     <article class="section-pad mx-auto max-w-3xl pt-32">
@@ -136,5 +136,10 @@ const juejinUrl = computed(() => `https://juejin.cn/post/${meta.value?.id}`)
 .prose-article :deep(td) {
   border: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
   padding: 0.5rem 0.75rem;
+}
+
+:deep(*) {
+  user-select: none;
+  -webkit-user-select: none;
 }
 </style>

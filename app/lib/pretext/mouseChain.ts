@@ -1,6 +1,6 @@
 import type { CircleExclusion } from './types'
 
-export type ChainSegment = {
+export type MouseHead = {
   x: number
   y: number
   angle: number
@@ -20,43 +20,29 @@ export type InkParticle = {
 }
 
 export type MouseChain = {
-  segments: ChainSegment[]
+  segments: MouseHead[]
   ink: InkParticle[]
   lastStepTime: number
   inkLastStep: number
   scale: number
 }
 
-export const CHAIN_COUNT = 16
-export const CHAIN_SPACING = 18
-export const HEAD_RADIUS = 34
-export const TAIL_RADIUS = 9
+export const HEAD_RADIUS = 16
 export const STEP_INTERVAL = 16
 export const INK_STEP_INTERVAL = 32
 export const IDLE_TIMEOUT = 720
-export const MAX_BEND = 0.3
-export const EXCLUSION_PAD = 10
-
-function segmentRadius(index: number, scale: number) {
-  const t = index / Math.max(1, CHAIN_COUNT - 1)
-  const eased = t * t
-  return (HEAD_RADIUS + (TAIL_RADIUS - HEAD_RADIUS) * eased) * scale
-}
 
 export function createMouseChain(x: number, y: number, scale = 1): MouseChain {
-  const segments: ChainSegment[] = []
-  for (let i = 0; i < CHAIN_COUNT; i++) {
-    const radius = segmentRadius(i, scale)
-    segments.push({
-      x,
-      y: y + i * CHAIN_SPACING * scale,
-      angle: -Math.PI / 2,
-      radius: 0,
-      targetRadius: radius,
-    })
-  }
   return {
-    segments,
+    segments: [
+      {
+        x,
+        y,
+        angle: 0,
+        radius: 0,
+        targetRadius: HEAD_RADIUS,
+      },
+    ],
     ink: [],
     lastStepTime: 0,
     inkLastStep: 0,
@@ -64,11 +50,10 @@ export function createMouseChain(x: number, y: number, scale = 1): MouseChain {
   }
 }
 
-export function resizeMouseChain(chain: MouseChain, scale: number) {
-  chain.scale = scale
-  for (let i = 0; i < chain.segments.length; i++) {
-    chain.segments[i]!.targetRadius = segmentRadius(i, scale)
-  }
+export function resizeMouseChain(chain: MouseChain, _scale: number) {
+  chain.scale = _scale
+  const head = chain.segments[0]
+  if (head) head.targetRadius = HEAD_RADIUS
 }
 
 export function updateMouseChain(
@@ -82,54 +67,27 @@ export function updateMouseChain(
   if (time - chain.lastStepTime < STEP_INTERVAL) return false
   chain.lastStepTime = time
 
-  const segs = chain.segments
-  const head = segs[0]
+  const head = chain.segments[0]
   if (!head) return false
 
-  const radiusLerp = idle || !inside ? 0.18 : 0.28
-  for (const seg of segs) {
-    const target = idle || !inside ? 0 : seg.targetRadius
-    seg.radius += (target - seg.radius) * radiusLerp
-    if (seg.radius < 0.4) seg.radius = 0
+  const prevX = head.x
+  const prevY = head.y
+  const prevR = head.radius
+  const prevA = head.angle
+
+  const target = idle || !inside ? 0 : head.targetRadius
+  head.radius += (target - head.radius) * (idle || !inside ? 0.28 : 0.55)
+  if (head.radius < 0.4) head.radius = 0
+
+  head.x = mouseX
+  head.y = mouseY
+  if (inside) {
+    const dx = mouseX - prevX
+    const dy = mouseY - prevY
+    if (dx !== 0 || dy !== 0) head.angle = Math.atan2(dy, dx) + Math.PI / 2
   }
 
-  if (!inside && chain.ink.length === 0) {
-    for (const seg of segs) {
-      seg.x += (mouseX - seg.x) * 0.12
-      seg.y += (mouseY - seg.y) * 0.12
-    }
-    return true
-  }
-
-  const dx = mouseX - head.x
-  const dy = mouseY - head.y
-  const dist = Math.hypot(dx, dy)
-  if (dist > 1.2) {
-    const speed = idle ? Math.min(dist, 10) : Math.min(dist, Math.max(10, dist * 0.42))
-    head.x += (dx / dist) * speed
-    head.y += (dy / dist) * speed
-    head.angle = Math.atan2(dy, dx)
-  } else {
-    head.x = mouseX
-    head.y = mouseY
-  }
-
-  const spacing = CHAIN_SPACING * chain.scale
-  for (let i = 1; i < segs.length; i++) {
-    const prev = segs[i - 1]!
-    const seg = segs[i]!
-    let angle = Math.atan2(prev.y - seg.y, prev.x - seg.x)
-    let diff = angle - prev.angle
-    while (diff > Math.PI) diff -= Math.PI * 2
-    while (diff < -Math.PI) diff += Math.PI * 2
-    if (diff > MAX_BEND) angle = prev.angle + MAX_BEND
-    else if (diff < -MAX_BEND) angle = prev.angle - MAX_BEND
-    seg.angle = angle
-    seg.x = prev.x - Math.cos(seg.angle) * spacing
-    seg.y = prev.y - Math.sin(seg.angle) * spacing
-  }
-
-  return true
+  return head.x !== prevX || head.y !== prevY || head.radius !== prevR || head.angle !== prevA
 }
 
 export function spawnInk(chain: MouseChain, x: number, y: number, angle: number) {
@@ -170,13 +128,10 @@ export function updateInk(chain: MouseChain, time: number) {
 }
 
 export function getChainExclusions(chain: MouseChain, top: number, bottom: number): CircleExclusion[] {
-  const out: CircleExclusion[] = []
-  for (const seg of chain.segments) {
-    if (seg.radius < 0.8) continue
-    if (seg.y + seg.radius + EXCLUSION_PAD < top || seg.y - seg.radius - EXCLUSION_PAD > bottom) continue
-    out.push({ x: seg.x, y: seg.y, radius: seg.radius + EXCLUSION_PAD })
-  }
-  return out
+  const head = chain.segments[0]
+  if (!head || head.radius < 0.4) return []
+  if (head.y + head.radius < top || head.y - head.radius > bottom) return []
+  return [{ x: head.x, y: head.y, radius: head.radius }]
 }
 
 export function getInkExclusions(chain: MouseChain, top: number, bottom: number): CircleExclusion[] {
@@ -215,5 +170,6 @@ export function getInkInfluence(chain: MouseChain, x: number, y: number) {
 
 export function chainHasPresence(chain: MouseChain) {
   if (chain.ink.length > 0) return true
-  return chain.segments.some((seg) => seg.radius > 0.8)
+  const head = chain.segments[0]
+  return Boolean(head && head.radius > 0.4)
 }

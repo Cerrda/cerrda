@@ -47,19 +47,11 @@ const dimensions = reactive({
   height: 0,
 })
 const isVisible = ref(true)
-const scrolling = usePageScrolling()
-const cheapBlur = 'blur(12px) saturate(1.35)'
 
 let observer: ResizeObserver | null = null
 let visibilityObserver: IntersectionObserver | null = null
 
-const liquidActive = computed(() => isVisible.value && !scrolling.value)
-
-const backdropValue = computed(() => {
-  if (!isVisible.value) return 'none'
-  if (!liquidActive.value) return cheapBlur
-  return `url(#${filterId})`
-})
+const backdropValue = computed(() => (isVisible.value ? `url(#${filterId})` : 'none'))
 
 const baseStyle = computed(() => {
   return {
@@ -114,7 +106,7 @@ onMounted(() => {
   if (!liquidGlassRoot.value) return
 
   observer = new ResizeObserver((entries) => {
-    if (!isVisible.value || scrolling.value) return
+    if (!isVisible.value) return
     const entry = entries[0]
     if (!entry) return
 

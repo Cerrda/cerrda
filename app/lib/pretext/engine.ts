@@ -6,15 +6,8 @@ import {
   type PreparedTextWithSegments,
   type LayoutCursor,
 } from '@chenglou/pretext'
-import {
-  layoutNextRichInlineLineRange,
-  materializeRichInlineLineRange,
-  prepareRichInline,
-  type PreparedRichInline,
-  type RichInlineCursor,
-  type RichInlineItem,
-} from '@chenglou/pretext/rich-inline'
 import { availableRanges } from './exclusions'
+import { packFlowRange, prepareFlowGlyphs, type FlowFragment, type FlowGlyph } from './flowLayout'
 import {
   chainHasPresence,
   createMouseChain,
@@ -30,21 +23,12 @@ import {
 } from './mouseChain'
 import { overlaySpecsFrom, parseArticleHtml } from './parseArticleHtml'
 import { buildMetrics, flowFontFor, readArticleTheme } from './theme'
-import type {
-  ArticleBlock,
-  ArticleMetrics,
-  ArticleSpan,
-  ArticleTheme,
-  CircleExclusion,
-  FlowItem,
-  LinkHit,
-  OverlaySpec,
-} from './types'
+import type { ArticleBlock, ArticleMetrics, ArticleSpan, ArticleTheme, FlowItem, LinkHit, OverlaySpec } from './types'
 
 type FlowPrepared = {
   kind: 'flow'
   variant: 'heading' | 'paragraph' | 'blockquote' | 'list-item'
-  prepared: PreparedRichInline
+  glyphs: FlowGlyph[]
   items: FlowItem[]
   lineHeight: number
   indent: number
@@ -84,7 +68,7 @@ type DrawnRichLine = {
   y: number
   lineHeight: number
   items: FlowItem[]
-  fragments: ReturnType<typeof materializeRichInlineLineRange>['fragments']
+  fragments: FlowFragment[]
 }
 
 type DrawnCodeLine = {
@@ -120,22 +104,13 @@ function spansToItems(
         ? metrics.inlineCodeFont
         : opts?.headingFont || flowFontFor(span, quoteStack(theme.fontSans), metrics),
       extraWidth: span.code ? 10 : 0,
-      break: 'normal',
+      break: span.code ? 'never' : 'normal',
       color: span.href ? theme.primary : span.code ? theme.foreground : fill,
       href: span.href,
       code: span.code,
     })
   }
   return items.filter((item) => item.text.length > 0)
-}
-
-function toRichItems(items: FlowItem[]): RichInlineItem[] {
-  return items.map((item) => ({
-    text: item.text,
-    font: item.font,
-    extraWidth: item.extraWidth,
-    break: item.break,
-  }))
 }
 
 export class PretextArticleEngine {
@@ -263,7 +238,7 @@ export class PretextArticleEngine {
     const href = this.hitLink(x, y)
     if (href) return { href }
     const head = this.chain.segments[0]
-    const angle = head?.angle ?? 0
+    const angle = (head?.angle ?? Math.PI / 2) - Math.PI / 2
     spawnInk(this.chain, x, y, angle)
     this.schedule()
     return {}
@@ -305,6 +280,14 @@ export class PretextArticleEngine {
     return Math.min(1, Math.max(0.72, this.metrics.width / 680))
   }
 
+  private glyphsFromItems(items: FlowItem[]) {
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0)
+    return prepareFlowGlyphs(items, (font, text) => {
+      this.ctx.font = font
+      return this.ctx.measureText(text).width
+    })
+  }
+
   private prepareBlocks(blocks: ArticleBlock[]): PreparedUnit[] {
     const units: PreparedUnit[] = []
     const { metrics, theme } = this
@@ -318,7 +301,7 @@ export class PretextArticleEngine {
         units.push({
           kind: 'flow',
           variant: 'heading',
-          prepared: prepareRichInline(toRichItems(items)),
+          glyphs: this.glyphsFromItems(items),
           items,
           lineHeight,
           indent: 0,
@@ -337,7 +320,7 @@ export class PretextArticleEngine {
         units.push({
           kind: 'flow',
           variant: block.type === 'blockquote' ? 'blockquote' : 'paragraph',
-          prepared: prepareRichInline(toRichItems(items)),
+          glyphs: this.glyphsFromItems(items),
           items,
           lineHeight: metrics.bodyLine,
           indent: block.type === 'blockquote' ? 18 : 0,
@@ -355,7 +338,7 @@ export class PretextArticleEngine {
           units.push({
             kind: 'flow',
             variant: 'list-item',
-            prepared: prepareRichInline(toRichItems(items)),
+            glyphs: this.glyphsFromItems(items),
             items,
             lineHeight: metrics.bodyLine,
             indent: block.ordered ? 28 : 22,
@@ -402,16 +385,12 @@ export class PretextArticleEngine {
     await this.init(html)
   }
 
-  private collectExclusions(): CircleExclusion[] {
-    return [
+  private layout(_force = false) {
+    const width = this.metrics.width
+    const exclusions = [
       ...getChainExclusions(this.chain, -40, this.contentHeight + 80),
       ...getInkExclusions(this.chain, -40, this.contentHeight + 80),
     ]
-  }
-
-  private layout(_force = false) {
-    const width = this.metrics.width
-    const exclusions = this.collectExclusions()
     const richLines: DrawnRichLine[] = []
     const codeLines: DrawnCodeLine[] = []
     const codeFrames: { x: number; y: number; w: number; h: number }[] = []
@@ -466,7 +445,7 @@ export class PretextArticleEngine {
       const flowLeft = left + unit.indent
       const startY = y
       const firstLineIndex = richLines.length
-      let cursor: RichInlineCursor | undefined
+      let glyphIndex = 0
       let lineY = startY
       let done = false
       let safety = 0
@@ -480,24 +459,53 @@ export class PretextArticleEngine {
           bottom = lineY
           continue
         }
-        for (const range of ranges) {
-          const next = layoutNextRichInlineLineRange(unit.prepared, range.right - range.left, cursor)
-          if (!next) {
+
+        const indexBefore = glyphIndex
+        for (let r = 0; r < ranges.length; r++) {
+          const range = ranges[r]!
+          const splitWord = r < ranges.length - 1
+          const packed = packFlowRange(unit.glyphs, glyphIndex, range.right - range.left, splitWord)
+          if (packed.end === glyphIndex && packed.fragments.length === 0) continue
+          glyphIndex = packed.end
+          if (packed.fragments.length) {
+            richLines.push({
+              x: range.left,
+              y: lineY,
+              lineHeight: unit.lineHeight,
+              items: unit.items,
+              fragments: packed.fragments,
+            })
+            this.collectLinkHits(packed.fragments, unit.items, range.left, lineY, unit.lineHeight, linkHits)
+            bottom = lineY + unit.lineHeight
+          }
+          if (glyphIndex >= unit.glyphs.length) {
             done = true
             break
           }
-          const line = materializeRichInlineLineRange(unit.prepared, next)
-          richLines.push({
-            x: range.left,
-            y: lineY,
-            lineHeight: unit.lineHeight,
-            items: unit.items,
-            fragments: line.fragments,
-          })
-          this.collectLinkHits(line.fragments, unit.items, range.left, lineY, unit.lineHeight, linkHits)
-          cursor = line.end
-          bottom = lineY + unit.lineHeight
         }
+
+        if (!done && glyphIndex === indexBefore) {
+          const fallback = ranges[ranges.length - 1]!
+          const packed = packFlowRange(unit.glyphs, glyphIndex, fallback.right - fallback.left, false, true)
+          if (packed.end === glyphIndex) {
+            done = true
+          } else {
+            glyphIndex = packed.end
+            if (packed.fragments.length) {
+              richLines.push({
+                x: fallback.left,
+                y: lineY,
+                lineHeight: unit.lineHeight,
+                items: unit.items,
+                fragments: packed.fragments,
+              })
+              this.collectLinkHits(packed.fragments, unit.items, fallback.left, lineY, unit.lineHeight, linkHits)
+              bottom = lineY + unit.lineHeight
+            }
+          }
+          if (glyphIndex >= unit.glyphs.length) done = true
+        }
+
         if (!done) lineY += unit.lineHeight
       }
 
@@ -529,7 +537,11 @@ export class PretextArticleEngine {
     const laidOut = Math.ceil(y + 24)
     if (!chainHasPresence(this.chain)) this.naturalHeight = Math.max(this.naturalHeight, laidOut)
     const reserved = this.metrics.bodyLine * 6
-    this.contentHeight = Math.max(laidOut, this.naturalHeight, this.naturalHeight ? this.naturalHeight : laidOut + reserved)
+    this.contentHeight = Math.max(
+      laidOut,
+      this.naturalHeight,
+      this.naturalHeight ? this.naturalHeight : laidOut + reserved,
+    )
     this.syncSize()
     this.onHeight?.(this.contentHeight)
   }
@@ -593,14 +605,7 @@ export class PretextArticleEngine {
   private tick(time: number) {
     this.raf = 0
     const idle = time - this.lastPointerAt > IDLE_TIMEOUT
-    const moved = updateMouseChain(
-      this.chain,
-      time,
-      this.pointer.x,
-      this.pointer.y,
-      idle,
-      this.pointer.inside,
-    )
+    const moved = updateMouseChain(this.chain, time, this.pointer.x, this.pointer.y, idle, this.pointer.inside)
     if (this.chain.ink.length) updateInk(this.chain, time)
     if (moved || this.chain.ink.length) {
       this.layout()
@@ -660,7 +665,6 @@ export class PretextArticleEngine {
     }
 
     this.drawBullets()
-    this.drawChain()
     this.drawInk()
   }
 
@@ -734,30 +738,6 @@ export class PretextArticleEngine {
       }
       x += frag.occupiedWidth
     }
-  }
-
-  private drawChain() {
-    const ctx = this.ctx
-    const segs = this.chain.segments
-    for (let i = segs.length - 1; i >= 1; i--) {
-      const seg = segs[i]!
-      if (seg.radius < 0.8) continue
-      const t = i / segs.length
-      ctx.beginPath()
-      ctx.fillStyle = this.theme.primary
-      ctx.globalAlpha = 0.08 + (1 - t) * 0.1
-      ctx.arc(seg.x, seg.y, Math.max(2, seg.radius * 0.34), 0, Math.PI * 2)
-      ctx.fill()
-    }
-    const head = segs[0]
-    if (head && head.radius > 0.8) {
-      ctx.beginPath()
-      ctx.fillStyle = this.theme.primary
-      ctx.globalAlpha = 0.12
-      ctx.arc(head.x, head.y, head.radius * 0.55, 0, Math.PI * 2)
-      ctx.fill()
-    }
-    ctx.globalAlpha = 1
   }
 
   private drawInk() {

@@ -58,9 +58,7 @@ function observeOverlays() {
       engine?.setOverlayHeight(id, entry.contentRect.height)
     }
   })
-  wrapRef.value
-    ?.querySelectorAll<HTMLElement>('[data-pretext-overlay]')
-    .forEach((el) => overlayObserver?.observe(el))
+  wrapRef.value?.querySelectorAll<HTMLElement>('[data-pretext-overlay]').forEach((el) => overlayObserver?.observe(el))
 }
 
 function onPointerMove(event: PointerEvent) {
@@ -69,10 +67,10 @@ function onPointerMove(event: PointerEvent) {
   if (!wrap) return
   const rect = wrap.getBoundingClientRect()
   const inside =
-    event.clientX >= rect.left
-    && event.clientX <= rect.right
-    && event.clientY >= rect.top
-    && event.clientY <= rect.bottom
+    event.clientX >= rect.left &&
+    event.clientX <= rect.right &&
+    event.clientY >= rect.top &&
+    event.clientY <= rect.bottom
   engine.setPointerClient(event.clientX, event.clientY, inside)
 }
 
@@ -147,21 +145,21 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="relative">
+  <div class="relative select-none" @selectstart.prevent>
     <div
       v-if="useCanvas"
       ref="wrapRef"
-      class="pretext-article relative w-full"
+      class="pretext-article relative w-full select-none"
       :class="ready ? '' : 'pointer-events-none absolute inset-x-0 top-0 opacity-0'"
       @pointerleave="onPointerLeave"
       @pointerdown="onPointerDown"
     >
-      <canvas ref="canvasRef" class="pointer-events-none block w-full" aria-hidden="true" />
+      <canvas ref="canvasRef" class="pointer-events-none block w-full select-none" aria-hidden="true" />
 
       <div
         v-for="overlay in overlays"
         :key="overlay.id"
-        class="pretext-overlay pointer-events-auto absolute top-0 right-0 left-0 z-[1]"
+        class="pretext-overlay pointer-events-auto absolute top-0 right-0 left-0 z-[1] select-none"
         :data-pretext-overlay="overlay.id"
       >
         <div v-if="overlay.type === 'table'" class="prose-article overflow-x-auto" v-html="overlay.html" />
@@ -170,17 +168,17 @@ onBeforeUnmount(() => {
           :src="overlay.src"
           :alt="overlay.alt || ''"
           class="max-w-full rounded-[1rem]"
-        >
+        />
       </div>
     </div>
 
     <div
       v-show="!useCanvas || !ready"
-      class="prose-article space-y-4 text-base leading-8 text-foreground/90"
+      class="prose-article select-none space-y-4 text-base leading-8 text-foreground/90"
       v-html="html"
     />
 
-    <div v-if="useCanvas && ready" class="sr-only" v-html="html" />
+    <div v-if="useCanvas && ready" class="sr-only select-none" v-html="html" />
   </div>
 </template>
 
@@ -238,5 +236,13 @@ onBeforeUnmount(() => {
   border-left: 2px solid color-mix(in oklch, var(--primary) 55%, transparent);
   padding-left: 1rem;
   color: var(--muted-foreground);
+}
+.pretext-article,
+.pretext-article :deep(*),
+.prose-article,
+.prose-article :deep(*),
+.sr-only {
+  user-select: none;
+  -webkit-user-select: none;
 }
 </style>

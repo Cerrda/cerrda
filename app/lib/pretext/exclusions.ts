@@ -1,6 +1,6 @@
 import type { CircleExclusion, HorzRange } from './types'
 
-export const MIN_LINE_WIDTH = 36
+export const MIN_LINE_WIDTH = 8
 
 export function subtractRanges(ranges: HorzRange[], left: number, right: number): HorzRange[] {
   const result: HorzRange[] = []
@@ -48,12 +48,13 @@ export function availableRanges(
   left: number,
   right: number,
   circles: CircleExclusion[],
+  extraCuts: HorzRange[] = [],
 ): HorzRange[] {
   let ranges: HorzRange[] = [{ left, right }]
   const top = y
   const bottom = y + lineHeight
 
-  const cuts: HorzRange[] = []
+  const cuts: HorzRange[] = [...extraCuts]
   for (const circle of circles) {
     const cut = circleStripRange(circle, top, bottom)
     if (cut) cuts.push(cut)
