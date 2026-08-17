@@ -33,7 +33,6 @@ function onShaderReady() {
       :saturation="props.saturation"
       :brightness="props.brightness"
       :speed="props.speed"
-      mouse-mode="hover"
       :pixel-ratio="gpuProfile.silkPixelRatio"
       :frame-rate="60"
       :auto-pause="false"

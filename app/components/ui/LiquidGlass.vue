@@ -65,11 +65,19 @@ const baseStyle = computed(() => {
 
 // Computed displacement image
 const displacementImage = computed(() => {
-  const border = Math.min(dimensions.width, dimensions.height) * (props.border * 0.5)
-  const yBorder = Math.min(dimensions.width, dimensions.height) * (props.border * 0.5)
+  const width = dimensions.width
+  const height = dimensions.height
+  if (width <= 0 || height <= 0) return ''
+
+  // 边框厚度按短边比例；内外圆角必须同心，否则胶囊外形里会出现更尖的内框。
+  const border = Math.min(width, height) * (props.border * 0.5)
+  const outerRx = Math.min(props.radius, width / 2, height / 2)
+  const innerRx = Math.max(0, outerRx - border)
+  const innerW = Math.max(0, width - border * 2)
+  const innerH = Math.max(0, height - border * 2)
 
   return `
-    <svg viewBox="0 0 ${dimensions.width} ${dimensions.height}" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="red" x1="100%" y1="0%" x2="0%" y2="0%">
           <stop offset="0%" stop-color="#0000"/>
@@ -80,17 +88,17 @@ const displacementImage = computed(() => {
           <stop offset="100%" stop-color="blue"/>
         </linearGradient>
       </defs>
-      <rect x="0" y="0" width="${dimensions.width}" height="${dimensions.height}" fill="black"></rect>
-      <rect x="0" y="0" width="${dimensions.width}" height="${dimensions.height}" rx="${props.radius}" fill="url(#red)" />
-      <rect x="0" y="0" width="${dimensions.width}" height="${dimensions.height}" rx="${props.radius}" fill="url(#blue)" style="mix-blend-mode: ${props.blend}" />
-      <rect 
-        x="${border}" 
-        y="${yBorder}" 
-        width="${dimensions.width - border * 2}" 
-        height="${dimensions.height - border * 2}" 
-        rx="${props.radius}" 
-        fill="hsl(0 0% ${props.lightness}% / ${props.alpha})" 
-        style="filter:blur(${props.blur}px)" 
+      <rect x="0" y="0" width="${width}" height="${height}" fill="black"></rect>
+      <rect x="0" y="0" width="${width}" height="${height}" rx="${outerRx}" fill="url(#red)" />
+      <rect x="0" y="0" width="${width}" height="${height}" rx="${outerRx}" fill="url(#blue)" style="mix-blend-mode: ${props.blend}" />
+      <rect
+        x="${border}"
+        y="${border}"
+        width="${innerW}"
+        height="${innerH}"
+        rx="${innerRx}"
+        fill="hsl(0 0% ${props.lightness}% / ${props.alpha})"
+        style="filter:blur(${props.blur}px)"
       />
     </svg>
   `
@@ -227,12 +235,12 @@ onUnmounted(() => {
   width: 100%;
   opacity: 1;
   border-radius: inherit;
-  overflow: hidden;
   background: color-mix(in oklch, var(--card) calc(var(--frost) * 100%), transparent);
   box-shadow:
-    0 0 1px 1px color-mix(in oklch, var(--foreground) 6%, transparent) inset,
-    0 0 8px 3px color-mix(in oklch, var(--primary) 6%, transparent) inset,
-    0 18px 48px var(--shadow-bloom);
+    0 0 2px 1px color-mix(in oklch, var(--foreground) 10%, transparent) inset,
+    0 0 10px 4px color-mix(in oklch, var(--foreground) 6%, transparent) inset,
+    0 4px 16px var(--shadow-bloom),
+    0 8px 24px var(--shadow-bloom);
 }
 
 .slot-container {

@@ -31,9 +31,9 @@ function onBrandClick(event: MouseEvent) {
     <div class="section-pad !py-4 md:!py-5">
       <LiquidGlass
         :radius="999"
-        :frost="0.4"
-        :border="0.08"
-        :scale="-42"
+        :frost="0.1"
+        :border="0.35"
+        :scale="-80"
         :blur="6"
         :g-offset="2"
         :b-offset="4"

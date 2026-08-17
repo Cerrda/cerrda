@@ -3,6 +3,7 @@ import { MotionConfig } from 'motion-v'
 
 const colorMode = useColorMode()
 const isDark = computed(() => colorMode.value === 'dark')
+const isDev = import.meta.dev
 </script>
 
 <template>
@@ -22,6 +23,7 @@ const isDark = computed(() => colorMode.value === 'dark')
         <NuxtPage />
       </NuxtLayout>
       <ClientOnly>
+        <FpsMeter v-if="isDev" />
         <BackToTop />
         <SmoothCursor />
       </ClientOnly>

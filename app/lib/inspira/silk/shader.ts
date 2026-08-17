@@ -39,9 +39,6 @@ void mainImage(out vec4 fragColor, vec2 fragCoord) {
     float t = iTime;
     uv.y += 0.03 * sin(8.0 * uv.x - t);
 
-    if (iMouse.z > 1.0)
-        uv += smoothstep(0.5, 0.0, distance(iMouse.xy / mr, uv)) * 0.015;
-
     float s = sqrt(silk(uv, t));
     float d = silkd(uv, t);
 

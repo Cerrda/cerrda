@@ -100,13 +100,13 @@ useEventListener(window, 'scrollend', updateScroll)
               >
                 <LiquidGlass
                   :radius="999"
-                  :frost="0.4"
-                  :border="0.08"
-                  :scale="-42"
+                  :frost="0.16"
+                  :border="0.35"
+                  :scale="-120"
                   :blur="6"
                   :g-offset="2"
                   :b-offset="4"
-                  container-class="h-11 overflow-hidden rounded-full"
+                  container-class="h-11 rounded-full"
                 >
                   <span class="relative flex h-11 items-center gap-2 pr-3.5 pl-1 text-foreground">
                     <span class="relative flex size-9 shrink-0 items-center justify-center">

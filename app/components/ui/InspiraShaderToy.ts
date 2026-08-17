@@ -51,6 +51,7 @@ export class InspiraShaderToy {
 
   private _speed: number = 1
   private _pixelRatio: number = 1
+  private _interactive: boolean = true
 
   // Shader source
   private shaderSource: string = ''
@@ -130,6 +131,7 @@ export class InspiraShaderToy {
     mouseMode?: MouseMode,
     fps?: number,
     pixelRatio = 1,
+    interactive = true,
   ) {
     if (mouseMode) {
       this._mouseMode = mouseMode
@@ -138,6 +140,7 @@ export class InspiraShaderToy {
       this.setFrameRate(fps)
     }
     this.setPixelRatio(pixelRatio)
+    this._interactive = interactive
 
     // Create renderer with WebGL 2 context
     this.renderer = new Renderer({
@@ -180,7 +183,9 @@ export class InspiraShaderToy {
   }
 
   private setup(): void {
-    this.setupMouseEvents()
+    if (this._interactive) {
+      this.setupMouseEvents()
+    }
     this.setupResizeHandler()
   }
 

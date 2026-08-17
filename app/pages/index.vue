@@ -29,14 +29,6 @@ let copiedResetTimer: ReturnType<typeof setTimeout> | undefined
 const featuredArticle = computed(() => articleMeta[0])
 const archiveArticles = computed(() => articleMeta.slice(1))
 
-const contentGlass = {
-  scale: -56,
-  blur: 6,
-  gOffset: 0,
-  bOffset: 0,
-  frost: 0.76,
-}
-
 function articleIndex(n: number) {
   return String(n).padStart(2, '0')
 }
@@ -114,28 +106,27 @@ onBeforeUnmount(() => {
 
         <div class="mt-10 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <ClientOnly>
-            <div
-              class="relative min-h-72 overflow-hidden rounded-[2rem] border border-border/50 bg-card/35 dark:bg-card/25"
-            >
-              <LightSpeed
-                class="absolute inset-0 z-0 min-h-72 cursor-pointer"
-                :effect-options="{
-                  distortion: 'turbulentDistortion',
-                  length: 400,
-                  cullFace: 'None',
-                  fov: 90,
-                  fovSpeedUp: 150,
-                  speedUp: 2,
-                }"
-              />
-              <div
-                class="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-background via-background/20 to-transparent"
-              />
-              <div class="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-6">
-                <p class="font-display text-xl">Speed of craft</p>
-                <p class="mt-2 text-sm text-muted-foreground">按住加速 · 从远程类型同步到 Agent 工作流</p>
+            <CssLiquidGlass class="pointer-events-none" container-class="min-h-72" :radius="32">
+              <template #media>
+                <LightSpeed
+                  class="absolute inset-0 min-h-72 cursor-pointer"
+                  :effect-options="{
+                    distortion: 'turbulentDistortion',
+                    length: 400,
+                    cullFace: 'None',
+                    fov: 90,
+                    fovSpeedUp: 150,
+                    speedUp: 2,
+                  }"
+                />
+              </template>
+              <div class="pointer-events-none absolute inset-x-0 bottom-0 px-6 pb-2.5 md:px-7 md:pb-3">
+                <p class="font-display text-xl drop-shadow-[0_1px_8px_rgb(0_0_0_/_0.55)]">Speed of craft</p>
+                <p class="mt-1 text-sm text-muted-foreground drop-shadow-[0_1px_8px_rgb(0_0_0_/_0.55)]">
+                  按住加速 · 从远程类型同步到 Agent 工作流
+                </p>
               </div>
-            </div>
+            </CssLiquidGlass>
           </ClientOnly>
 
           <TracingBeam class="min-h-[22rem] px-2 md:px-6">
@@ -233,64 +224,51 @@ onBeforeUnmount(() => {
         </BlurReveal>
 
         <div class="mt-10 grid gap-6 lg:grid-cols-2">
-          <div v-for="pkg in packages" :key="pkg.name">
-            <ClientOnly>
-              <LiquidGlass
-                class="rounded-[1.75rem]"
-                :radius="28"
-                :frost="contentGlass.frost"
-                :scale="contentGlass.scale"
-                :blur="contentGlass.blur"
-                :g-offset="contentGlass.gOffset"
-                :b-offset="contentGlass.bOffset"
-              >
-                <div class="rounded-[1.5rem] p-6 md:p-7">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <span
-                      class="rounded-full bg-primary/15 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-primary"
-                    >
-                      {{ pkg.role }}
-                    </span>
-                    <span class="text-xs text-muted-foreground">v{{ pkg.version }}</span>
-                  </div>
-                  <h3 class="mt-4 font-display text-2xl">
-                    <LinkPreview
-                      :url="pkg.href"
-                      :width="240"
-                      :height="150"
-                      link-class="underline decoration-primary/35 underline-offset-4 transition hover:text-primary hover:decoration-primary"
-                    >
-                      {{ pkg.name }}
-                    </LinkPreview>
-                  </h3>
-                  <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    {{ pkg.summary }}
-                  </p>
-                  <ul class="mt-5 space-y-2 text-sm text-muted-foreground">
-                    <li v-for="point in pkg.points" :key="point" class="flex gap-2">
-                      <span class="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-                      <span>{{ point }}</span>
-                    </li>
-                  </ul>
-                  <div class="mt-6">
-                    <NuxtLink :to="pkg.href" target="_blank" external>
-                      <InteractiveHoverButton text="查看包详情" />
-                    </NuxtLink>
-                  </div>
+          <Motion
+            v-for="(pkg, index) in packages"
+            :key="pkg.name"
+            :initial="{ opacity: 0, y: 24 }"
+            :while-in-view="{ opacity: 1, y: 0 }"
+            :transition="{ delay: Math.min(index * 0.08, 0.2), duration: 0.7, ease: [0.32, 0.72, 0, 1] }"
+            :viewport="{ once: true, amount: 0.25 }"
+          >
+            <CssLiquidGlass class="h-full rounded-[1.75rem]" container-class="h-full rounded-[1.75rem]" :radius="28">
+              <div class="flex h-full flex-col rounded-[1.5rem] p-6 md:p-7">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span
+                    class="rounded-full bg-primary/15 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-primary"
+                  >
+                    {{ pkg.role }}
+                  </span>
+                  <span class="text-xs text-muted-foreground">v{{ pkg.version }}</span>
                 </div>
-              </LiquidGlass>
-              <template #fallback>
-                <div class="rounded-[1.75rem] border border-border/60 bg-card/70 p-6 md:p-7">
-                  <h3 class="font-display text-2xl">
+                <h3 class="mt-4 font-display text-2xl">
+                  <LinkPreview
+                    :url="pkg.href"
+                    :width="240"
+                    :height="150"
+                    link-class="underline decoration-primary/35 underline-offset-4 transition hover:text-primary hover:decoration-primary"
+                  >
                     {{ pkg.name }}
-                  </h3>
-                  <p class="mt-3 text-sm text-muted-foreground">
-                    {{ pkg.summary }}
-                  </p>
+                  </LinkPreview>
+                </h3>
+                <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {{ pkg.summary }}
+                </p>
+                <ul class="mt-5 space-y-2 text-sm text-muted-foreground">
+                  <li v-for="point in pkg.points" :key="point" class="flex gap-2">
+                    <span class="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span>{{ point }}</span>
+                  </li>
+                </ul>
+                <div class="mt-6">
+                  <NuxtLink :to="pkg.href" target="_blank" external>
+                    <InteractiveHoverButton text="查看包详情" />
+                  </NuxtLink>
                 </div>
-              </template>
-            </ClientOnly>
-          </div>
+              </div>
+            </CssLiquidGlass>
+          </Motion>
         </div>
       </div>
     </section>
@@ -328,70 +306,46 @@ onBeforeUnmount(() => {
             :transition="{ delay: Math.min(index * 0.08, 0.2), duration: 0.7, ease: [0.32, 0.72, 0, 1] }"
             :viewport="{ once: true, amount: 0.25 }"
           >
-            <ClientOnly>
-              <LiquidGlass
-                class="h-full rounded-[1.75rem]"
-                container-class="h-full rounded-[1.75rem]"
-                :radius="28"
-                :frost="contentGlass.frost"
-                :scale="contentGlass.scale"
-                :blur="contentGlass.blur"
-                :g-offset="contentGlass.gOffset"
-                :b-offset="contentGlass.bOffset"
-              >
-                <article class="flex h-full flex-col p-6 md:p-7">
-                  <div class="flex items-center justify-between gap-3">
-                    <span class="text-[10px] uppercase tracking-[0.18em] text-primary">skills.sh</span>
-                    <span class="font-mono text-[11px] text-muted-foreground">0{{ index + 1 }}</span>
-                  </div>
+            <CssLiquidGlass class="h-full rounded-[1.75rem]" container-class="h-full rounded-[1.75rem]" :radius="28">
+              <article class="flex h-full flex-col p-6 md:p-7">
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-[10px] uppercase tracking-[0.18em] text-primary">skills.sh</span>
+                  <span class="font-mono text-[11px] text-muted-foreground">0{{ index + 1 }}</span>
+                </div>
 
-                  <h3 class="mt-4 font-display text-2xl tracking-tight">
-                    <LinkPreview
-                      :url="skill.href"
-                      :width="240"
-                      :height="150"
-                      link-class="underline decoration-primary/35 underline-offset-4 transition hover:text-primary hover:decoration-primary"
-                    >
-                      {{ skill.name }}
-                    </LinkPreview>
-                  </h3>
-
-                  <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    {{ skill.summary }}
-                  </p>
-
-                  <ul class="mt-5 space-y-2.5">
-                    <li
-                      v-for="point in skill.points"
-                      :key="point"
-                      class="flex gap-2.5 text-sm leading-snug text-muted-foreground"
-                    >
-                      <span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                      <span>{{ point }}</span>
-                    </li>
-                  </ul>
-
-                  <code
-                    class="mt-auto block overflow-x-auto rounded-xl bg-secondary/80 px-3 py-2.5 font-mono text-[11px] leading-relaxed text-foreground"
+                <h3 class="mt-4 font-display text-2xl tracking-tight">
+                  <LinkPreview
+                    :url="skill.href"
+                    :width="240"
+                    :height="150"
+                    link-class="underline decoration-primary/35 underline-offset-4 transition hover:text-primary hover:decoration-primary"
                   >
-                    {{ skill.install }}
-                  </code>
-                </article>
-              </LiquidGlass>
-              <template #fallback>
-                <article class="flex h-full flex-col rounded-[1.75rem] border border-border/60 bg-card/70 p-6 md:p-7">
-                  <h3 class="font-display text-2xl">
                     {{ skill.name }}
-                  </h3>
-                  <p class="mt-3 text-sm text-muted-foreground">
-                    {{ skill.summary }}
-                  </p>
-                  <code class="mt-5 block overflow-x-auto rounded-xl bg-secondary/80 px-3 py-2.5 font-mono text-[11px]">
-                    {{ skill.install }}
-                  </code>
-                </article>
-              </template>
-            </ClientOnly>
+                  </LinkPreview>
+                </h3>
+
+                <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {{ skill.summary }}
+                </p>
+
+                <ul class="mt-5 space-y-2.5">
+                  <li
+                    v-for="point in skill.points"
+                    :key="point"
+                    class="flex gap-2.5 text-sm leading-snug text-muted-foreground"
+                  >
+                    <span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span>{{ point }}</span>
+                  </li>
+                </ul>
+
+                <code
+                  class="mt-auto block overflow-x-auto rounded-xl bg-secondary/80 px-3 py-2.5 font-mono text-[11px] leading-relaxed text-foreground"
+                >
+                  {{ skill.install }}
+                </code>
+              </article>
+            </CssLiquidGlass>
           </Motion>
         </div>
       </div>
@@ -424,79 +378,55 @@ onBeforeUnmount(() => {
           :viewport="{ once: true, amount: 0.25 }"
           class="mt-12"
         >
-          <ClientOnly>
-            <LiquidGlass
-              class="rounded-[2rem]"
-              container-class="rounded-[2rem]"
-              :radius="32"
-              :frost="contentGlass.frost"
-              :scale="contentGlass.scale"
-              :blur="contentGlass.blur"
-              :g-offset="contentGlass.gOffset"
-              :b-offset="contentGlass.bOffset"
+          <CssLiquidGlass class="rounded-[2rem]" container-class="rounded-[2rem]" :radius="32">
+            <NuxtLink
+              :to="`/articles/${featuredArticle.slug}`"
+              class="group relative block overflow-hidden rounded-[2rem] p-6 md:p-9 lg:p-10"
             >
-              <NuxtLink
-                :to="`/articles/${featuredArticle.slug}`"
-                class="group relative block overflow-hidden p-6 md:p-9 lg:p-10"
-              >
-                <div class="article-orb article-orb-tr" aria-hidden="true" />
-                <div class="article-orb article-orb-bl" aria-hidden="true" />
+              <div class="article-orb article-orb-tr" aria-hidden="true" />
+              <div class="article-orb article-orb-bl" aria-hidden="true" />
 
-                <div class="relative grid gap-8 lg:grid-cols-[auto_1fr_auto] lg:items-end">
-                  <span
-                    class="font-display text-6xl leading-none tracking-tight text-primary/30 transition duration-500 group-hover:text-primary/55 md:text-8xl"
-                  >
-                    {{ articleIndex(1) }}
-                  </span>
+              <div class="relative grid gap-8 lg:grid-cols-[auto_1fr_auto] lg:items-end">
+                <span
+                  class="font-display text-6xl leading-none tracking-tight text-primary/30 transition duration-500 group-hover:text-primary/55 md:text-8xl"
+                >
+                  {{ articleIndex(1) }}
+                </span>
 
-                  <div class="min-w-0">
-                    <div class="flex flex-wrap items-center gap-2">
-                      <span
-                        class="rounded-full bg-primary/15 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary"
-                      >
-                        Latest
-                      </span>
-                      <span
-                        v-for="tag in featuredArticle.tags"
-                        :key="tag"
-                        class="rounded-full border border-border/60 bg-background/40 px-2.5 py-1 text-[11px] text-muted-foreground"
-                      >
-                        {{ tag }}
-                      </span>
-                    </div>
-                    <h3
-                      class="mt-4 max-w-3xl font-display text-2xl leading-snug tracking-tight transition duration-500 group-hover:text-primary md:text-4xl"
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span
+                      class="rounded-full bg-primary/15 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-primary"
                     >
-                      {{ featuredArticle.title }}
-                    </h3>
-                    <p class="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-                      {{ featuredArticle.description }}
-                    </p>
+                      Latest
+                    </span>
+                    <span
+                      v-for="tag in featuredArticle.tags"
+                      :key="tag"
+                      class="rounded-full border border-border/60 bg-background/40 px-2.5 py-1 text-[11px] text-muted-foreground"
+                    >
+                      {{ tag }}
+                    </span>
                   </div>
-
-                  <div class="flex flex-col items-start gap-4 lg:items-end">
-                    <time class="font-mono text-xs tracking-wide text-muted-foreground">
-                      {{ featuredArticle.date }}
-                    </time>
-                    <InteractiveHoverButton text="阅读全文" />
-                  </div>
+                  <h3
+                    class="mt-4 max-w-3xl font-display text-2xl leading-snug tracking-tight transition duration-500 group-hover:text-primary md:text-4xl"
+                  >
+                    {{ featuredArticle.title }}
+                  </h3>
+                  <p class="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+                    {{ featuredArticle.description }}
+                  </p>
                 </div>
-              </NuxtLink>
-            </LiquidGlass>
-            <template #fallback>
-              <NuxtLink
-                :to="`/articles/${featuredArticle.slug}`"
-                class="block rounded-[2rem] border border-border/60 bg-card/70 p-6 md:p-9"
-              >
-                <h3 class="font-display text-2xl md:text-4xl">
-                  {{ featuredArticle.title }}
-                </h3>
-                <p class="mt-4 text-sm text-muted-foreground">
-                  {{ featuredArticle.description }}
-                </p>
-              </NuxtLink>
-            </template>
-          </ClientOnly>
+
+                <div class="flex flex-col items-start gap-4 lg:items-end">
+                  <time class="font-mono text-xs tracking-wide text-muted-foreground">
+                    {{ featuredArticle.date }}
+                  </time>
+                  <InteractiveHoverButton text="阅读全文" />
+                </div>
+              </div>
+            </NuxtLink>
+          </CssLiquidGlass>
         </Motion>
 
         <!-- Archive -->
@@ -597,128 +527,109 @@ onBeforeUnmount(() => {
           </p>
         </BlurReveal>
 
-        <ClientOnly>
-          <LiquidGlass
-            class="h-full"
-            container-class="mt-10 rounded-[2rem]"
-            :radius="32"
-            :frost="contentGlass.frost"
-            :scale="contentGlass.scale"
-            :blur="contentGlass.blur"
-            :g-offset="contentGlass.gOffset"
-            :b-offset="contentGlass.bOffset"
+        <CssLiquidGlass class="h-full" container-class="mt-10 rounded-[2rem]" :radius="32">
+          <div
+            class="relative flex h-full min-h-[16rem] flex-col justify-center overflow-hidden rounded-[2rem] p-8 md:min-h-[18rem] md:p-10"
           >
             <div
-              class="relative flex h-full min-h-[16rem] flex-col justify-center overflow-hidden p-8 md:min-h-[18rem] md:p-10"
-            >
-              <div
-                class="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-primary/15 blur-3xl"
-                aria-hidden="true"
-              />
-              <div
-                class="pointer-events-none absolute -bottom-24 left-1/3 size-64 rounded-full bg-accent/40 blur-3xl dark:bg-primary/10"
-                aria-hidden="true"
-              />
+              class="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-primary/15 blur-3xl"
+              aria-hidden="true"
+            />
+            <div
+              class="pointer-events-none absolute -bottom-24 left-1/3 size-64 rounded-full bg-accent/40 blur-3xl dark:bg-primary/10"
+              aria-hidden="true"
+            />
 
-              <div class="relative grid h-full gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-                <div>
-                  <p class="text-xs uppercase tracking-[0.22em] text-muted-foreground">Contact</p>
-                  <h3 class="mt-3 font-display text-2xl md:text-4xl">联系方式</h3>
-                  <p class="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
-                    邮箱用于合作与技术交流；GitHub、掘金与 skills.sh 可直接查看开源与写作。点击右侧按钮打开完整信息。
-                  </p>
+            <div class="relative grid h-full gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+              <div>
+                <p class="text-xs uppercase tracking-[0.22em] text-muted-foreground">Contact</p>
+                <h3 class="mt-3 font-display text-2xl md:text-4xl">联系方式</h3>
+                <p class="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
+                  邮箱用于合作与技术交流；GitHub、掘金与 skills.sh 可直接查看开源与写作。点击右侧按钮打开完整信息。
+                </p>
 
-                  <ul class="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-                    <li v-for="channel in contactChannels" :key="channel.id" class="flex items-center gap-2">
-                      <span class="size-1.5 rounded-full bg-primary" />
-                      <span>{{ channel.label }}</span>
-                    </li>
-                  </ul>
-                </div>
+                <ul class="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+                  <li v-for="channel in contactChannels" :key="channel.id" class="flex items-center gap-2">
+                    <span class="size-1.5 rounded-full bg-primary" />
+                    <span>{{ channel.label }}</span>
+                  </li>
+                </ul>
+              </div>
 
-                <div class="w-full sm:w-auto lg:justify-self-end">
-                  <AnimatedModal>
-                    <AnimatedModalTrigger as="div" class="!rounded-none !p-0">
-                      <InteractiveHoverButton text="打开联系方式" class="w-full sm:w-auto" />
-                    </AnimatedModalTrigger>
-                    <AnimatedModalBody
-                      class="w-[min(32rem,calc(100vw-32px))] border-border bg-card dark:border-border dark:bg-card"
-                    >
-                      <AnimatedModalContent class="p-6 md:p-7">
-                        <p class="text-xs uppercase tracking-[0.2em] text-muted-foreground">Direct contact</p>
-                        <h3 class="mt-3 font-display text-2xl md:text-3xl">
-                          {{ siteProfile.name }}
-                        </h3>
-                        <p class="mt-2 text-sm text-muted-foreground">
-                          {{ siteProfile.role }} · {{ siteProfile.location }}
-                        </p>
+              <div class="w-full sm:w-auto lg:justify-self-end">
+                <AnimatedModal>
+                  <AnimatedModalTrigger as="div" class="!rounded-none !p-0">
+                    <InteractiveHoverButton text="打开联系方式" class="w-full sm:w-auto" />
+                  </AnimatedModalTrigger>
+                  <AnimatedModalBody
+                    class="w-[min(32rem,calc(100vw-32px))] border-border bg-card dark:border-border dark:bg-card"
+                  >
+                    <AnimatedModalContent class="p-6 md:p-7">
+                      <p class="text-xs uppercase tracking-[0.2em] text-muted-foreground">Direct contact</p>
+                      <h3 class="mt-3 font-display text-2xl md:text-3xl">
+                        {{ siteProfile.name }}
+                      </h3>
+                      <p class="mt-2 text-sm text-muted-foreground">
+                        {{ siteProfile.role }} · {{ siteProfile.location }}
+                      </p>
 
-                        <ul class="mt-6 space-y-3">
-                          <li
-                            v-for="channel in contactChannels"
-                            :key="channel.id"
-                            class="flex items-start justify-between gap-3 border-b border-border/60 pb-3 last:border-b-0 last:pb-0"
-                          >
-                            <div class="min-w-0">
-                              <p class="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                                {{ channel.label }}
-                              </p>
-                              <a
-                                :href="channel.href"
-                                :target="channel.id === 'email' ? undefined : '_blank'"
-                                :rel="channel.id === 'email' ? undefined : 'noopener noreferrer'"
-                                class="mt-1 block truncate font-medium text-foreground underline decoration-primary/30 underline-offset-4 transition hover:text-primary hover:decoration-primary"
-                              >
-                                {{ channel.value }}
-                              </a>
-                              <p class="mt-1 text-xs text-muted-foreground">
-                                {{ channel.hint }}
-                              </p>
-                            </div>
-                            <AnimatedTooltip :open="copiedChannelId === channel.id" title="复制成功">
-                              <button
-                                type="button"
-                                class="shrink-0 rounded-full border border-border/70 px-3 py-1.5 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
-                                @click="copyContactValue(channel.id, channel.value)"
-                              >
-                                复制
-                              </button>
-                            </AnimatedTooltip>
-                          </li>
-                        </ul>
-
-                        <AnimatedModalFooter>
-                          <AnimatedTooltip
-                            :open="copiedChannelId === 'email-cta'"
-                            title="邮箱地址复制成功"
-                            :subtitle="siteProfile.email"
-                          >
-                            <InteractiveHoverButton
-                              text="发送邮件"
-                              class="border-primary/30 bg-primary text-primary-foreground"
-                              @click="copyContactValue('email-cta', siteProfile.email)"
-                            />
+                      <ul class="mt-6 space-y-3">
+                        <li
+                          v-for="channel in contactChannels"
+                          :key="channel.id"
+                          class="flex items-start justify-between gap-3 border-b border-border/60 pb-3 last:border-b-0 last:pb-0"
+                        >
+                          <div class="min-w-0">
+                            <p class="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                              {{ channel.label }}
+                            </p>
+                            <a
+                              :href="channel.href"
+                              :target="channel.id === 'email' ? undefined : '_blank'"
+                              :rel="channel.id === 'email' ? undefined : 'noopener noreferrer'"
+                              class="mt-1 block truncate font-medium text-foreground underline decoration-primary/30 underline-offset-4 transition hover:text-primary hover:decoration-primary"
+                            >
+                              {{ channel.value }}
+                            </a>
+                            <p class="mt-1 text-xs text-muted-foreground">
+                              {{ channel.hint }}
+                            </p>
+                          </div>
+                          <AnimatedTooltip :open="copiedChannelId === channel.id" title="复制成功">
+                            <button
+                              type="button"
+                              class="shrink-0 rounded-full border border-border/70 px-3 py-1.5 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+                              @click="copyContactValue(channel.id, channel.value)"
+                            >
+                              复制
+                            </button>
                           </AnimatedTooltip>
-                          <NuxtLink :to="siteProfile.links.github" target="_blank" external>
-                            <InteractiveHoverButton text="GitHub" />
-                          </NuxtLink>
-                        </AnimatedModalFooter>
-                      </AnimatedModalContent>
-                    </AnimatedModalBody>
-                  </AnimatedModal>
-                </div>
+                        </li>
+                      </ul>
+
+                      <AnimatedModalFooter>
+                        <AnimatedTooltip
+                          :open="copiedChannelId === 'email-cta'"
+                          title="邮箱地址复制成功"
+                          :subtitle="siteProfile.email"
+                        >
+                          <InteractiveHoverButton
+                            text="发送邮件"
+                            class="border-primary/30 bg-primary text-primary-foreground"
+                            @click="copyContactValue('email-cta', siteProfile.email)"
+                          />
+                        </AnimatedTooltip>
+                        <NuxtLink :to="siteProfile.links.github" target="_blank" external>
+                          <InteractiveHoverButton text="GitHub" />
+                        </NuxtLink>
+                      </AnimatedModalFooter>
+                    </AnimatedModalContent>
+                  </AnimatedModalBody>
+                </AnimatedModal>
               </div>
             </div>
-          </LiquidGlass>
-          <template #fallback>
-            <div class="mt-10 rounded-[2rem] border border-border/60 bg-card/70 p-8 md:p-10">
-              <h3 class="font-display text-2xl">联系方式</h3>
-              <p class="mt-3 text-sm text-muted-foreground">
-                邮箱 {{ siteProfile.email }} · GitHub {{ siteProfile.links.github.replace('https://', '') }}
-              </p>
-            </div>
-          </template>
-        </ClientOnly>
+          </div>
+        </CssLiquidGlass>
       </div>
     </section>
 

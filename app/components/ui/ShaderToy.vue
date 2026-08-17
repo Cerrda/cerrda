@@ -91,7 +91,13 @@ onMounted(() => {
   if (!containerRef.value) return
 
   try {
-    shader = new InspiraShaderToy(containerRef.value, props.mouseMode, props.frameRate, props.pixelRatio)
+    shader = new InspiraShaderToy(
+      containerRef.value,
+      props.mouseMode,
+      props.frameRate,
+      props.pixelRatio,
+      props.interactive,
+    )
   } catch (error) {
     emit('error', error instanceof Error ? error.message : 'Failed to initialize WebGL')
     return
