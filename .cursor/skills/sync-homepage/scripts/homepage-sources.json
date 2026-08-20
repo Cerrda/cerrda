@@ -1,0 +1,39 @@
+{
+  "juejinUserId": "2564487822453831",
+  "githubSkillsRepo": "Cerrda/skills",
+  "skillsShProfile": "cerrda",
+  "npmMaintainer": "cerrda",
+  "npm": {
+    "pinned": [
+      {
+        "name": "vite-plugin-fetch-dts",
+        "role": "作者"
+      },
+      {
+        "name": "openapi-v3-request-generator",
+        "role": "贡献者"
+      },
+      {
+        "name": "dsh-cerrda-theme",
+        "role": "作者"
+      }
+    ],
+    "exclude": []
+  },
+  "articleSlugs": {
+    "7672698563611197490": "scrapling-config-crawl-skill",
+    "7672434949261197352": "faker-mock-setup-skill",
+    "7653373167660204078": "unocss-svg-hmr",
+    "7650080459327373354": "vue3-vcopy",
+    "7650093760348848147": "unocss-icons",
+    "7637342611919880228": "tooltip-perf",
+    "7597704040216215578": "v-ellipsis-tooltip",
+    "7576843726010662938": "uniapp-nav-bar",
+    "7576276707330981894": "fnm-windows",
+    "7674840998541443118": "dsh-cerrda-theme"
+  },
+  "skillHashes": {
+    "faker-mock-setup": "cc0b511d7c04f9b4",
+    "scrapling-config-crawl": "49cebd8ee41ee959"
+  }
+}

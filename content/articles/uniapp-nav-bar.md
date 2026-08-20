@@ -1,8 +1,8 @@
 ---
-title: "🌟让你的uniapp应用拥有更现代的交互体验，一个支持滚动渐变透明的导航栏组件🌟"
-description: "在开发小程序时，我们经常会看到这样的效果：页面顶部有张大图，导航栏初始是透明的，随着页面向下滚动，导航栏逐渐变得不透明。这种设计既美观又实用，今天就来分享如何实现这个效果。"
-date: 2025-11-26
-tags: ["uni-app", "导航栏", "透明"]
+title: "uni-app 自适应透明导航栏组件"
+description: "支持滚动渐变透明的现代导航栏交互体验。"
+date: 2025-12-01
+tags: ["uni-app"]
 juejin: https://juejin.cn/post/7576843726010662938
 slug: uniapp-nav-bar
 ---
@@ -26,7 +26,7 @@ slug: uniapp-nav-bar
 
 当用户向下滚动页面时，导航栏会从完全透明逐渐变为设定的背景色，整个过渡非常丝滑自然。
 
-<p align="center"><img src="https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/8f8c823dd5b643ad98994394ba20456e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787126761&x-signature=ritnww89R%2F9vgZ8vuTj9fNt3HKM%3D" alt="PixPin_2025-11-26_15-18-08.webp"></p>
+<p align="center"><img src="https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/8f8c823dd5b643ad98994394ba20456e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787731561&x-signature=831F%2B0YdYLMXWjkqi1a2Vd0koHk%3D" alt="PixPin_2025-11-26_15-18-08.webp"></p>
 
 ## 🔍 实现原理
 

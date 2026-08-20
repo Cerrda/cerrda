@@ -1,0 +1,107 @@
+[
+  {
+    "kind": "article",
+    "reason": "added",
+    "id": "7674840998541443118",
+    "slug": "deepseek-harness-dsh",
+    "sourceFile": "content/articles/deepseek-harness-dsh.md",
+    "remote": {
+      "title": "给 DeepSeek Harness（DSH） 换上液态玻璃丝绸暗色主题",
+      "brief": "如果你每天对着它写代码、排问题，难免会想：能不能再「好看」一点——不是换张壁纸那种好看，而是配色、字体、玻璃、背景动起来都像一套完整的产品设计。",
+      "tags": [
+        "DeepSeek",
+        "NPM",
+        "动效"
+      ],
+      "date": "2026-08-18"
+    },
+    "local": null
+  },
+  {
+    "kind": "article",
+    "reason": "updatedBody",
+    "id": "7672698563611197490",
+    "slug": "scrapling-config-crawl-skill",
+    "sourceFile": "content/articles/scrapling-config-crawl-skill.md",
+    "remote": {
+      "title": "把配置驱动爬虫做成可安装 Skill：scrapling-config-crawl",
+      "brief": "写爬虫最耗人的往往不是「会不会写 requests」，而是：每个站分页规则不同、增量怎么比、详情附件怎么下、翻页一不小心就跳页。",
+      "tags": [
+        "爬虫"
+      ],
+      "date": "2026-08-12"
+    },
+    "local": {
+      "title": "把配置驱动爬虫做成可安装 Skill：scrapling-config-crawl",
+      "description": "按 config.py 的 id 生成 scrapling 脚本并写入 SQLite，把翻页校验与增量采集固化成 Agent Skill。",
+      "tags": [
+        "爬虫",
+        "Agent Skill"
+      ]
+    }
+  },
+  {
+    "kind": "article",
+    "reason": "updatedBody",
+    "id": "7672434949261197352",
+    "slug": "faker-mock-setup-skill",
+    "sourceFile": "content/articles/faker-mock-setup-skill.md",
+    "remote": {
+      "title": "把团队 Mock 工作流做成可安装 Skill：faker-mock-setup 上架 skills.sh 实践",
+      "brief": "前端联调时，最烦的不是写页面，而是：接口没好、字段语义乱、枚举靠猜、列表条数对不上 UI。我们把「按 OpenAPI 生成页面级 Faker Mock」固化成一个 Agent Skill",
+      "tags": [
+        "AI编程",
+        "Cursor"
+      ],
+      "date": "2026-08-11"
+    },
+    "local": {
+      "title": "把团队 Mock 工作流做成可安装 Skill：faker-mock-setup 上架 skills.sh 实践",
+      "description": "把「按 OpenAPI 生成页面级 Faker Mock」固化为可安装 Skill，改善前端联调体验。",
+      "tags": [
+        "AI编程",
+        "Cursor"
+      ]
+    }
+  },
+  {
+    "kind": "article",
+    "reason": "updatedBody",
+    "id": "7576843726010662938",
+    "slug": "uniapp-nav-bar",
+    "sourceFile": "content/articles/uniapp-nav-bar.md",
+    "remote": {
+      "title": "🌟让你的uniapp应用拥有更现代的交互体验，一个支持滚动渐变透明的导航栏组件🌟",
+      "brief": "🌟让你的uniapp应用拥有更现代的交互体验，一个支持滚动渐变透明的导航栏组件。uni-app 自适应透明导航栏组件实现🌟",
+      "tags": [
+        "uni-app"
+      ],
+      "date": "2025-11-26"
+    },
+    "local": {
+      "title": "uni-app 自适应透明导航栏组件",
+      "description": "支持滚动渐变透明的现代导航栏交互体验。",
+      "tags": [
+        "uni-app"
+      ]
+    }
+  },
+  {
+    "kind": "package",
+    "reason": "added",
+    "name": "dsh-cerrda-theme",
+    "remote": {
+      "version": "0.2.0",
+      "description": "Deployment-level static web plugin for DSH: cerrda dark re-theme of the DeepSeek Harness Web GUI (rose/purple oklch, Liquid Glass composer, Silk WebGL2 background, Sora/Fraunces/JetBrains Mono). Install with: dsh plugin --profile web add dsh-cerrda-theme",
+      "keywords": [
+        "dsh",
+        "dsh-plugin",
+        "deepseek-harness",
+        "theme",
+        "cerrda"
+      ],
+      "excerpt": ""
+    },
+    "local": null
+  }
+]

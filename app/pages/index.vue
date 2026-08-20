@@ -33,6 +33,31 @@ function articleIndex(n: number) {
   return String(n).padStart(2, '0')
 }
 
+/** 偶数两列；奇数 1+2 L 形 bento，不留空格。align=end 时镜像，避免与 packages 同构图。 */
+function catalogGridClass(total: number) {
+  return total % 2 === 1 ? 'mt-10 grid gap-6 lg:grid-cols-12' : 'mt-10 grid gap-6 lg:grid-cols-2'
+}
+
+function catalogItemClass(index: number, total: number, align: 'start' | 'end' = 'start') {
+  if (total === 1) return 'lg:col-span-12'
+  if (total % 2 === 0) return ''
+  const mirror = align === 'end'
+  if (index === 0) {
+    return mirror ? 'lg:col-span-7 lg:col-start-6 lg:row-span-2' : 'lg:col-span-7 lg:row-span-2'
+  }
+  if (index === 1) {
+    return mirror ? 'lg:col-span-5 lg:col-start-1 lg:row-start-1' : 'lg:col-span-5'
+  }
+  if (index === 2) {
+    return mirror ? 'lg:col-span-5 lg:col-start-1 lg:row-start-2' : 'lg:col-span-5'
+  }
+  return 'lg:col-span-6'
+}
+
+function catalogFeatured(index: number, total: number) {
+  return total % 2 === 1 && index === 0
+}
+
 async function copyContactValue(id: string, value: string) {
   try {
     await navigator.clipboard.writeText(value)
@@ -223,17 +248,23 @@ onBeforeUnmount(() => {
           <p class="mt-3 max-w-2xl text-muted-foreground">自己维护的插件，以及参与贡献的 OpenAPI 请求生成器。</p>
         </BlurReveal>
 
-        <div class="mt-10 grid gap-6 lg:grid-cols-2">
+        <div :class="catalogGridClass(packages.length)">
           <Motion
             v-for="(pkg, index) in packages"
             :key="pkg.name"
+            :class="catalogItemClass(index, packages.length)"
             :initial="{ opacity: 0, y: 24 }"
             :while-in-view="{ opacity: 1, y: 0 }"
             :transition="{ delay: Math.min(index * 0.08, 0.2), duration: 0.7, ease: [0.32, 0.72, 0, 1] }"
             :viewport="{ once: true, amount: 0.25 }"
           >
             <CssLiquidGlass class="h-full rounded-[1.75rem]" container-class="h-full rounded-[1.75rem]" :radius="28">
-              <div class="flex h-full flex-col rounded-[1.5rem] p-6 md:p-7">
+              <div
+                :class="[
+                  'flex h-full flex-col rounded-[1.5rem]',
+                  catalogFeatured(index, packages.length) ? 'p-6 md:p-8 lg:p-9' : 'p-6 md:p-7',
+                ]"
+              >
                 <div class="flex flex-wrap items-center gap-2">
                   <span
                     class="rounded-full bg-primary/15 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-primary"
@@ -242,7 +273,12 @@ onBeforeUnmount(() => {
                   </span>
                   <span class="text-xs text-muted-foreground">v{{ pkg.version }}</span>
                 </div>
-                <h3 class="mt-4 font-display text-2xl">
+                <h3
+                  :class="[
+                    'mt-4 font-display tracking-tight',
+                    catalogFeatured(index, packages.length) ? 'text-2xl md:text-3xl' : 'text-2xl',
+                  ]"
+                >
                   <LinkPreview
                     :url="pkg.href"
                     :width="240"
@@ -261,7 +297,7 @@ onBeforeUnmount(() => {
                     <span>{{ point }}</span>
                   </li>
                 </ul>
-                <div class="mt-6">
+                <div :class="catalogFeatured(index, packages.length) ? 'mt-auto pt-8' : 'mt-6'">
                   <NuxtLink :to="pkg.href" target="_blank" external>
                     <InteractiveHoverButton text="查看包详情" />
                   </NuxtLink>
@@ -297,23 +333,34 @@ onBeforeUnmount(() => {
           </div>
         </BlurReveal>
 
-        <div class="mt-10 grid gap-5 lg:grid-cols-2">
+        <div :class="catalogGridClass(skills.length)">
           <Motion
             v-for="(skill, index) in skills"
             :key="skill.name"
+            :class="catalogItemClass(index, skills.length, 'end')"
             :initial="{ opacity: 0, y: 24 }"
             :while-in-view="{ opacity: 1, y: 0 }"
             :transition="{ delay: Math.min(index * 0.08, 0.2), duration: 0.7, ease: [0.32, 0.72, 0, 1] }"
             :viewport="{ once: true, amount: 0.25 }"
           >
             <CssLiquidGlass class="h-full rounded-[1.75rem]" container-class="h-full rounded-[1.75rem]" :radius="28">
-              <article class="flex h-full flex-col p-6 md:p-7">
+              <article
+                :class="[
+                  'flex h-full flex-col',
+                  catalogFeatured(index, skills.length) ? 'p-6 md:p-8 lg:p-9' : 'p-6 md:p-7',
+                ]"
+              >
                 <div class="flex items-center justify-between gap-3">
                   <span class="text-[10px] uppercase tracking-[0.18em] text-primary">skills.sh</span>
                   <span class="font-mono text-[11px] text-muted-foreground">0{{ index + 1 }}</span>
                 </div>
 
-                <h3 class="mt-4 font-display text-2xl tracking-tight">
+                <h3
+                  :class="[
+                    'mt-4 font-display tracking-tight',
+                    catalogFeatured(index, skills.length) ? 'text-2xl md:text-3xl' : 'text-2xl',
+                  ]"
+                >
                   <LinkPreview
                     :url="skill.href"
                     :width="240"

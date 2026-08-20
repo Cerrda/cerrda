@@ -9,7 +9,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "pregenerate": "node scripts/generate-articles.mjs",
-    "predev": "node scripts/generate-articles.mjs"
+    "predev": "node scripts/generate-articles.mjs",
+    "sync:homepage": "node .cursor/skills/sync-homepage/scripts/sync-homepage.mjs"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.8",

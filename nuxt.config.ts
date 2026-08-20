@@ -1,4 +1,5 @@
 import tailwindcss from '@tailwindcss/vite'
+import articles from './app/data/articles.json'
 import { faviconBootScript, themeClassBootScript } from './app/data/favicon'
 import { withAppBase } from './app/utils/withAppBase'
 
@@ -90,18 +91,7 @@ export default defineNuxtConfig({
     preset: 'static',
     prerender: {
       crawlLinks: true,
-      routes: [
-        '/',
-        '/articles/scrapling-config-crawl-skill',
-        '/articles/faker-mock-setup-skill',
-        '/articles/unocss-svg-hmr',
-        '/articles/vue3-vcopy',
-        '/articles/unocss-icons',
-        '/articles/tooltip-perf',
-        '/articles/v-ellipsis-tooltip',
-        '/articles/uniapp-nav-bar',
-        '/articles/fnm-windows',
-      ],
+      routes: ['/', ...articles.map((article) => `/articles/${article.slug}`)],
     },
   },
   routeRules: {

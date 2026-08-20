@@ -1,3 +1,9 @@
+import articleMeta from './articles.json'
+import packages from './packages.json'
+import skills from './skills.json'
+
+export { articleMeta, packages, skills }
+
 export const siteProfile = {
   name: 'Cerrda',
   role: '前端开发工程师',
@@ -117,52 +123,6 @@ export const projects = [
   },
 ]
 
-export const packages = [
-  {
-    name: 'vite-plugin-fetch-dts',
-    role: '作者',
-    href: 'https://npmx.dev/package/vite-plugin-fetch-dts',
-    npm: 'https://www.npmjs.com/package/vite-plugin-fetch-dts',
-    version: '0.7.0',
-    summary: '自动获取远程 Vue / Web Components 类型声明的 Vite 插件。',
-    points: [
-      '扫描远程 import，并行拉取类型并生成全局组件声明',
-      '支持热更新、source map、多正则匹配与 Web Components 事件转换',
-      '让微前端 / CDN 组件在本地获得完整 TypeScript 体验',
-    ],
-  },
-  {
-    name: 'openapi-v3-request-generator',
-    role: '贡献者',
-    href: 'https://npmx.dev/package/openapi-v3-request-generator',
-    npm: 'https://www.npmjs.com/package/openapi-v3-request-generator',
-    version: '4.0.2',
-    summary: '基于 OpenAPI v3 的请求代码生成器，支持高度自定义钩子。',
-    points: [
-      'ts/js 双模式、多项目文档、include/exclude 与 mock 生成',
-      'onGenRequestFnHook 定制请求函数形态',
-      'sourceMap + CLI 查找，降低大型 API 面维护成本',
-    ],
-  },
-]
-
-export const skills = [
-  {
-    name: 'faker-mock-setup',
-    href: 'https://skills.sh/cerrda/skills/faker-mock-setup',
-    install: 'npx skills add https://github.com/cerrda/skills --skill faker-mock-setup',
-    summary: '按 OpenAPI / 函数名生成页面级 Faker overrideResponse Mock。',
-    points: ['函数名或 URL → ApiId', '生成 setup{ApiId}MockHandler', 'Vue / Vite + MSW 联调'],
-  },
-  {
-    name: 'scrapling-config-crawl',
-    href: 'https://skills.sh/cerrda/skills/scrapling-config-crawl',
-    install: 'npx skills add https://github.com/cerrda/skills --skill scrapling-config-crawl',
-    summary: '按 config.py id 生成 scrapling 采集脚本并写入 SQLite。',
-    points: ['list / data 增量与附件分流', '强制复用项目 utils.*', '仅面向依法公开数据'],
-  },
-]
-
 export const careerTimeline = [
   {
     title: '2026',
@@ -180,77 +140,3 @@ export const careerTimeline = [
   },
 ]
 
-export const articleMeta = [
-  {
-    slug: 'scrapling-config-crawl-skill',
-    id: '7672698563611197490',
-    title: '把配置驱动爬虫做成可安装 Skill：scrapling-config-crawl',
-    description: '按 config.py 的 id 生成 scrapling 脚本并写入 SQLite，把翻页校验与增量采集固化成 Agent Skill。',
-    date: '2026-08-12',
-    tags: ['爬虫', 'Agent Skill'],
-  },
-  {
-    slug: 'faker-mock-setup-skill',
-    id: '7672434949261197352',
-    title: '把团队 Mock 工作流做成可安装 Skill：faker-mock-setup 上架 skills.sh 实践',
-    description: '把「按 OpenAPI 生成页面级 Faker Mock」固化为可安装 Skill，改善前端联调体验。',
-    date: '2026-08-11',
-    tags: ['AI编程', 'Cursor'],
-  },
-  {
-    slug: 'unocss-svg-hmr',
-    id: '7653373167660204078',
-    title: '开发体验升级：UnoCSS 自定义 SVG 图标热更新方案',
-    description: '用 chokidar + @iconify/tools + configDeps 实现图标热更新，无需重启开发服务器。',
-    date: '2026-07-01',
-    tags: ['架构', '前端框架'],
-  },
-  {
-    slug: 'vue3-vcopy',
-    id: '7650080459327373354',
-    title: '一行指令搞定复制：Vue 3 vCopy 实现解析',
-    description: '基于 VueUse useClipboard 与 Element Plus 虚拟 Tooltip 的复制指令实现。',
-    date: '2026-06-01',
-    tags: ['前端', '代码规范'],
-  },
-  {
-    slug: 'unocss-icons',
-    id: '7650093760348848147',
-    title: '从 uno.config.ts 看懂 UnoCSS 图标方案',
-    description: 'presetIcons 与 Iconify 工具链：本地 SVG 到原子类与 VS Code 补全。',
-    date: '2026-06-01',
-    tags: ['前端', '代码规范'],
-  },
-  {
-    slug: 'tooltip-perf',
-    id: '7637342611919880228',
-    title: '性能提升 satisfying！一个 Vue3 指令干掉页面上 200 个无用 Tooltip 实例',
-    description: '按需创建虚拟 Tooltip，消灭中后台表格中的无效 Tooltip 实例。',
-    date: '2026-05-01',
-    tags: ['设计', '前端'],
-  },
-  {
-    slug: 'v-ellipsis-tooltip',
-    id: '7597704040216215578',
-    title: '一行代码解决文本溢出提示：Vue 3 + Element Plus 打造智能 v-ellipsis-tooltip 指令',
-    description: '仅在文本真正溢出时展示 Tooltip 的自定义指令。',
-    date: '2026-02-01',
-    tags: ['前端', 'Vue.js'],
-  },
-  {
-    slug: 'uniapp-nav-bar',
-    id: '7576843726010662938',
-    title: 'uni-app 自适应透明导航栏组件',
-    description: '支持滚动渐变透明的现代导航栏交互体验。',
-    date: '2025-12-01',
-    tags: ['uni-app'],
-  },
-  {
-    slug: 'fnm-windows',
-    id: '7576276707330981894',
-    title: 'Windows 系统中使用 fnm 自动管理 node 版本',
-    description: '打开项目时自动切换到项目所需的 Node 版本。',
-    date: '2025-12-01',
-    tags: ['前端'],
-  },
-]

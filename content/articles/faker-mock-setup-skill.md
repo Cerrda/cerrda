@@ -1,8 +1,8 @@
 ---
 title: "把团队 Mock 工作流做成可安装 Skill：faker-mock-setup 上架 skills.sh 实践"
-description: "把按 OpenAPI 生成页面级 Faker Mock 的工作流固化为可安装 Agent Skill，并用一行命令接入 skills.sh。"
+description: "把「按 OpenAPI 生成页面级 Faker Mock」固化为可安装 Skill，改善前端联调体验。"
 date: 2026-08-11
-tags: ["Mock", "Faker", "MSW", "Vue"]
+tags: ["AI编程","Cursor"]
 juejin: https://juejin.cn/post/7672434949261197352
 slug: faker-mock-setup-skill
 ---
@@ -19,7 +19,7 @@ slug: faker-mock-setup-skill
 
 ## 先看一张图：它解决什么
 
-![默认 Mock vs 自定义 Faker Mock](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/afe5550cfbec4893b590ef302f9320c2~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787041107&x-signature=To8ISPbMqyTpOZZf7bQg8RHp%2Bu8%3D)
+![默认 Mock vs 自定义 Faker Mock](https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/afe5550cfbec4893b590ef302f9320c2~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787645907&x-signature=Zz4BUdswByoqO9PuT%2Blu%2FWld4I0%3D)
 
 |      | 默认 Mock（gen 出来的） | 自定义 Faker Mock（本 Skill）             |
 | ---- | ---------------- | ----------------------------------- |
@@ -46,7 +46,7 @@ export const setupXxxMockHandler = async () => {
 
 ## 架构直觉：MSW + Faker + OpenAPI
 
-![MSW 拦截与 Faker 造数转存失败，建议直接上传图片文件](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/5ced91e4343f456ba7410a8cd7de729b~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787041107&x-signature=euF6TO7U1odSvGlw9iGtv5plIVg%3D)
+![MSW 拦截与 Faker 造数转存失败，建议直接上传图片文件](https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/5ced91e4343f456ba7410a8cd7de729b~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787645907&x-signature=cqX4%2Ft4hkj8k1m5RvtGalMEvNqM%3D)
 链路可以记成三步：
 
 1.  **OpenAPI gen**：`mock: true` 时产出 `*.mock.ts`（`{ApiId}MockHandler`）
@@ -65,7 +65,7 @@ export const setupXxxMockHandler = async () => {
 
 ## 怎么装：从 GitHub 到 Agent
 
-![安装链路：GitHub → skills CLI → Agent](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/0cc2f3e2e7e44723bab18f13a835625f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787041107&x-signature=q6vPexj87mbfuImoB5LCPlH49Zo%3D)
+![安装链路：GitHub → skills CLI → Agent](https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/0cc2f3e2e7e44723bab18f13a835625f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787645907&x-signature=40y0cqha4QjFWIZlkw%2FuYSOQrtc%3D)
 skills.sh **没有单独「投稿审核」**。公开仓库 + 有人执行 `npx skills add`，遥测就会进入索引。
 
 ```bash

@@ -1,0 +1,24 @@
+[
+  {
+    "name": "faker-mock-setup",
+    "href": "https://skills.sh/cerrda/skills/faker-mock-setup",
+    "install": "npx skills add https://github.com/cerrda/skills --skill faker-mock-setup",
+    "summary": "按 OpenAPI / 函数名生成页面级 Faker overrideResponse Mock。",
+    "points": [
+      "函数名或 URL → ApiId",
+      "生成 setup{ApiId}MockHandler",
+      "Vue / Vite + MSW 联调"
+    ]
+  },
+  {
+    "name": "scrapling-config-crawl",
+    "href": "https://skills.sh/cerrda/skills/scrapling-config-crawl",
+    "install": "npx skills add https://github.com/cerrda/skills --skill scrapling-config-crawl",
+    "summary": "按 config.py id 生成 scrapling 采集脚本并写入 SQLite。",
+    "points": [
+      "list / data 增量与附件分流",
+      "强制复用项目 utils.*",
+      "仅面向依法公开数据"
+    ]
+  }
+]

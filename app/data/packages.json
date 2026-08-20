@@ -1,0 +1,41 @@
+[
+  {
+    "name": "vite-plugin-fetch-dts",
+    "role": "作者",
+    "href": "https://npmx.dev/package/vite-plugin-fetch-dts",
+    "npm": "https://www.npmjs.com/package/vite-plugin-fetch-dts",
+    "version": "0.7.0",
+    "summary": "自动获取远程 Vue / Web Components 类型声明的 Vite 插件。",
+    "points": [
+      "扫描远程 import，并行拉取类型并生成全局组件声明",
+      "支持热更新、source map、多正则匹配与 Web Components 事件转换",
+      "让微前端 / CDN 组件在本地获得完整 TypeScript 体验"
+    ]
+  },
+  {
+    "name": "openapi-v3-request-generator",
+    "role": "贡献者",
+    "href": "https://npmx.dev/package/openapi-v3-request-generator",
+    "npm": "https://www.npmjs.com/package/openapi-v3-request-generator",
+    "version": "4.0.2",
+    "summary": "基于 OpenAPI v3 的请求代码生成器，支持高度自定义钩子。",
+    "points": [
+      "ts/js 双模式、多项目文档、include/exclude 与 mock 生成",
+      "onGenRequestFnHook 定制请求函数形态",
+      "sourceMap + CLI 查找，降低大型 API 面维护成本"
+    ]
+  },
+  {
+    "name": "dsh-cerrda-theme",
+    "role": "作者",
+    "href": "https://npmx.dev/package/dsh-cerrda-theme",
+    "npm": "https://www.npmjs.com/package/dsh-cerrda-theme",
+    "version": "0.2.0",
+    "summary": "给 DeepSeek Harness Web GUI 套上 cerrda 玫瑰深紫暗色主题。",
+    "points": [
+      "部署级 bundle 插件，装上重启即生效，无需 GUI 审批",
+      "液态玻璃输入栏与 Silk WebGL2 丝绸背景",
+      "稳定 DOM 锚点覆盖，减少透明 / 减少动效时自动降级"
+    ]
+  }
+]

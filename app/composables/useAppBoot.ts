@@ -7,7 +7,7 @@ export type GpuProfile = {
 }
 
 export const defaultGpuProfile: GpuProfile = {
-  silkPixelRatio: 0.75,
+  silkPixelRatio: 0.4,
   lightSpeedPixelRatio: 1.25,
 }
 
@@ -77,13 +77,13 @@ export function detectGpuProfile(): GpuProfile {
 
   if (constrained) {
     return {
-      silkPixelRatio: 0.55,
+      silkPixelRatio: 0.3,
       lightSpeedPixelRatio: 1,
     }
   }
 
   return {
-    silkPixelRatio: 0.75,
+    silkPixelRatio: 0.4,
     lightSpeedPixelRatio: Math.min(1.25, dpr),
   }
 }
