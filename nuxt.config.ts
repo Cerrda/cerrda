@@ -43,7 +43,7 @@ export default defineNuxtConfig({
         { key: 'color-scheme', name: 'color-scheme', content: 'dark', tagPriority: 'critical' },
         {
           name: 'description',
-          content: '前端开发工程师 Cerrda 的个人主页：Vue/Nuxt 工程化、Agent Skill、开源工具与技术文章。',
+          content: '前端工程师 Cerrda：Vue / Nuxt 工程化、Agent Skill 与开源工具链。把重复摩擦沉淀为可安装的基础设施。',
         },
         { key: 'theme-color', name: 'theme-color', content: '#1a1520' },
       ],

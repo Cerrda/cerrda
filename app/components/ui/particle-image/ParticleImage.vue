@@ -64,6 +64,7 @@ let particles: ImageParticle | undefined
 let started = false
 let sizeFrame = 0
 let offscreen = false
+let pageVisible = true
 let themeObserver: MutationObserver | undefined
 let viewObserver: IntersectionObserver | undefined
 
@@ -79,8 +80,13 @@ function applyParticleTheme() {
 
 function syncPlayback() {
   if (!particles) return
-  if (offscreen) particles.pauseLoop()
+  if (offscreen || !pageVisible) particles.pauseLoop()
   else particles.resumeLoop()
+}
+
+function handleVisibility() {
+  pageVisible = document.visibilityState === 'visible'
+  syncPlayback()
 }
 
 function measure() {
@@ -160,6 +166,9 @@ onMounted(() => {
     )
     viewObserver.observe(wrapperRef.value)
   }
+
+  document.addEventListener('visibilitychange', handleVisibility)
+  handleVisibility()
 })
 
 watch(() => colorMode.value, applyParticleTheme)
@@ -169,6 +178,7 @@ onBeforeUnmount(() => {
   themeObserver = undefined
   viewObserver?.disconnect()
   viewObserver = undefined
+  document.removeEventListener('visibilitychange', handleVisibility)
   cancelAnimationFrame(sizeFrame)
   particles?.stop({ fadePosition: 'none' })
   particles = undefined

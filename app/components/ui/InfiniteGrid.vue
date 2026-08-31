@@ -16,6 +16,24 @@ interface Props {
 const props = defineProps<Props>()
 
 const loopItems = computed(() => [...props.items, ...props.items])
+const inView = shallowRef(true)
+const trackRef = useTemplateRef<HTMLElement>('trackRef')
+let viewObserver: IntersectionObserver | undefined
+
+onMounted(() => {
+  if (!trackRef.value) return
+  viewObserver = new IntersectionObserver(
+    ([entry]) => {
+      inView.value = entry?.isIntersecting ?? true
+    },
+    { rootMargin: '80px' },
+  )
+  viewObserver.observe(trackRef.value)
+})
+
+onUnmounted(() => {
+  viewObserver?.disconnect()
+})
 </script>
 
 <template>
@@ -30,7 +48,11 @@ const loopItems = computed(() => [...props.items, ...props.items])
     <div
       class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,oklch(0.82_0.05_350/0.14),transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_20%,oklch(0.45_0.04_350/0.12),transparent_50%)]"
     />
-    <div class="infinite-track flex w-max gap-4 py-2">
+    <div
+      ref="trackRef"
+      class="infinite-track flex w-max gap-4 py-2"
+      :class="inView ? 'running' : 'paused'"
+    >
       <div
         v-for="(item, index) in loopItems"
         :key="`${item.title}-${index}`"
@@ -55,6 +77,15 @@ const loopItems = computed(() => [...props.items, ...props.items])
   animation: infinite-scroll 28s linear infinite;
   will-change: transform;
   transform: translateZ(0);
+}
+
+.infinite-track.paused {
+  animation-play-state: paused;
+  will-change: auto;
+}
+
+.infinite-track.running {
+  animation-play-state: running;
 }
 
 @keyframes infinite-scroll {

@@ -784,6 +784,7 @@ export class LightSpeedApp {
   paused: boolean;
   private raf = 0;
   private boundResize!: () => void;
+  private readonly lookAtTarget = new THREE.Vector3();
 
   constructor(container: HTMLElement, options: LightSpeedOptions) {
     this.options = options;
@@ -899,7 +900,7 @@ export class LightSpeedApp {
     const smaaPass = new EffectPass(
       this.camera,
       new SMAAEffect({
-        preset: SMAAPreset.MEDIUM,
+        preset: SMAAPreset.LOW,
       }),
     );
     this.renderPass.renderToScreen = false;
@@ -1005,13 +1006,12 @@ export class LightSpeedApp {
 
     if (typeof this.options.distortion === "object" && this.options.distortion.getJS) {
       const distortion = this.options.distortion.getJS(0.025, time);
-      this.camera.lookAt(
-        new THREE.Vector3(
-          this.camera.position.x + distortion.x,
-          this.camera.position.y + distortion.y,
-          this.camera.position.z + distortion.z,
-        ),
+      this.lookAtTarget.set(
+        this.camera.position.x + distortion.x,
+        this.camera.position.y + distortion.y,
+        this.camera.position.z + distortion.z,
       );
+      this.camera.lookAt(this.lookAtTarget);
       updateCamera = true;
     }
 

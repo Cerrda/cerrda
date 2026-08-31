@@ -19,17 +19,17 @@ float fabric(vec2 p) {
     return f + 0.1 * noise(m * p);
 }
 
-float silk(vec2 uv, float t) {
-    float s = sin(5.0 * (uv.x + uv.y + cos(2.0 * uv.x + 5.0 * uv.y)) + sin(12.0 * (uv.x + uv.y)) - t);
+float silkPair(vec2 uv, float t, out float d) {
+    float xy = uv.x + uv.y;
+    float a = 2.0 * uv.x + 5.0 * uv.y;
+    float ca = cos(a);
+    float arg = 5.0 * (xy + ca) + sin(12.0 * xy) - t;
+    float s = sin(arg);
     s = 0.7 + 0.3 * (s * s * 0.5 + s);
     s *= 0.9 + 0.6 * fabric(uv * min(iResolution.x, iResolution.y) * 0.0006);
+    d = (5.0 * (1.0 - 2.0 * sin(a)) + 12.0 * cos(12.0 * xy)) * cos(arg);
+    d = 0.005 * d * (sign(d) + 3.0);
     return s * 0.9 + 0.1;
-}
-
-float silkd(vec2 uv, float t) {
-    float xy = uv.x + uv.y;
-    float d = (5.0 * (1.0 - 2.0 * sin(2.0 * uv.x + 5.0 * uv.y)) + 12.0 * cos(12.0 * xy)) * cos(5.0 * (cos(2.0 * uv.x + 5.0 * uv.y) + xy) + sin(12.0 * xy) - t);
-    return 0.005 * d * (sign(d) + 3.0);
 }
 
 void mainImage(out vec4 fragColor, vec2 fragCoord) {
@@ -39,14 +39,14 @@ void mainImage(out vec4 fragColor, vec2 fragCoord) {
     float t = iTime;
     uv.y += 0.03 * sin(8.0 * uv.x - t);
 
-    float s = sqrt(silk(uv, t));
-    float d = silkd(uv, t);
+    float d;
+    float s = sqrt(silkPair(uv, t, d));
 
     vec3 c = vec3(s);
     c += 0.7 * vec3(1, 0.83, 0.6) * d;
     c *= 1.0 - max(0.0, 0.8 * d);
 #if INVERT
-    c = pow(c, 0.3 / vec3(0.52, 0.5, 0.4));
+    c = pow(c, vec3(0.5769230769, 0.6, 0.75));
     c = 1.0 - c;
 #else
     c = pow(c, vec3(0.52, 0.5, 0.4));

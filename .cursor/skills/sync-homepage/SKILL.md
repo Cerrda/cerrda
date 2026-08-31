@@ -126,7 +126,7 @@ points: 扫描远程 import，并行拉取类型并生成全局组件声明 | �
 
 ## 不要动
 
-- `projects`、`careerTimeline`、`siteProfile`（除非用户明确要求）
+- `careerTimeline`、`siteProfile`（除非用户明确要求）
 - copyQueue 之外、远端也没变的已有文案
 - 已有文章的手工 slug（除非用户要求改）
 

@@ -28,6 +28,7 @@ export class InspiraShaderToy {
   private mesh: Mesh | null = null
   private resizeObserver?: ResizeObserver
   private animationFrameId = 0
+  private resizeRaf = 0
   private removeEventListeners: (() => void)[] = []
 
   // Timing
@@ -41,10 +42,17 @@ export class InspiraShaderToy {
   // Callback
   private onDrawCallback?: () => void
 
-  // Uniforms
+  // Uniforms (reused every frame to avoid GC)
   private iFrame: number = 0
   private iMouse: MouseState = { x: 0, y: 0, clickX: 0, clickY: 0 }
   private hsv: HSVControls = { hue: 0, saturation: 1, brightness: 1 }
+  private readonly iResolutionValue: [number, number, number] = [1, 1, 1]
+  private readonly iMouseValue: [number, number, number, number] = [0, 0, 0, 0]
+  private readonly iDateValue: [number, number, number, number] = [0, 0, 0, 0]
+  private readonly iHsvValue: [number, number, number] = [0, 1, 1]
+  private lastResizeW = 0
+  private lastResizeH = 0
+  private lastResizeDpr = 0
   private _mouseMode: MouseMode = 'click'
   private _mouseSensitivity: number = 1.0
   private _mouseDamping: number = 0.9
@@ -142,17 +150,18 @@ export class InspiraShaderToy {
     this.setPixelRatio(pixelRatio)
     this._interactive = interactive
 
-    // Create renderer with WebGL 2 context
+    // Create renderer with WebGL 2 context.
+    // Silk is fully opaque in the shader; page opacity lives on the CSS wrapper.
+    // preserveDrawingBuffer is off: nothing reads the canvas after composite.
     this.renderer = new Renderer({
       width: this.getSafeWidth(),
       height: this.getSafeHeight(),
       dpr: this._pixelRatio,
-      alpha: true,
+      alpha: false,
       depth: false,
       stencil: false,
       antialias: false,
-      // 主题燃烧切换需要 drawImage 丝绸 canvas；默认 false 会读到空白
-      preserveDrawingBuffer: true,
+      preserveDrawingBuffer: false,
       powerPreference: 'high-performance',
     })
 
@@ -197,17 +206,15 @@ export class InspiraShaderToy {
     return Math.max(1, this.container.clientHeight)
   }
 
-  private getResolution(): [number, number, number] {
-    const width = this.getSafeWidth()
-    const height = this.getSafeHeight()
-    const dpr = this._pixelRatio
-
-    return [width * dpr, height * dpr, dpr]
+  private syncResolution(width: number, height: number, dpr: number): void {
+    this.iResolutionValue[0] = width * dpr
+    this.iResolutionValue[1] = height * dpr
+    this.iResolutionValue[2] = dpr
   }
 
   private updateProgramResolution(): void {
     if (this.program) {
-      this.program.uniforms.iResolution.value = this.getResolution()
+      this.program.uniforms.iResolution.value = this.iResolutionValue
     }
   }
 
@@ -216,6 +223,14 @@ export class InspiraShaderToy {
     const height = this.getSafeHeight()
     const dpr = this._pixelRatio
 
+    if (width === this.lastResizeW && height === this.lastResizeH && dpr === this.lastResizeDpr) {
+      return
+    }
+
+    this.lastResizeW = width
+    this.lastResizeH = height
+    this.lastResizeDpr = dpr
+    this.syncResolution(width, height, dpr)
     this.renderer.dpr = dpr
     this.renderer.setSize(width, height)
     this.renderer.setViewport(width * dpr, height * dpr)
@@ -328,7 +343,11 @@ export class InspiraShaderToy {
 
   private setupResizeHandler(): void {
     this.resizeObserver = new ResizeObserver(() => {
-      this.resize()
+      if (this.resizeRaf) return
+      this.resizeRaf = requestAnimationFrame(() => {
+        this.resizeRaf = 0
+        this.resize()
+      })
     })
 
     this.resizeObserver.observe(this.container)
@@ -346,15 +365,15 @@ export class InspiraShaderToy {
         fragment: fullFragmentShader,
         uniforms: {
           iResolution: {
-            value: this.getResolution(),
+            value: this.iResolutionValue,
           },
           iTime: { value: 0 },
           iTimeDelta: { value: 0 },
           iFrameRate: { value: this.targetFPS },
           iFrame: { value: 0 },
-          iMouse: { value: [0, 0, 0, 0] },
-          iDate: { value: [0, 0, 0, 0] },
-          iHSV: { value: [this.hsv.hue, this.hsv.saturation, this.hsv.brightness] },
+          iMouse: { value: this.iMouseValue },
+          iDate: { value: this.iDateValue },
+          iHSV: { value: this.iHsvValue },
           iSpeed: { value: this._speed },
         },
       })
@@ -375,42 +394,42 @@ export class InspiraShaderToy {
     }
   }
 
+  private syncHsvUniform(): void {
+    this.iHsvValue[0] = this.hsv.hue
+    this.iHsvValue[1] = this.hsv.saturation
+    this.iHsvValue[2] = this.hsv.brightness
+  }
+
   private draw(): void {
     if (!this.program || !this.mesh) {
       console.warn('Program or mesh not initialized')
       return
     }
 
-    const now = this.isPlaying ? Date.now() : this.prevDrawTime
-    const date = new Date(now)
+    const now = this.isPlaying ? performance.now() : this.prevDrawTime
 
     if (this.firstDrawTime === 0) {
       this.firstDrawTime = now
     }
 
-    if (this.onDrawCallback) {
-      this.onDrawCallback()
-    }
+    this.onDrawCallback?.()
 
     const iTimeDelta = (now - this.prevDrawTime) * 0.001 * this._speed
     const iTime = (now - this.firstDrawTime) * 0.001 * this._speed
-    const iDate = [date.getFullYear(), date.getMonth(), date.getDate(), date.getTime() * 0.001]
+    this.iDateValue[3] = now * 0.001
 
-    if (this.program && this.mesh) {
-      // Update uniforms
-      this.program.uniforms.iResolution.value = this.getResolution()
-      this.program.uniforms.iTime.value = iTime
-      this.program.uniforms.iTimeDelta.value = iTimeDelta
-      this.program.uniforms.iFrameRate.value = this.targetFPS
-      this.program.uniforms.iFrame.value = this.iFrame
-      this.program.uniforms.iMouse.value = [this.iMouse.x, this.iMouse.y, this.iMouse.clickX, this.iMouse.clickY]
-      this.program.uniforms.iDate.value = iDate
-      this.program.uniforms.iHSV.value = [this.hsv.hue, this.hsv.saturation, this.hsv.brightness]
-      this.program.uniforms.iSpeed.value = this._speed
-
-      // Render
-      this.renderer.render({ scene: this.mesh, camera: this.camera })
+    if (this._interactive) {
+      this.iMouseValue[0] = this.iMouse.x
+      this.iMouseValue[1] = this.iMouse.y
+      this.iMouseValue[2] = this.iMouse.clickX
+      this.iMouseValue[3] = this.iMouse.clickY
     }
+
+    this.program.uniforms.iTime.value = iTime
+    this.program.uniforms.iTimeDelta.value = iTimeDelta
+    this.program.uniforms.iFrame.value = this.iFrame
+
+    this.renderer.render({ scene: this.mesh, camera: this.camera })
 
     this.prevDrawTime = now
     this.iFrame++
@@ -424,7 +443,7 @@ export class InspiraShaderToy {
     let shouldDraw = true
 
     if (this.targetFPS < 60) {
-      const now = Date.now()
+      const now = performance.now()
       const elapsed = now - this.lastFrameTime
 
       if (elapsed < this.frameInterval) {
@@ -458,8 +477,8 @@ export class InspiraShaderToy {
     if (hsv.hue !== undefined) this.hsv.hue = hsv.hue
     if (hsv.saturation !== undefined) this.hsv.saturation = hsv.saturation
     if (hsv.brightness !== undefined) this.hsv.brightness = hsv.brightness
+    this.syncHsvUniform()
 
-    // Update immediately if not playing
     if (!this.isPlaying && this.program && this.mesh) {
       this.draw()
     }
@@ -467,8 +486,8 @@ export class InspiraShaderToy {
 
   public setHue(val: number) {
     this.hsv.hue = val
+    this.syncHsvUniform()
 
-    // Update immediately if not playing
     if (!this.isPlaying && this.program && this.mesh) {
       this.draw()
     }
@@ -476,8 +495,8 @@ export class InspiraShaderToy {
 
   public setSaturation(val: number) {
     this.hsv.saturation = val
+    this.syncHsvUniform()
 
-    // Update immediately if not playing
     if (!this.isPlaying && this.program && this.mesh) {
       this.draw()
     }
@@ -485,8 +504,8 @@ export class InspiraShaderToy {
 
   public setBrightness(val: number) {
     this.hsv.brightness = val
+    this.syncHsvUniform()
 
-    // Update immediately if not playing
     if (!this.isPlaying && this.program && this.mesh) {
       this.draw()
     }
@@ -498,8 +517,10 @@ export class InspiraShaderToy {
   // New speed methods
   public setSpeed(val: number): void {
     this._speed = Math.max(0, val)
+    if (this.program) {
+      this.program.uniforms.iSpeed.value = this._speed
+    }
 
-    // Update immediately if not playing
     if (!this.isPlaying && this.program && this.mesh) {
       this.draw()
     }
@@ -512,6 +533,9 @@ export class InspiraShaderToy {
   public setFrameRate(fps: number): void {
     this.targetFPS = Math.max(1, Math.min(60, fps))
     this.frameInterval = 1000 / this.targetFPS
+    if (this.program) {
+      this.program.uniforms.iFrameRate.value = this.targetFPS
+    }
   }
 
   public getFrameRate(): number {
@@ -546,7 +570,7 @@ export class InspiraShaderToy {
   }
 
   public reset(): void {
-    const now = Date.now()
+    const now = performance.now()
     this.firstDrawTime = now
     this.prevDrawTime = now
     this.lastFrameTime = now
@@ -565,7 +589,7 @@ export class InspiraShaderToy {
   public play(): void {
     if (!this.isPlaying) {
       this.isPlaying = true
-      const now = Date.now()
+      const now = performance.now()
       const elapsed = this.prevDrawTime - this.firstDrawTime
       this.firstDrawTime = now - elapsed
       this.prevDrawTime = now
@@ -577,6 +601,10 @@ export class InspiraShaderToy {
 
   public dispose(): void {
     this.pause()
+    if (this.resizeRaf) {
+      cancelAnimationFrame(this.resizeRaf)
+      this.resizeRaf = 0
+    }
     this.resizeObserver?.disconnect()
     this.resizeObserver = undefined
     this.removeEventListeners.forEach((remove) => remove())

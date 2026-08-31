@@ -29,7 +29,6 @@ NUXT_APP_BASE_URL=/cerrda/ pnpm generate
 
 ## 内容替换
 
-- 项目占位：`app/data/site.ts` → `projects`
 - 文章源稿：`content/articles/*.md`（改完后运行 `node scripts/generate-articles.mjs`）
 - 个人信息：`app/data/site.ts` → `siteProfile`
 - 文章 / NPM / Skills 数据：`app/data/articles.json`、`app/data/packages.json`、`app/data/skills.json`

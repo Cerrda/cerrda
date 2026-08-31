@@ -1,22 +1,7 @@
 <script setup lang="ts">
 import { PhArrowRight } from '@phosphor-icons/vue'
 import { Motion } from 'motion-v'
-import {
-  articleMeta,
-  careerTimeline,
-  contactChannels,
-  morphingRoles,
-  packages,
-  projects,
-  siteProfile,
-  skills,
-} from '~/data/site'
-
-const gridItems = projects.map((p) => ({
-  title: p.title,
-  subtitle: p.subtitle,
-  tag: p.highlight,
-}))
+import { articleMeta, careerTimeline, contactChannels, morphingRoles, packages, siteProfile, skills } from '~/data/site'
 
 const timelineItems = careerTimeline.map((item) => ({
   id: `year-${item.title}`,
@@ -107,8 +92,8 @@ onBeforeUnmount(() => {
           </BlurReveal>
           <BlurReveal :delay="0.36" :duration="1">
             <div class="mt-8 flex flex-wrap gap-3">
-              <NuxtLink href="#projects">
-                <InteractiveHoverButton text="查看项目" />
+              <NuxtLink href="#packages">
+                <InteractiveHoverButton text="查看开源" />
               </NuxtLink>
               <NuxtLink href="#articles">
                 <InteractiveHoverButton text="阅读文章" class="border-primary/30 bg-primary text-primary-foreground" />
@@ -126,7 +111,7 @@ onBeforeUnmount(() => {
       <div class="mx-auto max-w-6xl">
         <BlurReveal>
           <p class="eyebrow w-fit">About</p>
-          <h2 class="mt-4 font-display text-3xl md:text-5xl">工程化直觉，写进工具与 Skill</h2>
+          <h2 class="mt-4 font-display text-3xl md:text-5xl">把工程判断，写成可复用的工具与 Skill</h2>
         </BlurReveal>
 
         <div class="mt-10 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
@@ -148,7 +133,7 @@ onBeforeUnmount(() => {
               <div class="pointer-events-none absolute inset-x-0 bottom-0 px-6 pb-2.5 md:px-7 md:pb-3">
                 <p class="font-display text-xl drop-shadow-[0_1px_8px_rgb(0_0_0_/_0.55)]">Speed of craft</p>
                 <p class="mt-1 text-sm text-muted-foreground drop-shadow-[0_1px_8px_rgb(0_0_0_/_0.55)]">
-                  按住加速 · 从远程类型同步到 Agent 工作流
+                  从远程类型同步到可安装的 Agent 工作流
                 </p>
               </div>
             </CssLiquidGlass>
@@ -159,83 +144,25 @@ onBeforeUnmount(() => {
               <div>
                 <h3 class="font-display text-xl">前端工程</h3>
                 <p class="mt-2 text-muted-foreground">
-                  Vue 指令体系、UnoCSS 图标工具链、Vite 插件与 OpenAPI 代码生成——把日常摩擦变成一次配置、长期收益。
+                  Vue 指令体系、UnoCSS 图标工具链、Vite 插件与 OpenAPI
+                  代码生成。把日常摩擦收敛成一次配置、长期复利的基础设施。
                 </p>
               </div>
               <div>
                 <h3 class="font-display text-xl">Agent 开发</h3>
                 <p class="mt-2 text-muted-foreground">
-                  Skill 不是 README 的另一种写法，而是可版本化的约束与流程：触发描述、硬性规则、assets 模板与合规边界。
+                  Skill 不是 README 的另一种写法，而是可版本化的约束与流程：触发条件、硬性规则、assets 模板与合规边界。
                 </p>
               </div>
               <div>
                 <h3 class="font-display text-xl">作品观</h3>
                 <p class="mt-2 text-muted-foreground">
-                  面试官能直接看到：我会把问题抽象成工具，也会把工具讲清楚——包括它解决什么、不解决什么。
+                  先把问题抽象成工具，再把工具的边界写清楚——它解决什么，以及明确不解决什么。
                 </p>
               </div>
             </div>
           </TracingBeam>
         </div>
-      </div>
-    </section>
-
-    <!-- Projects -->
-    <section id="projects" class="section-pad">
-      <div class="mx-auto max-w-6xl">
-        <BlurReveal>
-          <p class="eyebrow w-fit">Projects</p>
-          <h2 class="mt-4 font-display text-3xl md:text-5xl">精选项目</h2>
-          <p class="mt-3 max-w-2xl text-muted-foreground">
-            以下为专业向示例项目占位，后续可替换为真实作品。重点展示前端工程与 Agent 基础设施能力。
-          </p>
-        </BlurReveal>
-
-        <ClientOnly>
-          <InfiniteGrid class="mt-10" :items="gridItems" />
-        </ClientOnly>
-
-        <BentoGrid class="mt-10">
-          <BentoGridItem
-            v-for="(project, index) in projects"
-            :key="project.id"
-            :class="['bg-card/70 dark:bg-card/60', [0, 3, 4].includes(index) ? 'md:col-span-2' : '']"
-          >
-            <template #header>
-              <div class="flex items-center justify-between gap-3">
-                <span class="text-[10px] uppercase tracking-[0.18em] text-primary">
-                  {{ project.highlight }}
-                </span>
-                <span
-                  v-if="project.placeholder"
-                  class="rounded-full bg-secondary px-2 py-0.5 text-[10px] text-muted-foreground"
-                >
-                  Placeholder
-                </span>
-              </div>
-            </template>
-            <template #title>
-              {{ project.title }}
-            </template>
-            <template #description>
-              <p class="text-sm text-muted-foreground">
-                {{ project.subtitle }}
-              </p>
-              <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {{ project.description }}
-              </p>
-              <div class="mt-4 flex flex-wrap gap-2">
-                <span
-                  v-for="tech in project.stack"
-                  :key="tech"
-                  class="rounded-full border border-border/70 px-2.5 py-1 text-[11px]"
-                >
-                  {{ tech }}
-                </span>
-              </div>
-            </template>
-          </BentoGridItem>
-        </BentoGrid>
       </div>
     </section>
 
@@ -245,7 +172,9 @@ onBeforeUnmount(() => {
         <BlurReveal>
           <p class="eyebrow w-fit">Open Source</p>
           <h2 class="mt-4 font-display text-3xl md:text-5xl">NPM 包</h2>
-          <p class="mt-3 max-w-2xl text-muted-foreground">自己维护的插件，以及参与贡献的 OpenAPI 请求生成器。</p>
+          <p class="mt-3 max-w-2xl text-muted-foreground">
+            自研 Vite 插件与主题包，以及参与维护的 OpenAPI 请求代码生成器。
+          </p>
         </BlurReveal>
 
         <div :class="catalogGridClass(packages.length)">
@@ -318,7 +247,7 @@ onBeforeUnmount(() => {
               <p class="eyebrow w-fit">Agent Skills</p>
               <h2 class="mt-4 font-display text-3xl md:text-5xl">可安装的工程化 Skill</h2>
               <p class="mt-3 max-w-2xl text-muted-foreground">
-                把 Mock 联调与配置驱动采集沉淀成可版本化、可分发的 Agent 上下文。
+                把 Mock 联调与配置驱动采集固化为可版本化、可分发的 Agent 工作流。
               </p>
             </div>
             <LinkPreview
@@ -407,7 +336,7 @@ onBeforeUnmount(() => {
               <p class="eyebrow w-fit">Writing</p>
               <h2 class="mt-4 font-display text-3xl md:text-5xl">文章</h2>
               <p class="mt-3 max-w-2xl text-muted-foreground">
-                从掘金迁移到本站的技术文章。关注指令、性能、图标方案与 Agent Skill。
+                从掘金迁入本站。覆盖指令体系、性能优化、图标工具链与 Agent Skill 实践。
               </p>
             </div>
             <p class="font-display text-5xl leading-none text-primary/25 md:text-6xl">
@@ -545,7 +474,7 @@ onBeforeUnmount(() => {
         <ClientOnly>
           <Timeline
             title="轨迹"
-            description="从前端工程化到 Agent Skill，持续把重复摩擦沉淀成工具。"
+            description="从前端工程化到 Agent Skill，持续把重复摩擦抽象成可复用工具。"
             :items="timelineItems"
           >
             <template v-for="item in careerTimeline" :key="item.title" #[`year-${item.title}`]>
@@ -570,7 +499,7 @@ onBeforeUnmount(() => {
           <p class="eyebrow w-fit">Connect</p>
           <h2 class="mt-4 font-display text-3xl md:text-5xl">一起把 DX 做成基础设施</h2>
           <p class="mt-3 max-w-2xl text-muted-foreground">
-            欢迎交流前端工程化、Agent Skill 与开源工具。邮箱与社交账号集中放在下方。
+            欢迎就前端工程化、Agent Skill 与开源工具展开合作或深度交流。
           </p>
         </BlurReveal>
 
@@ -592,7 +521,7 @@ onBeforeUnmount(() => {
                 <p class="text-xs uppercase tracking-[0.22em] text-muted-foreground">Contact</p>
                 <h3 class="mt-3 font-display text-2xl md:text-4xl">联系方式</h3>
                 <p class="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
-                  邮箱用于合作与技术交流；GitHub、掘金与 skills.sh 可直接查看开源与写作。点击右侧按钮打开完整信息。
+                  邮箱用于合作与技术交流。GitHub、掘金与 skills.sh 可直接查看开源仓库、文章与可安装 Skill。
                 </p>
 
                 <ul class="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">

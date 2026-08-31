@@ -23,6 +23,7 @@ const overlays = ref<OverlaySpec[]>([])
 let engine: PretextArticleEngine | null = null
 let overlayObserver: ResizeObserver | undefined
 let wrapObserver: ResizeObserver | undefined
+let lastWrapWidth = 0
 
 const useCanvas = computed(() => !failed.value)
 
@@ -104,17 +105,23 @@ function onPointerDown(event: PointerEvent) {
   }
 }
 
+function observeWrap(node: HTMLElement) {
+  wrapObserver?.disconnect()
+  wrapObserver = new ResizeObserver((entries) => {
+    const width = Math.round(entries[0]?.contentRect.width ?? 0)
+    if (width === lastWrapWidth) return
+    lastWrapWidth = width
+    engine?.resize()
+  })
+  wrapObserver.observe(node)
+}
 onMounted(async () => {
   await nextTick()
-  wrapObserver = new ResizeObserver(() => engine?.resize())
-  if (wrapRef.value) wrapObserver.observe(wrapRef.value)
+  if (wrapRef.value) observeWrap(wrapRef.value)
   if (useCanvas.value) await boot()
   if (!ready.value && useCanvas.value && (!wrapRef.value || !canvasRef.value)) {
     await nextTick()
-    if (wrapRef.value && !wrapObserver) {
-      wrapObserver = new ResizeObserver(() => engine?.resize())
-      wrapObserver.observe(wrapRef.value)
-    }
+    if (wrapRef.value && !wrapObserver) observeWrap(wrapRef.value)
     await boot()
   }
 })

@@ -3,11 +3,13 @@ import { watch, type Ref } from 'vue'
 export type GpuProfile = {
   /** Internal silk render scale. CSS still fills the viewport. */
   silkPixelRatio: number
+  silkFrameRate: number
   lightSpeedPixelRatio: number
 }
 
 export const defaultGpuProfile: GpuProfile = {
   silkPixelRatio: 0.4,
+  silkFrameRate: 30,
   lightSpeedPixelRatio: 1.25,
 }
 
@@ -78,12 +80,14 @@ export function detectGpuProfile(): GpuProfile {
   if (constrained) {
     return {
       silkPixelRatio: 0.3,
+      silkFrameRate: 24,
       lightSpeedPixelRatio: 1,
     }
   }
 
   return {
     silkPixelRatio: 0.4,
+    silkFrameRate: 30,
     lightSpeedPixelRatio: Math.min(1.25, dpr),
   }
 }

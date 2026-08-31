@@ -18,7 +18,8 @@ interface Props {
 const textIndex = ref(0)
 const morph = ref(0)
 const coolDown = ref(0)
-const time = ref(new Date())
+let lastTimeMs = 0
+let cooldownStyled = false
 
 const text1Ref = ref<HTMLSpanElement>()
 const text2Ref = ref<HTMLSpanElement>()
@@ -38,6 +39,7 @@ function setStyles(fraction: number) {
 }
 
 function doMorph() {
+  cooldownStyled = false
   morph.value -= coolDown.value
   coolDown.value = 0
 
@@ -57,6 +59,8 @@ function doMorph() {
 
 function doCoolDown() {
   morph.value = 0
+  if (cooldownStyled) return
+  cooldownStyled = true
 
   if (text1Ref.value && text2Ref.value) {
     text2Ref.value.style.filter = 'none'
@@ -79,13 +83,18 @@ function seedInitialText() {
 const { ready } = useAppBoot()
 let animationFrameId: number = 0
 let started = false
+let inView = true
+let pageVisible = true
+let viewObserver: IntersectionObserver | undefined
+const rootRef = useTemplateRef<HTMLElement>('rootRef')
 
-function animate() {
-  animationFrameId = requestAnimationFrame(animate)
+function animate(now: number) {
+  animationFrameId = 0
+  if (!started) return
 
-  const newTime = new Date()
-  const dt = (newTime.getTime() - time.value.getTime()) / 1000
-  time.value = newTime
+  if (!lastTimeMs) lastTimeMs = now
+  const dt = Math.min(0.05, (now - lastTimeMs) / 1000)
+  lastTimeMs = now
 
   coolDown.value -= dt
 
@@ -94,18 +103,54 @@ function animate() {
   } else {
     doCoolDown()
   }
+
+  if (inView && pageVisible) {
+    animationFrameId = requestAnimationFrame(animate)
+  }
+}
+
+function stopLoop() {
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId)
+    animationFrameId = 0
+  }
+}
+
+function syncLoop() {
+  pageVisible = document.visibilityState === 'visible'
+  if (started && inView && pageVisible) {
+    if (!animationFrameId) {
+      lastTimeMs = 0
+      animationFrameId = requestAnimationFrame(animate)
+    }
+    return
+  }
+  stopLoop()
 }
 
 function start() {
   if (started) return
   started = true
   seedInitialText()
-  time.value = new Date()
-  animate()
+  lastTimeMs = 0
+  syncLoop()
 }
 
 onMounted(() => {
   seedInitialText()
+
+  if (rootRef.value) {
+    viewObserver = new IntersectionObserver(
+      ([entry]) => {
+        inView = entry?.isIntersecting ?? true
+        syncLoop()
+      },
+      { rootMargin: '80px' },
+    )
+    viewObserver.observe(rootRef.value)
+  }
+
+  document.addEventListener('visibilitychange', syncLoop)
 
   if (ready.value) {
     start()
@@ -120,12 +165,16 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  cancelAnimationFrame(animationFrameId)
+  started = false
+  stopLoop()
+  viewObserver?.disconnect()
+  document.removeEventListener('visibilitychange', syncLoop)
 })
 </script>
 
 <template>
   <div
+    ref="rootRef"
     :class="
       cn(
         `relative mx-auto h-16 w-full max-w-(--breakpoint-md) overflow-hidden text-center font-sans text-[40pt] leading-none font-bold filter-[url(#threshold)_blur(0.6px)] md:h-24 lg:text-[6rem]`,

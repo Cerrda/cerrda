@@ -34,7 +34,7 @@ function onShaderReady() {
       :brightness="props.brightness"
       :speed="props.speed"
       :pixel-ratio="gpuProfile.silkPixelRatio"
-      :frame-rate="30"
+      :frame-rate="gpuProfile.silkFrameRate"
       :auto-pause="false"
       :interactive="false"
       @ready="onShaderReady"

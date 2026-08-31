@@ -83,7 +83,6 @@ export async function preloadPageModules() {
     import('~/components/ui/LightSpeed.vue'),
     import('~/components/ui/LiquidGlass.vue'),
     import('~/components/ui/SmoothCursor.vue'),
-    import('~/components/ui/InfiniteGrid.vue'),
     import('motion-v'),
     import('ogl'),
   ])

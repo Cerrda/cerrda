@@ -3,7 +3,7 @@
     "name": "faker-mock-setup",
     "href": "https://skills.sh/cerrda/skills/faker-mock-setup",
     "install": "npx skills add https://github.com/cerrda/skills --skill faker-mock-setup",
-    "summary": "按 OpenAPI / 函数名生成页面级 Faker overrideResponse Mock。",
+    "summary": "按 OpenAPI / 函数名生成页面级 Faker overrideResponse Mock，把联调工作流固化为可安装 Skill。",
     "points": [
       "函数名或 URL → ApiId",
       "生成 setup{ApiId}MockHandler",
@@ -14,7 +14,7 @@
     "name": "scrapling-config-crawl",
     "href": "https://skills.sh/cerrda/skills/scrapling-config-crawl",
     "install": "npx skills add https://github.com/cerrda/skills --skill scrapling-config-crawl",
-    "summary": "按 config.py id 生成 scrapling 采集脚本并写入 SQLite。",
+    "summary": "按 config.py 的 id 生成 scrapling 采集脚本，将增量写入、翻页校验与合规边界固化为 Skill。",
     "points": [
       "list / data 增量与附件分流",
       "强制复用项目 utils.*",

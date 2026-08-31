@@ -48,7 +48,7 @@ watch(height, (newHeight) => {
       <h2 class="mb-4 max-w-4xl font-display text-lg text-foreground md:text-4xl">
         {{ title }}
       </h2>
-      <p class="max-w-sm text-sm text-muted-foreground md:text-base">
+      <p class="max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
         {{ description }}
       </p>
     </div>

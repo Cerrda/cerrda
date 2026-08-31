@@ -221,13 +221,14 @@ export class PretextArticleEngine {
   }
 
   syncPointerFromScroll() {
-    if (!this.lastClient.x && !this.lastClient.y) return
-    const rect = this.canvas.getBoundingClientRect()
-    const x = this.lastClient.x - rect.left
-    const y = this.lastClient.y - rect.top
-    const inside = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height
-    this.pointer = { x, y, inside }
-    this.hoveredHref = this.hitLink(x, y)
+    if (this.lastClient.x || this.lastClient.y) {
+      const rect = this.canvas.getBoundingClientRect()
+      const x = this.lastClient.x - rect.left
+      const y = this.lastClient.y - rect.top
+      const inside = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height
+      this.pointer = { x, y, inside }
+      this.hoveredHref = this.hitLink(x, y)
+    }
     this.schedule()
   }
 
@@ -585,14 +586,19 @@ export class PretextArticleEngine {
   private syncSize() {
     const cssW = Math.max(1, this.wrap.clientWidth)
     const cssH = Math.max(1, this.contentHeight || 240)
-    const dpr = Math.min(2, Math.ceil(window.devicePixelRatio || 1))
+    const dpr = Math.min(1.5, window.devicePixelRatio || 1)
     this.dpr = dpr
-    if (this.canvas.width !== Math.round(cssW * dpr) || this.canvas.height !== Math.round(cssH * dpr)) {
-      this.canvas.width = Math.round(cssW * dpr)
-      this.canvas.height = Math.round(cssH * dpr)
+    const nextW = Math.round(cssW * dpr)
+    const nextH = Math.round(cssH * dpr)
+    if (this.canvas.width !== nextW || this.canvas.height !== nextH) {
+      this.canvas.width = nextW
+      this.canvas.height = nextH
     }
     this.canvas.style.width = `${cssW}px`
     this.canvas.style.height = `${cssH}px`
+    this.canvas.style.position = ''
+    this.canvas.style.top = ''
+    this.canvas.style.zIndex = ''
     this.wrap.style.minHeight = `${cssH}px`
     this.metrics = { ...this.metrics, width: cssW }
   }
@@ -607,13 +613,21 @@ export class PretextArticleEngine {
     const idle = time - this.lastPointerAt > IDLE_TIMEOUT
     const moved = updateMouseChain(this.chain, time, this.pointer.x, this.pointer.y, idle, this.pointer.inside)
     if (this.chain.ink.length) updateInk(this.chain, time)
+    const live = moved || this.chain.ink.length > 0 || !idle || chainHasPresence(this.chain)
     if (moved || this.chain.ink.length) {
       this.layout()
       this.positionOverlays()
     }
-    this.draw()
-    if (this.running && (moved || this.chain.ink.length || !idle || chainHasPresence(this.chain))) {
-      this.schedule()
+    if (live) this.draw()
+    if (this.running && live) this.schedule()
+  }
+
+  private viewBand() {
+    const rect = this.wrap.getBoundingClientRect()
+    const pad = 160
+    return {
+      top: -rect.top - pad,
+      bottom: -rect.top + window.innerHeight + pad,
     }
   }
 
@@ -622,12 +636,16 @@ export class PretextArticleEngine {
     const { width } = this.metrics
     const height = this.contentHeight
     const dpr = this.dpr
+    const band = this.viewBand()
+    const clearY = Math.max(0, band.top)
+    const clearH = Math.max(1, Math.min(height, band.bottom) - clearY)
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    ctx.clearRect(0, 0, width, height)
+    ctx.clearRect(0, clearY, width, clearH)
     ctx.textBaseline = 'top'
     ctx.textAlign = 'left'
 
     for (const bar of this.quoteBars) {
+      if (bar.y + bar.h < band.top || bar.y > band.bottom) continue
       ctx.fillStyle = this.theme.primary
       ctx.globalAlpha = 0.55
       ctx.fillRect(bar.x, bar.y, 2, bar.h)
@@ -635,6 +653,7 @@ export class PretextArticleEngine {
     }
 
     for (const hr of this.hrs) {
+      if (hr.y < band.top || hr.y > band.bottom) continue
       ctx.strokeStyle = this.theme.border
       ctx.globalAlpha = 0.8
       ctx.lineWidth = 1
@@ -646,6 +665,7 @@ export class PretextArticleEngine {
     }
 
     for (const frame of this.codeFrames) {
+      if (frame.y + frame.h < band.top || frame.y > band.bottom) continue
       this.roundRect(ctx, frame.x, frame.y, frame.w, frame.h, 16)
       ctx.fillStyle = this.theme.secondary
       ctx.globalAlpha = 0.82
@@ -656,23 +676,26 @@ export class PretextArticleEngine {
     ctx.fillStyle = this.theme.foreground
     ctx.font = this.metrics.codeFont
     for (const line of this.codeLines) {
+      if (line.y + this.metrics.codeLine < band.top || line.y > band.bottom) continue
       ctx.fillText(line.text, line.x, line.y)
     }
 
     const hasInk = this.chain.ink.length > 0
     for (const line of this.richLines) {
+      if (line.y + line.lineHeight < band.top || line.y > band.bottom) continue
       this.drawRichLine(line, hasInk)
     }
 
-    this.drawBullets()
+    this.drawBullets(band.top, band.bottom)
     this.drawInk()
   }
 
-  private drawBullets() {
+  private drawBullets(top: number, bottom: number) {
     if (!this.bullets.length) return
     this.ctx.fillStyle = this.theme.primary
     this.ctx.font = this.metrics.bodyFont
     for (const bullet of this.bullets) {
+      if (bullet.y + this.metrics.bodyLine < top || bullet.y > bottom) continue
       this.ctx.fillText(bullet.text, bullet.x, bullet.y)
     }
   }
