@@ -30,7 +30,7 @@ export default defineNuxtConfig({
   app: {
     baseURL,
     head: {
-      title: 'Cerrda — Frontend & Agent Engineer',
+      title: 'Cerrda | Frontend & Agent Infrastructure',
       htmlAttrs: {
         'lang': 'zh-CN',
         'style': 'color-scheme:dark;background-color:#1a1520',
@@ -44,7 +44,8 @@ export default defineNuxtConfig({
         { key: 'color-scheme', name: 'color-scheme', content: 'dark', tagPriority: 'critical' },
         {
           name: 'description',
-          content: '前端工程师 Cerrda：Vue / Nuxt 工程化、Agent Skill 与开源工具链。把重复摩擦沉淀为可安装的基础设施。',
+          content:
+            '前端工程师 Cerrda：Vue / Nuxt 工程化、开源工具链与 Agent 基础设施。发布 Vite 插件，并在 skills.sh 上架可安装 Skill。',
         },
         { key: 'theme-color', name: 'theme-color', content: '#1a1520' },
       ],

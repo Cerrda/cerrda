@@ -111,7 +111,10 @@ onBeforeUnmount(() => {
       <div class="mx-auto max-w-6xl">
         <BlurReveal>
           <p class="eyebrow w-fit">About</p>
-          <h2 class="mt-4 font-display text-3xl md:text-5xl">把工程判断，写成可复用的工具与 Skill</h2>
+          <h2 class="mt-4 font-display text-3xl md:text-5xl">把工程判断，写成可安装的工具与 Skill</h2>
+          <p class="mt-3 max-w-2xl text-muted-foreground">
+            {{ siteProfile.bio }}
+          </p>
         </BlurReveal>
 
         <div class="mt-10 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
@@ -131,9 +134,9 @@ onBeforeUnmount(() => {
                 />
               </template>
               <div class="pointer-events-none absolute inset-x-0 bottom-0 px-6 pb-2.5 md:px-7 md:pb-3">
-                <p class="font-display text-xl drop-shadow-[0_1px_8px_rgb(0_0_0_/_0.55)]">Speed of craft</p>
+                <p class="font-display text-xl drop-shadow-[0_1px_8px_rgb(0_0_0_/_0.55)]">DX to Agent Skills</p>
                 <p class="mt-1 text-sm text-muted-foreground drop-shadow-[0_1px_8px_rgb(0_0_0_/_0.55)]">
-                  从远程类型同步到可安装的 Agent 工作流
+                  从远程类型同步，到可安装的 Agent 工作流
                 </p>
               </div>
             </CssLiquidGlass>
@@ -144,20 +147,21 @@ onBeforeUnmount(() => {
               <div>
                 <h3 class="font-display text-xl">前端工程</h3>
                 <p class="mt-2 text-muted-foreground">
-                  Vue 指令体系、UnoCSS 图标工具链、Vite 插件与 OpenAPI
-                  代码生成。把日常摩擦收敛成一次配置、长期复利的基础设施。
+                  Vue 自定义指令、UnoCSS 图标热更新、Vite 远程类型插件与 OpenAPI
+                  请求生成。把中后台里反复出现的摩擦，收敛成一次配置、长期复用的工具链。
                 </p>
               </div>
               <div>
-                <h3 class="font-display text-xl">Agent 开发</h3>
+                <h3 class="font-display text-xl">Agent 基础设施</h3>
                 <p class="mt-2 text-muted-foreground">
-                  Skill 不是 README 的另一种写法，而是可版本化的约束与流程：触发条件、硬性规则、assets 模板与合规边界。
+                  Skill 不是 README 的另一种写法，而是可版本化的约束与流程：触发条件、硬性规则、assets
+                  模板与合规边界，上架 skills.sh 后安装即可执行。
                 </p>
               </div>
               <div>
-                <h3 class="font-display text-xl">作品观</h3>
+                <h3 class="font-display text-xl">交付原则</h3>
                 <p class="mt-2 text-muted-foreground">
-                  先把问题抽象成工具，再把工具的边界写清楚——它解决什么，以及明确不解决什么。
+                  先把问题抽象成工具，再把边界写清楚：它解决什么，以及明确不解决什么。
                 </p>
               </div>
             </div>
@@ -171,9 +175,9 @@ onBeforeUnmount(() => {
       <div class="mx-auto max-w-6xl">
         <BlurReveal>
           <p class="eyebrow w-fit">Open Source</p>
-          <h2 class="mt-4 font-display text-3xl md:text-5xl">NPM 包</h2>
+          <h2 class="mt-4 font-display text-3xl md:text-5xl">开源工具链</h2>
           <p class="mt-3 max-w-2xl text-muted-foreground">
-            自研 Vite 插件与主题包，以及参与维护的 OpenAPI 请求代码生成器。
+            自研 Vite 插件与部署级主题，并参与维护面向大型 API 面的 OpenAPI 请求生成器。
           </p>
         </BlurReveal>
 
@@ -245,9 +249,9 @@ onBeforeUnmount(() => {
           <div class="flex flex-wrap items-end justify-between gap-6">
             <div>
               <p class="eyebrow w-fit">Agent Skills</p>
-              <h2 class="mt-4 font-display text-3xl md:text-5xl">可安装的工程化 Skill</h2>
+              <h2 class="mt-4 font-display text-3xl md:text-5xl">上架 skills.sh 的工程化 Skill</h2>
               <p class="mt-3 max-w-2xl text-muted-foreground">
-                把 Mock 联调与配置驱动采集固化为可版本化、可分发的 Agent 工作流。
+                把 Mock 联调与配置驱动采集写成可安装、可版本化的 Agent 工作流，含触发条件、硬性规则与合规边界。
               </p>
             </div>
             <LinkPreview
@@ -336,7 +340,7 @@ onBeforeUnmount(() => {
               <p class="eyebrow w-fit">Writing</p>
               <h2 class="mt-4 font-display text-3xl md:text-5xl">文章</h2>
               <p class="mt-3 max-w-2xl text-muted-foreground">
-                从掘金迁入本站。覆盖指令体系、性能优化、图标工具链与 Agent Skill 实践。
+                工程实践记录。覆盖 Vue 指令体系、中后台性能、图标工具链，以及 Agent Skill 的设计与上架。
               </p>
             </div>
             <p class="font-display text-5xl leading-none text-primary/25 md:text-6xl">
@@ -474,7 +478,7 @@ onBeforeUnmount(() => {
         <ClientOnly>
           <Timeline
             title="轨迹"
-            description="从前端工程化到 Agent Skill，持续把重复摩擦抽象成可复用工具。"
+            description="从 Vue 指令与中后台性能，到 Vite 插件、OpenAPI 工具链，以及上架 skills.sh 的可安装 Agent Skill。"
             :items="timelineItems"
           >
             <template v-for="item in careerTimeline" :key="item.title" #[`year-${item.title}`]>
@@ -482,6 +486,9 @@ onBeforeUnmount(() => {
                 <h3 class="mb-3 text-left text-2xl font-bold text-muted-foreground md:hidden">
                   {{ item.title }}
                 </h3>
+                <p class="mb-2 font-display text-xl tracking-tight text-foreground md:text-2xl">
+                  {{ item.headline }}
+                </p>
                 <p class="max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
                   {{ item.content }}
                 </p>
@@ -497,9 +504,9 @@ onBeforeUnmount(() => {
       <div class="mx-auto max-w-6xl">
         <BlurReveal>
           <p class="eyebrow w-fit">Connect</p>
-          <h2 class="mt-4 font-display text-3xl md:text-5xl">一起把 DX 做成基础设施</h2>
+          <h2 class="mt-4 font-display text-3xl md:text-5xl">开源合作与技术交流</h2>
           <p class="mt-3 max-w-2xl text-muted-foreground">
-            欢迎就前端工程化、Agent Skill 与开源工具展开合作或深度交流。
+            前端工程化、Agent Skill 与开源工具链。邮箱直接联系，仓库与 Skill 可公开查阅。
           </p>
         </BlurReveal>
 
@@ -521,7 +528,7 @@ onBeforeUnmount(() => {
                 <p class="text-xs uppercase tracking-[0.22em] text-muted-foreground">Contact</p>
                 <h3 class="mt-3 font-display text-2xl md:text-4xl">联系方式</h3>
                 <p class="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
-                  邮箱用于合作与技术交流。GitHub、掘金与 skills.sh 可直接查看开源仓库、文章与可安装 Skill。
+                  邮箱用于项目合作与技术交流。开源仓库、文章与可安装 Skill 分别在 GitHub、掘金与 skills.sh。
                 </p>
 
                 <ul class="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">

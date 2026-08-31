@@ -3,21 +3,21 @@
     "name": "faker-mock-setup",
     "href": "https://skills.sh/cerrda/skills/faker-mock-setup",
     "install": "npx skills add https://github.com/cerrda/skills --skill faker-mock-setup",
-    "summary": "按 OpenAPI / 函数名生成页面级 Faker overrideResponse Mock，把联调工作流固化为可安装 Skill。",
+    "summary": "按 OpenAPI 或函数名生成页面级 Faker overrideResponse Mock，把前端联调从口头约定变成可安装、可复用的 Agent 工作流。",
     "points": [
-      "函数名或 URL → ApiId",
-      "生成 setup{ApiId}MockHandler",
-      "Vue / Vite + MSW 联调"
+      "由函数名或 URL 推导 ApiId",
+      "生成页面级 setup{ApiId}MockHandler",
+      "面向 Vue / Vite + MSW 联调"
     ]
   },
   {
     "name": "scrapling-config-crawl",
     "href": "https://skills.sh/cerrda/skills/scrapling-config-crawl",
     "install": "npx skills add https://github.com/cerrda/skills --skill scrapling-config-crawl",
-    "summary": "按 config.py 的 id 生成 scrapling 采集脚本，将增量写入、翻页校验与合规边界固化为 Skill。",
+    "summary": "按 config.py 的 id 生成 scrapling 采集脚本，将增量写入、翻页校验与合规边界固化为可安装 Skill。仅面向依法公开数据。",
     "points": [
-      "list / data 增量与附件分流",
-      "强制复用项目 utils.*",
+      "list / data 增量写入与附件分流",
+      "强制复用项目 utils，避免脚本各自为政",
       "仅面向依法公开数据"
     ]
   }
