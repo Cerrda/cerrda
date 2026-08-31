@@ -2,6 +2,7 @@
 import { nextTick, onMounted, ref } from 'vue'
 import type { MultiStepLoaderStep } from '~/components/ui/MultiStepLoader.vue'
 import {
+  readBootSession,
   useAppBoot,
   waitForFlag,
   waitForSilkCompiled,
@@ -13,7 +14,8 @@ const route = useRoute()
 const { ready, lightSpeedCompiled, particlesReady } = useAppBoot()
 
 const spaAlreadyShown =
-  import.meta.client && Boolean((window as Window & { __cerrdaBootShown?: boolean }).__cerrdaBootShown)
+  import.meta.client &&
+  (Boolean((window as Window & { __cerrdaBootShown?: boolean }).__cerrdaBootShown) || readBootSession())
 const isHome = () => route.path === '/'
 
 let finishing = false

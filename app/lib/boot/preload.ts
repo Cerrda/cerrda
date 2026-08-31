@@ -37,6 +37,7 @@ export async function preloadFonts() {
     await Promise.all([
       document.fonts.load('600 48px Fraunces'),
       document.fonts.load('700 72px Fraunces'),
+      document.fonts.load('400 17px Sora'),
       document.fonts.load('500 16px Sora'),
       document.fonts.load('600 16px Sora'),
       document.fonts.load('400 14px "JetBrains Mono"'),

@@ -85,10 +85,6 @@ type OverlayLayout = {
 
 const MAX_FLOW_LINES = 2400
 
-function quoteStack(name: string) {
-  return name.includes(' ') ? `"${name}"` : name
-}
-
 function spansToItems(
   spans: ArticleSpan[],
   metrics: ArticleMetrics,
@@ -100,9 +96,7 @@ function spansToItems(
   for (const span of spans) {
     items.push({
       text: span.text,
-      font: span.code
-        ? metrics.inlineCodeFont
-        : opts?.headingFont || flowFontFor(span, quoteStack(theme.fontSans), metrics),
+      font: span.code ? metrics.inlineCodeFont : opts?.headingFont || flowFontFor(span, theme.fontSans, metrics),
       extraWidth: span.code ? 10 : 0,
       break: span.code ? 'never' : 'normal',
       color: span.href ? theme.primary : span.code ? theme.foreground : fill,
@@ -142,7 +136,14 @@ export class PretextArticleEngine {
   private raf = 0
   private running = false
   private localeReady = false
+  private fontBound = false
+  private warmupFrames = 0
+  private pendingPaint = false
+  private viewPad = 240
+  private viewTop = 0
+  private viewHeight = 0
   private onHeight?: (height: number) => void
+  private lastHtml = ''
 
   constructor(opts: {
     canvas: HTMLCanvasElement
@@ -150,7 +151,7 @@ export class PretextArticleEngine {
     skipFirstHeading?: boolean
     onHeight?: (height: number) => void
   }) {
-    const ctx = opts.canvas.getContext('2d')
+    const ctx = opts.canvas.getContext('2d', { alpha: true })
     if (!ctx) throw new Error('Canvas 2D unavailable')
     this.canvas = opts.canvas
     this.wrap = opts.wrap
@@ -171,16 +172,12 @@ export class PretextArticleEngine {
       setLocale('zh-CN')
       this.localeReady = true
     }
-    await Promise.race([
-      document.fonts.ready,
-      new Promise<void>((resolve) => {
-        window.setTimeout(resolve, 1800)
-      }),
-    ])
     this.lastHtml = html
     this.theme = readArticleTheme(this.wrap)
     this.metrics = buildMetrics(Math.max(280, this.wrap.clientWidth || this.metrics.width), this.theme)
-    this.syncSize()
+    this.bindFontEvents()
+    await this.ensureFonts()
+    this.syncCanvasWindow()
     const blocks = parseArticleHtml(html, this.skipFirstHeading)
     this.overlays = overlaySpecsFrom(blocks)
     this.overlayHeights.clear()
@@ -191,9 +188,17 @@ export class PretextArticleEngine {
     this.draw()
   }
 
+  paint() {
+    this.pendingPaint = true
+    this.draw()
+  }
+
   start() {
     if (this.running) return
     this.running = true
+    this.warmupFrames = 16
+    this.pendingPaint = true
+    this.draw()
     this.schedule()
   }
 
@@ -204,43 +209,40 @@ export class PretextArticleEngine {
   }
 
   destroy() {
+    this.unbindFontEvents()
     this.stop()
   }
 
   setPointerClient(clientX: number, clientY: number, inside: boolean) {
     this.lastClient = { x: clientX, y: clientY }
-    const rect = this.canvas.getBoundingClientRect()
-    this.pointer = {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
-      inside,
-    }
+    const local = this.clientToLocal(clientX, clientY)
+    this.pointer = { x: local.x, y: local.y, inside }
     this.lastPointerAt = performance.now()
     this.hoveredHref = this.hitLink(this.pointer.x, this.pointer.y)
+    this.pendingPaint = true
     this.schedule()
   }
 
   syncPointerFromScroll() {
     if (this.lastClient.x || this.lastClient.y) {
-      const rect = this.canvas.getBoundingClientRect()
-      const x = this.lastClient.x - rect.left
-      const y = this.lastClient.y - rect.top
-      const inside = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height
-      this.pointer = { x, y, inside }
-      this.hoveredHref = this.hitLink(x, y)
+      const local = this.clientToLocal(this.lastClient.x, this.lastClient.y)
+      const inside = local.x >= 0 && local.y >= 0 && local.x <= this.metrics.width && local.y <= this.contentHeight
+      this.pointer = { x: local.x, y: local.y, inside }
+      this.hoveredHref = this.hitLink(local.x, local.y)
     }
+    this.pendingPaint = true
     this.schedule()
+    if (!this.running) this.draw()
   }
 
   pointerDown(clientX: number, clientY: number): { href?: string } {
-    const rect = this.canvas.getBoundingClientRect()
-    const x = clientX - rect.left
-    const y = clientY - rect.top
+    const { x, y } = this.clientToLocal(clientX, clientY)
     const href = this.hitLink(x, y)
     if (href) return { href }
     const head = this.chain.segments[0]
     const angle = (head?.angle ?? Math.PI / 2) - Math.PI / 2
     spawnInk(this.chain, x, y, angle)
+    this.pendingPaint = true
     this.schedule()
     return {}
   }
@@ -269,16 +271,57 @@ export class PretextArticleEngine {
       this.units = this.prepareBlocks(parseArticleHtml(this.lastHtml, this.skipFirstHeading))
     }
     this.naturalHeight = 0
-    this.syncSize()
+    this.syncCanvasWindow()
     this.layout(true)
     this.positionOverlays()
     this.draw()
   }
 
-  private lastHtml = ''
-
   private chainScale() {
     return Math.min(1, Math.max(0.72, this.metrics.width / 680))
+  }
+
+  private bindFontEvents() {
+    if (this.fontBound || !document.fonts) return
+    this.fontBound = true
+    document.fonts.addEventListener('loadingdone', this.onFontsChanged)
+  }
+
+  private unbindFontEvents() {
+    if (!this.fontBound || !document.fonts) return
+    document.fonts.removeEventListener('loadingdone', this.onFontsChanged)
+    this.fontBound = false
+  }
+
+  private onFontsChanged = () => {
+    if (!this.lastHtml) return
+    this.units = this.prepareBlocks(parseArticleHtml(this.lastHtml, this.skipFirstHeading))
+    this.naturalHeight = 0
+    this.layout(true)
+    this.positionOverlays()
+    this.draw()
+  }
+
+  private async ensureFonts() {
+    if (!document.fonts) return
+    const specs = [
+      this.metrics.bodyFont,
+      this.metrics.h2Font,
+      this.metrics.h3Font,
+      this.metrics.h4Font,
+      this.metrics.codeFont,
+      this.metrics.inlineCodeFont,
+    ]
+    try {
+      await Promise.race([
+        Promise.all(specs.map((font) => document.fonts.load(font))),
+        new Promise<void>((resolve) => {
+          window.setTimeout(resolve, 1800)
+        }),
+      ])
+    } catch {
+      /* canvas falls back to the CJK / generic stack */
+    }
   }
 
   private glyphsFromItems(items: FlowItem[]) {
@@ -543,7 +586,7 @@ export class PretextArticleEngine {
       this.naturalHeight,
       this.naturalHeight ? this.naturalHeight : laidOut + reserved,
     )
-    this.syncSize()
+    this.syncCanvasWindow()
     this.onHeight?.(this.contentHeight)
   }
 
@@ -583,22 +626,40 @@ export class PretextArticleEngine {
     }
   }
 
-  private syncSize() {
+  private clientToLocal(clientX: number, clientY: number) {
+    const rect = this.wrap.getBoundingClientRect()
+    return { x: clientX - rect.left, y: clientY - rect.top }
+  }
+
+  private viewWindow() {
+    const rect = this.wrap.getBoundingClientRect()
+    const pad = this.viewPad
+    const top = Math.max(0, Math.floor(-rect.top - pad))
+    const height = Math.max(1, Math.ceil((window.innerHeight || 800) + pad * 2))
+    return { top, height, bottom: top + height }
+  }
+
+  private syncCanvasWindow() {
     const cssW = Math.max(1, this.wrap.clientWidth)
     const cssH = Math.max(1, this.contentHeight || 240)
-    const dpr = Math.min(1.5, window.devicePixelRatio || 1)
+    const dpr = Math.min(1.25, window.devicePixelRatio || 1)
     this.dpr = dpr
+    const { top, height } = this.viewWindow()
+    this.viewTop = top
+    this.viewHeight = height
     const nextW = Math.round(cssW * dpr)
-    const nextH = Math.round(cssH * dpr)
+    const nextH = Math.round(height * dpr)
     if (this.canvas.width !== nextW || this.canvas.height !== nextH) {
       this.canvas.width = nextW
       this.canvas.height = nextH
     }
     this.canvas.style.width = `${cssW}px`
-    this.canvas.style.height = `${cssH}px`
-    this.canvas.style.position = ''
-    this.canvas.style.top = ''
-    this.canvas.style.zIndex = ''
+    this.canvas.style.height = `${height}px`
+    this.canvas.style.position = 'absolute'
+    this.canvas.style.left = '0'
+    this.canvas.style.top = `${top}px`
+    this.canvas.style.zIndex = '0'
+    this.wrap.style.position = 'relative'
     this.wrap.style.minHeight = `${cssH}px`
     this.metrics = { ...this.metrics, width: cssW }
   }
@@ -613,39 +674,36 @@ export class PretextArticleEngine {
     const idle = time - this.lastPointerAt > IDLE_TIMEOUT
     const moved = updateMouseChain(this.chain, time, this.pointer.x, this.pointer.y, idle, this.pointer.inside)
     if (this.chain.ink.length) updateInk(this.chain, time)
-    const live = moved || this.chain.ink.length > 0 || !idle || chainHasPresence(this.chain)
+    const warming = this.warmupFrames > 0
+    if (warming) this.warmupFrames--
+    const scrolling = this.pendingPaint
+    this.pendingPaint = false
+    const live = warming || scrolling || moved || this.chain.ink.length > 0 || !idle || chainHasPresence(this.chain)
     if (moved || this.chain.ink.length) {
       this.layout()
       this.positionOverlays()
     }
     if (live) this.draw()
-    if (this.running && live) this.schedule()
-  }
-
-  private viewBand() {
-    const rect = this.wrap.getBoundingClientRect()
-    const pad = 160
-    return {
-      top: -rect.top - pad,
-      bottom: -rect.top + window.innerHeight + pad,
+    if (this.running && (warming || moved || this.chain.ink.length > 0 || !idle || chainHasPresence(this.chain))) {
+      this.schedule()
     }
   }
 
   private draw() {
+    this.syncCanvasWindow()
     const ctx = this.ctx
     const { width } = this.metrics
-    const height = this.contentHeight
     const dpr = this.dpr
-    const band = this.viewBand()
-    const clearY = Math.max(0, band.top)
-    const clearH = Math.max(1, Math.min(height, band.bottom) - clearY)
+    const top = this.viewTop
+    const bottom = this.viewTop + this.viewHeight
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    ctx.clearRect(0, clearY, width, clearH)
+    ctx.clearRect(0, 0, width, this.viewHeight)
+    ctx.setTransform(dpr, 0, 0, dpr, 0, -top * dpr)
     ctx.textBaseline = 'top'
     ctx.textAlign = 'left'
 
     for (const bar of this.quoteBars) {
-      if (bar.y + bar.h < band.top || bar.y > band.bottom) continue
+      if (bar.y + bar.h < top || bar.y > bottom) continue
       ctx.fillStyle = this.theme.primary
       ctx.globalAlpha = 0.55
       ctx.fillRect(bar.x, bar.y, 2, bar.h)
@@ -653,7 +711,7 @@ export class PretextArticleEngine {
     }
 
     for (const hr of this.hrs) {
-      if (hr.y < band.top || hr.y > band.bottom) continue
+      if (hr.y < top || hr.y > bottom) continue
       ctx.strokeStyle = this.theme.border
       ctx.globalAlpha = 0.8
       ctx.lineWidth = 1
@@ -665,7 +723,7 @@ export class PretextArticleEngine {
     }
 
     for (const frame of this.codeFrames) {
-      if (frame.y + frame.h < band.top || frame.y > band.bottom) continue
+      if (frame.y + frame.h < top || frame.y > bottom) continue
       this.roundRect(ctx, frame.x, frame.y, frame.w, frame.h, 16)
       ctx.fillStyle = this.theme.secondary
       ctx.globalAlpha = 0.82
@@ -676,17 +734,17 @@ export class PretextArticleEngine {
     ctx.fillStyle = this.theme.foreground
     ctx.font = this.metrics.codeFont
     for (const line of this.codeLines) {
-      if (line.y + this.metrics.codeLine < band.top || line.y > band.bottom) continue
+      if (line.y + this.metrics.codeLine < top || line.y > bottom) continue
       ctx.fillText(line.text, line.x, line.y)
     }
 
     const hasInk = this.chain.ink.length > 0
     for (const line of this.richLines) {
-      if (line.y + line.lineHeight < band.top || line.y > band.bottom) continue
+      if (line.y + line.lineHeight < top || line.y > bottom) continue
       this.drawRichLine(line, hasInk)
     }
 
-    this.drawBullets(band.top, band.bottom)
+    this.drawBullets(top, bottom)
     this.drawInk()
   }
 

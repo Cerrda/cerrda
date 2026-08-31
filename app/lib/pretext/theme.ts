@@ -1,23 +1,59 @@
 import type { ArticleMetrics, ArticleTheme } from './types'
 
+const CJK_SANS = '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC"'
+const CJK_SERIF = '"Songti SC", "Noto Serif SC", "SimSun"'
+const CJK_MONO = '"Sarasa Term SC", "Microsoft YaHei Mono", "Microsoft YaHei", ui-monospace'
+
 function pickFontFamily(value: string, fallback: string) {
   const first = value
     .split(',')
     .map((part) => part.trim().replace(/^['"]|['"]$/g, ''))
-    .find((part) => part && part !== 'ui-sans-serif' && part !== 'ui-serif' && part !== 'ui-monospace' && part !== 'system-ui')
+    .find(
+      (part) =>
+        part && part !== 'ui-sans-serif' && part !== 'ui-serif' && part !== 'ui-monospace' && part !== 'system-ui',
+    )
   return first || fallback
+}
+
+function quoteFamily(name: string) {
+  return name.includes(' ') ? `"${name}"` : name
+}
+
+function canvasFont(
+  family: string,
+  size: number,
+  opts?: { weight?: string | number; style?: 'italic' | ''; generic?: 'sans-serif' | 'serif' | 'monospace' },
+) {
+  const weight = opts?.weight ?? '400'
+  const style = opts?.style ? `${opts.style} ` : ''
+  const generic = opts?.generic ?? 'sans-serif'
+  const cjk = generic === 'serif' ? CJK_SERIF : generic === 'monospace' ? CJK_MONO : CJK_SANS
+  return `${style}${weight} ${size}px ${quoteFamily(family)}, ${cjk}, ${generic}`
+}
+
+function cssVarColor(el: HTMLElement, name: string, fallback: string) {
+  const probe = document.createElement('span')
+  probe.style.color = `var(${name})`
+  probe.style.position = 'absolute'
+  probe.style.visibility = 'hidden'
+  probe.style.pointerEvents = 'none'
+  el.appendChild(probe)
+  const color = getComputedStyle(probe).color
+  probe.remove()
+  return color && color !== 'rgba(0, 0, 0, 0)' ? color : fallback
 }
 
 export function readArticleTheme(el: HTMLElement): ArticleTheme {
   const styles = getComputedStyle(el)
+  const fallback = styles.color || '#f5f5f5'
   return {
-    foreground: styles.getPropertyValue('--foreground').trim() || styles.color,
-    muted: styles.getPropertyValue('--muted-foreground').trim() || styles.color,
-    primary: styles.getPropertyValue('--primary').trim() || styles.color,
-    secondary: styles.getPropertyValue('--secondary').trim() || 'transparent',
-    border: styles.getPropertyValue('--border').trim() || styles.color,
-    background: styles.getPropertyValue('--background').trim() || 'transparent',
-    card: styles.getPropertyValue('--card').trim() || 'transparent',
+    foreground: cssVarColor(el, '--foreground', fallback),
+    muted: cssVarColor(el, '--muted-foreground', fallback),
+    primary: cssVarColor(el, '--primary', fallback),
+    secondary: cssVarColor(el, '--secondary', 'transparent'),
+    border: cssVarColor(el, '--border', fallback),
+    background: cssVarColor(el, '--background', 'transparent'),
+    card: cssVarColor(el, '--card', 'transparent'),
     fontSans: pickFontFamily(styles.getPropertyValue('--font-sans'), 'Sora'),
     fontDisplay: pickFontFamily(styles.getPropertyValue('--font-display'), 'Fraunces'),
     fontMono: pickFontFamily(styles.getPropertyValue('--font-mono'), 'JetBrains Mono'),
@@ -32,7 +68,6 @@ export function buildMetrics(width: number, theme: ArticleTheme): ArticleMetrics
   const h3Size = Math.round(20 * scale)
   const h4Size = Math.round(17 * scale)
   const codeSize = Math.max(12, Math.round(13.5 * scale))
-  const quote = (name: string) => (name.includes(' ') ? `"${name}"` : name)
 
   return {
     width,
@@ -46,18 +81,23 @@ export function buildMetrics(width: number, theme: ArticleTheme): ArticleMetrics
     h4Line: Math.round(28 * scale),
     codeSize,
     codeLine: Math.round(22 * scale),
-    bodyFont: `400 ${bodySize}px ${quote(theme.fontSans)}, sans-serif`,
-    h2Font: `600 ${h2Size}px ${quote(theme.fontDisplay)}, serif`,
-    h3Font: `600 ${h3Size}px ${quote(theme.fontDisplay)}, serif`,
-    h4Font: `600 ${h4Size}px ${quote(theme.fontSans)}, sans-serif`,
-    codeFont: `400 ${codeSize}px ${quote(theme.fontMono)}, monospace`,
-    inlineCodeFont: `400 ${Math.max(12, bodySize - 2)}px ${quote(theme.fontMono)}, monospace`,
+    bodyFont: canvasFont(theme.fontSans, bodySize),
+    h2Font: canvasFont(theme.fontDisplay, h2Size, { weight: 600, generic: 'serif' }),
+    h3Font: canvasFont(theme.fontDisplay, h3Size, { weight: 600, generic: 'serif' }),
+    h4Font: canvasFont(theme.fontSans, h4Size, { weight: 600 }),
+    codeFont: canvasFont(theme.fontMono, codeSize, { generic: 'monospace' }),
+    inlineCodeFont: canvasFont(theme.fontMono, Math.max(12, bodySize - 2), { generic: 'monospace' }),
   }
 }
 
-export function flowFontFor(span: { strong: boolean; em: boolean; code: boolean }, base: string, metrics: ArticleMetrics) {
+export function flowFontFor(
+  span: { strong: boolean; em: boolean; code: boolean },
+  family: string,
+  metrics: ArticleMetrics,
+) {
   if (span.code) return metrics.inlineCodeFont
-  const weight = span.strong ? '600' : '400'
-  const style = span.em ? 'italic ' : ''
-  return `${style}${weight} ${metrics.bodySize}px ${base}`
+  return canvasFont(family, metrics.bodySize, {
+    weight: span.strong ? '600' : '400',
+    style: span.em ? 'italic' : '',
+  })
 }

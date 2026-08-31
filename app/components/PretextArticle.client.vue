@@ -45,8 +45,14 @@ async function boot() {
     await nextTick()
     observeOverlays()
     engine.positionOverlays()
-    engine.start()
+    const active = engine
+    active.resize()
+    active.paint()
+    active.start()
     ready.value = true
+    await nextTick()
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    if (engine === active) active.paint()
   } catch (error) {
     console.warn('[PretextArticle] fallback to HTML', error)
     failed.value = true
@@ -155,6 +161,7 @@ watch(canvasRef, async (el) => {
 
 useEventListener(window, 'pointermove', onPointerMove, { passive: true })
 useEventListener(window, 'scroll', () => engine?.syncPointerFromScroll(), { passive: true })
+useEventListener(window, 'resize', () => engine?.syncPointerFromScroll(), { passive: true })
 
 onBeforeUnmount(() => {
   overlayObserver?.disconnect()
@@ -169,8 +176,8 @@ onBeforeUnmount(() => {
     <div
       v-if="useCanvas"
       ref="wrapRef"
-      class="pretext-article relative w-full select-none"
-      :class="ready ? '' : 'pointer-events-none absolute inset-x-0 top-0 opacity-0'"
+      class="pretext-article w-full select-none"
+      :class="ready ? 'relative' : 'pointer-events-none absolute inset-x-0 top-0'"
       @pointerleave="onPointerLeave"
       @pointerdown="onPointerDown"
     >

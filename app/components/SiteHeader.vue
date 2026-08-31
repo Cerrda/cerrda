@@ -3,19 +3,15 @@ import { brandEditorial } from '~/data/editorial'
 import { navItems, siteProfile } from '~/data/site'
 
 const route = useRoute()
-const { app } = useRuntimeConfig()
-
-const links = computed(() =>
-  navItems.map((item) => ({
-    ...item,
-    href: route.path === '/' ? `#${item.id}` : withAppBase(`/#${item.id}`, app.baseURL),
-  })),
-)
 
 const brandAriaLabel = computed(() => (route.path === '/' ? '回到顶部' : `${siteProfile.name} 首页`))
 
+function isModifiedClick(event: MouseEvent) {
+  return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+}
+
 function onBrandClick(event: MouseEvent) {
-  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  if (isModifiedClick(event)) return
   if (route.path !== '/') return
 
   event.preventDefault()
@@ -23,6 +19,15 @@ function onBrandClick(event: MouseEvent) {
     history.replaceState(history.state, '', route.path)
   }
   window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function onNavClick(event: MouseEvent, id: string) {
+  if (isModifiedClick(event)) return
+  if (route.path !== '/') return
+
+  event.preventDefault()
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  history.replaceState(history.state, '', `${route.path}#${id}`)
 }
 </script>
 
@@ -50,14 +55,15 @@ function onBrandClick(event: MouseEvent) {
           </NuxtLink>
 
           <nav class="hidden items-center gap-1.5 md:flex">
-            <a
-              v-for="item in links"
+            <NuxtLink
+              v-for="item in navItems"
               :key="item.id"
-              :href="item.href"
+              :to="{ path: '/', hash: `#${item.id}` }"
               class="rounded-full px-3.5 py-2 text-[15px] text-muted-foreground transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-accent/70 hover:text-foreground"
+              @click="onNavClick($event, item.id)"
             >
               {{ item.label }}
-            </a>
+            </NuxtLink>
           </nav>
 
           <div class="flex items-center gap-1">
