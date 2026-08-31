@@ -14,6 +14,15 @@ export function withAppBase(path: string, baseURL = '/'): string {
   return `${base}${normalized}`
 }
 
+/** Prefix root-absolute asset URLs inside article HTML for GitHub Pages (`/cerrda/...`). */
+export function prefixHtmlLocalAssets(html: string, baseURL = '/'): string {
+  if (!html) return html
+  return html.replace(/(\ssrc=["'])(\/[^"']+)/gi, (full, pre, src) => {
+    if (src.startsWith('//')) return full
+    return `${pre}${withAppBase(src, baseURL)}`
+  })
+}
+
 export function useAppAsset(path: MaybeRefOrGetter<string>) {
   const config = useRuntimeConfig()
   return computed(() => withAppBase(toValue(path), config.app.baseURL))

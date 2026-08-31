@@ -2,10 +2,17 @@
 import { useEventListener } from '@vueuse/core'
 import { PretextArticleEngine } from '~/lib/pretext/engine'
 import type { OverlaySpec } from '~/lib/pretext/types'
+import { withAppBase } from '~/utils/withAppBase'
 
 const props = defineProps<{
   html: string
 }>()
+
+const config = useRuntimeConfig()
+
+function overlaySrc(src: string) {
+  return withAppBase(src, config.app.baseURL)
+}
 
 const wrapRef = ref<HTMLElement | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -57,6 +64,14 @@ function observeOverlays() {
     }
   })
   wrapRef.value?.querySelectorAll<HTMLElement>('[data-pretext-overlay]').forEach((el) => overlayObserver?.observe(el))
+}
+
+function onOverlayResize(event: Event) {
+  const img = event.target as HTMLImageElement
+  const overlay = img.closest<HTMLElement>('[data-pretext-overlay]')
+  const id = overlay?.dataset.pretextOverlay
+  if (!id || !overlay) return
+  engine?.setOverlayHeight(id, overlay.getBoundingClientRect().height)
 }
 
 function onPointerMove(event: PointerEvent) {
@@ -163,9 +178,12 @@ onBeforeUnmount(() => {
         <div v-if="overlay.type === 'table'" class="prose-article overflow-x-auto" v-html="overlay.html" />
         <img
           v-else-if="overlay.type === 'image'"
-          :src="overlay.src"
+          :src="overlaySrc(overlay.src)"
           :alt="overlay.alt || ''"
-          class="max-w-full rounded-[1rem]"
+          referrerpolicy="no-referrer"
+          decoding="async"
+          class="block w-full max-w-full rounded-[1rem]"
+          @load="onOverlayResize"
         />
       </div>
     </div>
@@ -213,6 +231,9 @@ onBeforeUnmount(() => {
   margin: 0.85rem 0;
 }
 .prose-article :deep(img) {
+  display: block;
+  width: 100%;
+  height: auto;
   max-width: 100%;
   border-radius: 1rem;
 }

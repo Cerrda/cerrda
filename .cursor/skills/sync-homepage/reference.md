@@ -72,4 +72,4 @@
 ## Related scripts
 
 - `node .cursor/skills/sync-homepage/scripts/sync-homepage.mjs` — 拉事实、写 copyQueue
-- `node scripts/generate-articles.mjs` — md → HTML
+- `node scripts/generate-articles.mjs` — md → HTML，并把正文图片落到 `public/articles/assets/`

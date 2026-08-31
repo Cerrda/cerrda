@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { PhArrowLeft } from '@phosphor-icons/vue'
 import { getArticleMetaBySlug } from '~/utils/articles'
+import { prefixHtmlLocalAssets, withAppBase } from '~/utils/withAppBase'
 
 const route = useRoute()
+const config = useRuntimeConfig()
 const slug = computed(() => String(route.params.slug || ''))
 const meta = computed(() => getArticleMetaBySlug(slug.value))
 
@@ -17,8 +19,10 @@ const { data: html } = await useAsyncData(`article-html-${slug.value}`, async ()
     const file = path.join(process.cwd(), 'public', 'articles', `${slug.value}.html`)
     return await fs.readFile(file, 'utf8')
   }
-  return await $fetch<string>(`/articles/${slug.value}.html`)
+  return await $fetch<string>(withAppBase(`/articles/${slug.value}.html`, config.app.baseURL))
 })
+
+const articleHtml = computed(() => prefixHtmlLocalAssets(html.value || '', config.app.baseURL))
 
 useSeoMeta({
   title: `${meta.value.title} · Cerrda`,
@@ -65,10 +69,10 @@ const juejinUrl = computed(() => `https://juejin.cn/post/${meta.value?.id}`)
         </div>
       </BlurReveal>
 
-      <ClientOnly v-if="html">
-        <PretextArticle class="mt-10" :html="html" />
+      <ClientOnly v-if="articleHtml">
+        <PretextArticle class="mt-10" :html="articleHtml" />
         <template #fallback>
-          <div class="prose-article mt-10 space-y-4 text-base leading-8 text-foreground/90" v-html="html" />
+          <div class="prose-article mt-10 space-y-4 text-base leading-8 text-foreground/90" v-html="articleHtml" />
         </template>
       </ClientOnly>
       <p v-else class="mt-10 text-muted-foreground">
@@ -118,6 +122,9 @@ const juejinUrl = computed(() => `https://juejin.cn/post/${meta.value?.id}`)
   margin: 0.85rem 0;
 }
 .prose-article :deep(img) {
+  display: block;
+  width: 100%;
+  height: auto;
   max-width: 100%;
   border-radius: 1rem;
 }

@@ -4,31 +4,31 @@
 </blockquote>
 <p>DeepSeek Harness（下文简称 DSH）把 Agent 工作流做成了浏览器里的工作台：会话、工具调用、轨迹、插件，一条龙。默认 GUI 已经很好用，但如果你每天对着它写代码、排问题，难免会想：能不能再「好看」一点——不是换张壁纸那种好看，而是配色、字体、玻璃、背景动起来都像一套完整的产品设计。</p>
 <p><code>dsh-cerrda-theme</code> 就是这件事。它是一个 <strong>部署级静态 Web 插件</strong>：一行命令装上，重启 DSH 后自动生效，<strong>不用在 GUI 里点审批</strong>，进程挂了再起来也不会丢。</p>
-<p><img src="https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/9a9044b724f0417ea0d1114bb0718675~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=vyipYNf2EajWfSrt4V36obSm2hI%3D" alt="01-hero.jpg">
+<p><img src="/articles/assets/dsh-cerrda-theme/01-hero.jpg" alt="01-hero.jpg" referrerpolicy="no-referrer" loading="lazy" decoding="async">
 <em>首页：「探索未至之境」叠在 Silk 暗色绸面背景上，侧边栏和输入栏都是半透明玻璃。</em></p>
 <hr>
 <h2>装完长什么样</h2>
 <p>主题复刻的是 cerrda 那套设计语言：<strong>玫瑰粉叠深紫</strong>，色值全部走 <code>oklch</code>，不是随便抽几个 hex。字体是 <strong>Sora（界面）/ Fraunces（标题）/ JetBrains Mono（代码）</strong>。背景不是一张静图，而是 WebGL2 实时渲染的丝绸（Silk）。</p>
-<p><img src="./assets/03-composer-glass.jpg" alt="输入栏特写：玻璃卡片与玫瑰粉发送按钮转存失败，建议直接上传图片文件"></p>
+<p><img src="/articles/assets/dsh-cerrda-theme/03-composer-glass.jpg" alt="输入栏特写：玻璃卡片与玫瑰粉发送按钮转存失败，建议直接上传图片文件" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
 <p><em>输入栏是整套 UI 里最高频的表面，所以这里上的是「重」液态玻璃：SVG 位移滤镜 + RGB 色散，边缘会有轻微彩色折射。</em></p>
 <p>发送按钮启用后会亮成玫瑰粉，外圈还有一圈缓慢旋转的流光描边（ShimmerBorder）。侧边栏、会话头、工具卡片、菜单和弹窗则用更轻的 CSS 液态玻璃（frost + chrome），保证日常滚动不会把 GPU 打满。</p>
 <p>丝绸背景是会动的：</p>
-<p><img src="https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/e2ba609beff74717a58e3beadf60636d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=Zv9UVXeFLyyWjL77hHMpmO5E40A%3D" alt="12-silk-bg.gif"></p>
+<p><img src="/articles/assets/dsh-cerrda-theme/12-silk-bg.gif" alt="12-silk-bg.gif" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
 <p><em>Silk 背景：WebGL2 fragment shader，hue 310 / 低饱和，叠在 UI 下面，opacity 约 0.5。</em></p>
 <hr>
 <h2>真正用起来的时候</h2>
 <p>空首页好看只是第一眼。Agent 真正干活时，界面会堆满 Think、Pwsh、Read、工具卡片和 Markdown。主题要过的关是：<strong>信息密度上去之后，还能不能分得清层级。</strong></p>
-<p><img src="https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/a750ff06e88d4944920209d6104a4899~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=xU%2Bzx8jTQVIb2yoiQWMUDD1Ez9Q%3D" alt="06-tools.jpg"></p>
+<p><img src="/articles/assets/dsh-cerrda-theme/06-tools.jpg" alt="06-tools.jpg" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
 <p><em>工具卡片走紧凑但留白的节奏。失败的调用会用玫瑰描边点出来，不会淹没在暗色里。</em></p>
 <p>鼠标滑过工具卡片时，会有跟随指针的径向辉光（CardSpotlight），点击按钮有 Ripple 波纹。这些动效都尊重 <code>prefers-reduced-motion</code>：系统开了「减少动效」，动画会自动关掉。</p>
 <p>Markdown 标题用 Fraunces，列表标记是玫瑰色，行内代码带着一层很淡的粉底。长回答读起来不像终端 dump，更像一篇排过版的技术笔记：</p>
-<p><img src="https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/ae7375e1dd314bffa60c725b14cae1ae~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=iZn3NL1qYbr8PKapr9COw6D34FI%3D" alt="05-conversation.jpg"></p>
+<p><img src="/articles/assets/dsh-cerrda-theme/05-conversation.jpg" alt="05-conversation.jpg" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
 <p>轨迹视图也一起收进同一套语言——表格、回合胶囊、事件类型标签都是玻璃底 + 玫瑰强调：</p>
-<p><img src="https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/2c7fa84095a54a0fb4a39f1db0c105cb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=0RuW%2BougJSyH2nG9aCGKjNmsej8%3D" alt="10-trajectory.jpg"></p>
+<p><img src="/articles/assets/dsh-cerrda-theme/10-trajectory.jpg" alt="10-trajectory.jpg" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
 <p>设置弹窗用弹簧入场（轻微 <code>rotateX</code> + scale），遮罩带模糊。主题把「跟随系统」外观也强制映射成同一套暗色 token——所以你切浅色，cerrda 仍然是这身玫瑰深紫，不会出现一半亮一半暗的拼盘。</p>
-<p><img src="https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/4c2e576c3d7d46c9b529f69bc07d850b~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=4bq11ZshtyNA4Yv3uyn58LK9tTA%3D" alt="08-settings.jpg"></p>
+<p><img src="/articles/assets/dsh-cerrda-theme/08-settings.jpg" alt="08-settings.jpg" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
 <p>插件列表页同样套了这层玻璃。主题自己就是用 DSH 的插件机制装进去的，所以在「插件」里能看到它和 <code>agent</code>、<code>session</code>、<code>api-gateway</code> 并列：</p>
-<p><img src="https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/c06dc3038f64458e8a7910c123009f84~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=o1yBfvfKcN9Uh7vYdf0K4yut1xk%3D" alt="09-plugins.jpg"></p>
+<p><img src="/articles/assets/dsh-cerrda-theme/09-plugins.jpg" alt="09-plugins.jpg" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
 <hr>
 <h2>一行命令安装</h2>
 <p>需要本机已经能跑 DSH Web profile，并且 <code>pnpm</code> 在 PATH 上。</p>

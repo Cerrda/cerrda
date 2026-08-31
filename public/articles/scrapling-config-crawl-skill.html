@@ -4,7 +4,7 @@
 <p>写爬虫最耗人的往往不是「会不会写 requests」，而是：<strong>每个站分页规则不同、增量怎么比、详情附件怎么下、翻页一不小心就跳页</strong>。<br>我们把「按 <code>config.py</code> 的 id 生成 scrapling 脚本 + 写 SQLite」固化成 Agent Skill，并推进 <a href="https://skills.sh/">skills.sh</a>——一行命令装上，对话里丢 <code>id</code> 就能跑完整流程。</p>
 <hr>
 <h2>免责声明（请先读）</h2>
-<p><img src="https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/7f21977a1dbf47a0935a06642a74dded~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787712417&x-signature=EpaeV6Io4T6LLoTGlIdBYYwsxNE%3D" alt="juejin-crawl-disclaimer.png"></p>
+<p><img src="/articles/assets/scrapling-config-crawl-skill/juejin-crawl-disclaimer.png" alt="juejin-crawl-disclaimer.png" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
 <p>本 Skill 与文中示例仅面向<strong>依法公开</strong>的网页信息采集与工程化实践分享。</p>
 <p>使用前请确认：</p>
 <ol>
@@ -16,7 +16,7 @@
 <p>若你的场景不确定是否合规，请先咨询法务，<strong>不要</strong>直接跑采集。</p>
 <hr>
 <h2>它解决什么</h2>
-<p><img src="https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/0eb8eb422ed940a2ae87a9e31bcef047~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787712417&x-signature=XhqMSmI3kC98p2gpwt1jf%2F5L8sA%3D" alt="juejin-crawl-pipeline.png"></p>
+<p><img src="/articles/assets/scrapling-config-crawl-skill/juejin-crawl-pipeline.png" alt="juejin-crawl-pipeline.png" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
 <table>
 <thead>
 <tr>
@@ -60,7 +60,7 @@
 </code></pre>
 <hr>
 <h2>list vs data：两条采集路径</h2>
-<p><img src="https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/7131aa65f7b44a7ebf1e67eb3a3a9341~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787712417&x-signature=WVUY2muoZSluLxvXZqGZHWbaK%2Bg%3D" alt="juejin-list-vs-data.png"></p>
+<p><img src="/articles/assets/scrapling-config-crawl-skill/juejin-list-vs-data.png" alt="juejin-list-vs-data.png" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
 <table>
 <thead>
 <tr>
@@ -116,7 +116,7 @@
 </tbody></table>
 <hr>
 <h2>怎么装：从 GitHub 到 Agent</h2>
-<p><img src="https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/100b81754492440aab34dc6d0db49cbf~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787712417&x-signature=IdSxVtF0tKSIKo5KlrTAuHstT2w%3D" alt="juejin-crawl-install.png">
+<p><img src="/articles/assets/scrapling-config-crawl-skill/juejin-crawl-install.png" alt="juejin-crawl-install.png" referrerpolicy="no-referrer" loading="lazy" decoding="async">
 skills.sh <strong>没有单独「投稿审核」</strong>。公开仓库 + 有人执行 <code>npx skills add</code>，遥测就会进入索引。</p>
 <p>本仓库已支持<strong>多 Skill 并列</strong>（例如还有 <code>faker-mock-setup</code>），按需安装即可：</p>
 <pre><code class="language-bash"># 安装本 Skill
