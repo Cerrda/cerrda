@@ -54,7 +54,7 @@ export const morphingRoles = ['Frontend Engineer', 'Agent Infrastructure', 'Open
 export const navItems = [
   { id: 'about', label: '关于' },
   { id: 'packages', label: '开源' },
-  { id: 'skills', label: 'Skills' },
+  { id: 'skills', label: 'SKILLS' },
   { id: 'articles', label: '文章' },
   { id: 'timeline', label: '轨迹' },
 ] as const
