@@ -40,7 +40,7 @@ const juejinUrl = computed(() => `https://juejin.cn/post/${meta.value?.id}`)
       <BlurReveal :delay="0.04" :duration="0.7" :y-offset="10" blur="8px">
         <nav aria-label="文章导航">
           <NuxtLink
-            to="/#articles"
+            to="/articles"
             class="group inline-flex items-center gap-3 rounded-full border border-border/50 bg-card/55 py-1.5 pr-4 pl-1.5 text-sm text-muted-foreground outline-none transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-primary/40 hover:bg-primary/8 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-[0.98]"
             aria-label="返回文章列表"
           >

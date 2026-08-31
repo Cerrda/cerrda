@@ -8,6 +8,7 @@ import {
   waitForSilkCompiled,
   writeBootSession,
 } from '~/composables/useAppBoot'
+import { navSectionFromPath } from '~/data/site'
 import { settleFirstPaint, startPreloadBundle, type PreloadBundle } from '~/lib/boot/preload'
 
 const route = useRoute()
@@ -16,7 +17,7 @@ const { ready, lightSpeedCompiled, particlesReady } = useAppBoot()
 const spaAlreadyShown =
   import.meta.client &&
   (Boolean((window as Window & { __cerrdaBootShown?: boolean }).__cerrdaBootShown) || readBootSession())
-const isHome = () => route.path === '/'
+const isHome = () => route.path === '/' || Boolean(navSectionFromPath(route.path))
 
 let finishing = false
 let bundle: PreloadBundle | null = null

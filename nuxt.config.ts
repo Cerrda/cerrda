@@ -1,6 +1,7 @@
 import tailwindcss from '@tailwindcss/vite'
 import articles from './app/data/articles.json'
 import { faviconBootScript, themeClassBootScript } from './app/data/favicon'
+import { navSectionPaths } from './app/data/site'
 import { withAppBase } from './app/utils/withAppBase'
 
 const baseURL = process.env.NUXT_APP_BASE_URL || '/'
@@ -91,11 +92,12 @@ export default defineNuxtConfig({
     preset: 'static',
     prerender: {
       crawlLinks: true,
-      routes: ['/', ...articles.map((article) => `/articles/${article.slug}`)],
+      routes: ['/', ...navSectionPaths, ...articles.map((article) => `/articles/${article.slug}`)],
     },
   },
   routeRules: {
     '/': { prerender: true },
+    ...Object.fromEntries(navSectionPaths.map((path) => [path, { prerender: true }])),
     '/articles/**': { prerender: true },
   },
 })

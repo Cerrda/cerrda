@@ -57,7 +57,16 @@ export const navItems = [
   { id: 'skills', label: 'Skills' },
   { id: 'articles', label: '文章' },
   { id: 'timeline', label: '轨迹' },
-]
+] as const
+
+export type NavSectionId = (typeof navItems)[number]['id']
+
+export const navSectionPaths = navItems.map((item) => `/${item.id}`)
+
+export function navSectionFromPath(path: string): NavSectionId | null {
+  const id = path.replace(/^\/+|\/+$/g, '')
+  return navItems.some((item) => item.id === id) ? (id as NavSectionId) : null
+}
 
 export const careerTimeline = [
   {

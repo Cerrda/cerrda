@@ -92,10 +92,10 @@ onBeforeUnmount(() => {
           </BlurReveal>
           <BlurReveal :delay="0.36" :duration="1">
             <div class="mt-8 flex flex-wrap gap-3">
-              <NuxtLink href="#packages">
+              <NuxtLink to="/packages">
                 <InteractiveHoverButton text="查看开源" />
               </NuxtLink>
-              <NuxtLink href="#articles">
+              <NuxtLink to="/articles">
                 <InteractiveHoverButton text="阅读文章" class="border-primary/30 bg-primary text-primary-foreground" />
               </NuxtLink>
             </div>

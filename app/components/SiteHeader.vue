@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { brandEditorial } from '~/data/editorial'
-import { navItems, siteProfile } from '~/data/site'
+import { navItems, navSectionFromPath, siteProfile } from '~/data/site'
 
 const route = useRoute()
 
-const brandAriaLabel = computed(() => (route.path === '/' ? '回到顶部' : `${siteProfile.name} 首页`))
+const brandAriaLabel = computed(() =>
+  route.path === '/' || navSectionFromPath(route.path) ? '回到顶部' : `${siteProfile.name} 首页`,
+)
 
 function isModifiedClick(event: MouseEvent) {
   return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
@@ -15,19 +17,7 @@ function onBrandClick(event: MouseEvent) {
   if (route.path !== '/') return
 
   event.preventDefault()
-  if (route.hash) {
-    history.replaceState(history.state, '', route.path)
-  }
   window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-function onNavClick(event: MouseEvent, id: string) {
-  if (isModifiedClick(event)) return
-  if (route.path !== '/') return
-
-  event.preventDefault()
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-  history.replaceState(history.state, '', `${route.path}#${id}`)
 }
 </script>
 
@@ -58,9 +48,10 @@ function onNavClick(event: MouseEvent, id: string) {
             <NuxtLink
               v-for="item in navItems"
               :key="item.id"
-              :to="{ path: '/', hash: `#${item.id}` }"
+              :to="`/${item.id}`"
               class="rounded-full px-3.5 py-2 text-[15px] text-muted-foreground transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-accent/70 hover:text-foreground"
-              @click="onNavClick($event, item.id)"
+              :class="route.path === `/${item.id}` ? 'text-foreground' : ''"
+              :aria-current="route.path === `/${item.id}` ? 'page' : undefined"
             >
               {{ item.label }}
             </NuxtLink>
