@@ -1,11 +1,5 @@
 <p align="center">
-  <img src="assets/profile/banner.svg" alt="CERRDA operator surface" width="100%" />
-</p>
-<p align="center">
-  <img src="assets/profile/boot.svg" alt="CERRDA boot sequence" width="100%" />
-</p>
-<p align="center">
-  <img src="assets/profile/kernel.svg" alt="CERRDA kernel map" width="100%" />
+  <img src="assets/profile/banner.svg" alt="CERRDA" width="100%" />
 </p>
 
 <br/>
