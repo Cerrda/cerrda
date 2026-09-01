@@ -13,8 +13,6 @@ export const defaultGpuProfile: GpuProfile = {
   lightSpeedPixelRatio: 1.25,
 }
 
-export const BOOT_SESSION_KEY = 'cerrda-boot-session'
-
 /**
  * Document-lifetime boot gate. False until the Multi Step Loader finishes
  * preloading fonts, shaders, and engine chunks. Survives SPA navigation.
@@ -45,6 +43,43 @@ export function waitForFlag(flag: Ref<boolean>, timeoutMs = 8000) {
       if (value) finish()
     })
     const timer = setTimeout(finish, timeoutMs)
+  })
+}
+
+function isFontStylesheet(link: HTMLLinkElement) {
+  const href = link.href || ''
+  return href.includes('fonts.googleapis.com') || href.includes('fonts.gstatic.com')
+}
+
+/** 等应用 CSS 真正生效，再揭掉 booting 遮罩，避免刷新闪未样式化方框。 */
+export function waitForAppStyles(timeoutMs = 2500) {
+  if (!import.meta.client) return Promise.resolve()
+
+  const pending = [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].filter((link) => {
+    if (isFontStylesheet(link)) return false
+    if (link.media === 'print' || link.media === 'disabled') return true
+    try {
+      return !link.sheet
+    } catch {
+      return true
+    }
+  })
+
+  if (!pending.length) return Promise.resolve()
+
+  return new Promise<void>((resolve) => {
+    let left = pending.length
+    const timer = window.setTimeout(resolve, timeoutMs)
+    const done = () => {
+      left -= 1
+      if (left > 0) return
+      clearTimeout(timer)
+      resolve()
+    }
+    for (const link of pending) {
+      link.addEventListener('load', done, { once: true })
+      link.addEventListener('error', done, { once: true })
+    }
   })
 }
 
@@ -89,23 +124,5 @@ export function detectGpuProfile(): GpuProfile {
     silkPixelRatio: 0.4,
     silkFrameRate: 30,
     lightSpeedPixelRatio: Math.min(1.25, dpr),
-  }
-}
-
-export function readBootSession() {
-  if (!import.meta.client) return false
-  try {
-    return sessionStorage.getItem(BOOT_SESSION_KEY) === '1'
-  } catch {
-    return false
-  }
-}
-
-export function writeBootSession() {
-  if (!import.meta.client) return
-  try {
-    sessionStorage.setItem(BOOT_SESSION_KEY, '1')
-  } catch {
-    /* private mode */
   }
 }

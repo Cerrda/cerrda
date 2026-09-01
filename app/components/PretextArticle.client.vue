@@ -270,6 +270,10 @@ onBeforeUnmount(() => {
   padding-left: 1rem;
   color: var(--muted-foreground);
 }
+.pretext-article {
+  overflow: clip;
+}
+
 .pretext-article,
 .pretext-article :deep(*),
 .prose-article,

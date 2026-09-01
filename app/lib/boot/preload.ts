@@ -14,6 +14,15 @@ function waitFrames(count = 2) {
   })
 }
 
+function withTimeout(promise: Promise<unknown>, ms: number) {
+  return Promise.race([
+    promise,
+    new Promise<void>((resolve) => {
+      setTimeout(resolve, ms)
+    }),
+  ])
+}
+
 function decodeImage(src: string) {
   return new Promise<void>((resolve) => {
     const img = new Image()
@@ -34,15 +43,17 @@ function decodeImage(src: string) {
 export async function preloadFonts() {
   if (!document.fonts) return
   try {
-    await Promise.all([
-      document.fonts.load('600 48px Fraunces'),
-      document.fonts.load('700 72px Fraunces'),
-      document.fonts.load('400 17px Sora'),
-      document.fonts.load('500 16px Sora'),
-      document.fonts.load('600 16px Sora'),
-      document.fonts.load('400 14px "JetBrains Mono"'),
-      document.fonts.ready,
-    ])
+    await withTimeout(
+      Promise.all([
+        document.fonts.load('600 48px Fraunces'),
+        document.fonts.load('700 72px Fraunces'),
+        document.fonts.load('400 17px Sora'),
+        document.fonts.load('500 16px Sora'),
+        document.fonts.load('600 16px Sora'),
+        document.fonts.load('400 14px "JetBrains Mono"'),
+      ]),
+      1800,
+    )
   } catch {
     /* continue even if a face is missing */
   }

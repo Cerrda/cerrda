@@ -185,7 +185,15 @@ onUnmounted(() => {
     <span ref="text1Ref" :class="[TEXT_CLASSES]" />
     <span ref="text2Ref" :class="[TEXT_CLASSES]" />
 
-    <svg id="filters" class="fixed size-0" preserveAspectRatio="xMidYMid slice">
+    <svg
+      id="filters"
+      width="0"
+      height="0"
+      class="fixed size-0"
+      style="position: fixed; width: 0; height: 0; overflow: hidden"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >
       <defs>
         <filter id="threshold">
           <feColorMatrix

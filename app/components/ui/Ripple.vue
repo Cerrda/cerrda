@@ -25,7 +25,10 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div :class="cn('pointer-events-none absolute inset-0 select-none overflow-hidden', props.class)">
+  <div
+    :class="cn('pointer-events-none absolute inset-0 select-none overflow-hidden', props.class)"
+    style="position: absolute; inset: 0; overflow: hidden; pointer-events: none"
+  >
     <RippleCircle
       v-for="index in props.numberOfCircles"
       :key="index"

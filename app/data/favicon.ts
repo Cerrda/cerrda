@@ -70,7 +70,43 @@ export const themeBootStyle = [
   `html.light,html.light body,html.light #__nuxt{color-scheme:light;background-color:${lightCanvas}}`,
   `html.booting::after{content:"";position:fixed;inset:0;z-index:199;background-color:${darkCanvas};pointer-events:none}`,
   `html.light.booting::after{background-color:${lightCanvas}}`,
+  `html.booting:has([data-theme-burn="loader"])::after{content:none}`,
+  `[data-theme-burn="loader"]{position:fixed;inset:0;z-index:200;overflow:hidden;display:flex;align-items:center;justify-content:center;width:100%;height:100%;background-color:${darkCanvas};color:#f4eef2}`,
+  `html.light [data-theme-burn="loader"]{background-color:${lightCanvas};color:#1a1520}`,
+  `[data-theme-burn="loader"] svg{width:24px;height:24px;flex-shrink:0;display:block}`,
+  `[data-theme-burn="loader"] .cerrda-loader-close{display:none}`,
+  `[data-theme-burn="loader"] .cerrda-loader-panel{position:relative;z-index:10;height:24rem}`,
+  `[data-theme-burn="loader"] .cerrda-loader-list{position:relative;margin:10rem auto 0;display:flex;flex-direction:column;max-width:36rem;width:100%;padding:0 1.25rem}`,
+  `[data-theme-burn="loader"] .cerrda-loader-row{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;text-align:left}`,
+  `[data-theme-burn="loader"] .cerrda-loader-text{font-size:1.125rem;line-height:1.75rem}`,
+  `@keyframes cerrda-boot-spin{to{transform:rotate(360deg)}}`,
+  `[data-theme-burn="loader"] .cerrda-loader-spin{animation:cerrda-boot-spin 1s linear infinite;color:#e8a4b8}`,
+  `html.booted #cerrda-boot-ssr,html:has(#__nuxt [data-theme-burn="loader"]) #cerrda-boot-ssr{display:none}`,
+  `html.booting .app-shell{opacity:0;visibility:hidden;pointer-events:none}`,
 ].join('')
+
+const bootSteps = [
+  ['spin', '载入字体与视觉系统'],
+  ['wait', '预热 GPU 与丝绸着色器'],
+  ['wait', '编译三维光轨引擎'],
+  ['wait', '缓存图像与粒子层'],
+  ['wait', '同步交互层'],
+] as const
+
+const spinSvg =
+  '<svg class="cerrda-loader-spin" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.755 10.059a7.5 7.5 0 0 1 12.548-3.364l1.903 1.903h-3.183a.75.75 0 1 0 0 1.5h4.992a.75.75 0 0 0 .75-.75V4.356a.75.75 0 0 0-1.5 0v3.18l-1.9-1.9A9 9 0 0 0 3.306 9.67a.75.75 0 1 0 1.45.388Zm15.408 3.352a.75.75 0 0 0-.919.53 7.5 7.5 0 0 1-12.548 3.364l-1.902-1.903h3.183a.75.75 0 0 0 0-1.5H2.984a.75.75 0 0 0-.75.75v4.992a.75.75 0 0 0 1.5 0v-3.18l1.9 1.9a9 9 0 0 0 15.059-4.035.75.75 0 0 0-.53-.918Z" clip-rule="evenodd"/></svg>'
+const waitSvg =
+  '<svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" style="opacity:.45"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>'
+
+/** 写在 body 最前，刷新第一帧就是步骤，不必等 Vue / Tailwind。 */
+export const themeBootLoaderHtml = `<div id="cerrda-boot-ssr" data-theme-burn="loader">${`<div class="cerrda-loader-panel"><div class="cerrda-loader-list">${bootSteps
+  .map(
+    ([kind, text], index) =>
+      `<div class="cerrda-loader-row" style="opacity:${index === 0 ? 1 : Math.max(1 - index * 0.2, 0.2)}">${
+        kind === 'spin' ? spinSvg : waitSvg
+      }<span class="cerrda-loader-text">${text}</span></div>`,
+  )
+  .join('')}</div></div>`}</div>`
 
 function themeFromStorageExpr(keyJson: string) {
   return `var p=localStorage.getItem(${keyJson});if(p!=="light"&&p!=="dark"){p="dark";try{localStorage.setItem(${keyJson},"dark")}catch(e){}}var d=p!=="light";`

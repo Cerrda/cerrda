@@ -19,8 +19,16 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const circleStyle = computed(() => ({
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
   width: `${props.size}px`,
   height: `${props.size}px`,
+  borderRadius: '50%',
+  boxSizing: 'border-box',
+  borderWidth: '1px',
+  borderColor: 'rgba(255,255,255,0.15)',
+  pointerEvents: 'none',
   opacity: props.opacity,
   animationDelay: `${props.animationDelay}ms`,
   borderStyle: props.borderStyle,
@@ -41,6 +49,8 @@ const circleStyle = computed(() => ({
 
 <style scoped>
 .animate-ripple-circle {
+  position: absolute;
+  border-radius: 50%;
   animation: ripple-effect var(--duration, 2s) ease-in-out infinite;
   border-width: 1px;
   top: 50%;

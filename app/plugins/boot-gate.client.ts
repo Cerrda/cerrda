@@ -3,15 +3,15 @@ import { startPreloadBundle } from '~/lib/boot/preload'
 export default defineNuxtPlugin({
   name: 'boot-gate',
   enforce: 'pre',
-  setup() {
+  async setup() {
     if (!import.meta.client) return
     const { ready, gpuProfile } = useAppBoot()
     gpuProfile.value = detectGpuProfile()
     startPreloadBundle()
 
-    if (ready.value || readBootSession()) {
+    if (ready.value || (window as Window & { __cerrdaBootShown?: boolean }).__cerrdaBootShown) {
       ready.value = true
-      ;(window as Window & { __cerrdaBootShown?: boolean }).__cerrdaBootShown = true
+      await waitForAppStyles()
       document.documentElement.classList.add('booted')
       document.documentElement.classList.remove('booting')
       return

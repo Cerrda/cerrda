@@ -211,6 +211,16 @@ export class PretextArticleEngine {
   destroy() {
     this.unbindFontEvents()
     this.stop()
+    this.canvas.style.width = ''
+    this.canvas.style.height = ''
+    this.canvas.style.position = ''
+    this.canvas.style.left = ''
+    this.canvas.style.top = ''
+    this.canvas.style.zIndex = ''
+    this.wrap.style.position = ''
+    this.wrap.style.height = ''
+    this.wrap.style.minHeight = ''
+    this.wrap.style.overflow = ''
   }
 
   setPointerClient(clientX: number, clientY: number, inside: boolean) {
@@ -251,6 +261,7 @@ export class PretextArticleEngine {
     const prev = this.overlayHeights.get(id) ?? 0
     if (Math.abs(prev - height) < 1) return
     this.overlayHeights.set(id, height)
+    this.naturalHeight = 0
     this.layout(true)
     this.positionOverlays()
     this.draw()
@@ -493,15 +504,22 @@ export class PretextArticleEngine {
       let lineY = startY
       let done = false
       let safety = 0
+      let emptySkips = 0
       let bottom = startY
 
       while (!done && safety < MAX_FLOW_LINES) {
         safety++
-        const ranges = availableRanges(lineY, unit.lineHeight, flowLeft, right, exclusions)
+        let ranges = availableRanges(lineY, unit.lineHeight, flowLeft, right, exclusions)
         if (!ranges.length) {
-          lineY += unit.lineHeight
-          bottom = lineY
-          continue
+          emptySkips++
+          if (emptySkips > 12) ranges = [{ left: flowLeft, right }]
+          else {
+            lineY += unit.lineHeight
+            bottom = lineY
+            continue
+          }
+        } else {
+          emptySkips = 0
         }
 
         const indexBefore = glyphIndex
@@ -580,12 +598,9 @@ export class PretextArticleEngine {
 
     const laidOut = Math.ceil(y + 24)
     if (!chainHasPresence(this.chain)) this.naturalHeight = Math.max(this.naturalHeight, laidOut)
-    const reserved = this.metrics.bodyLine * 6
-    this.contentHeight = Math.max(
-      laidOut,
-      this.naturalHeight,
-      this.naturalHeight ? this.naturalHeight : laidOut + reserved,
-    )
+    else if (!this.naturalHeight) this.naturalHeight = laidOut
+    const wrapSlack = this.metrics.bodyLine * 8
+    this.contentHeight = Math.max(this.naturalHeight, Math.min(laidOut, this.naturalHeight + wrapSlack))
     this.syncCanvasWindow()
     this.onHeight?.(this.contentHeight)
   }
@@ -634,8 +649,12 @@ export class PretextArticleEngine {
   private viewWindow() {
     const rect = this.wrap.getBoundingClientRect()
     const pad = this.viewPad
-    const top = Math.max(0, Math.floor(-rect.top - pad))
-    const height = Math.max(1, Math.ceil((window.innerHeight || 800) + pad * 2))
+    const contentH = Math.max(1, this.contentHeight || 240)
+    const viewH = Math.max(1, Math.ceil((window.innerHeight || 800) + pad * 2))
+    const height = Math.min(viewH, contentH)
+    const rawTop = Math.floor(-rect.top - pad)
+    const maxTop = Math.max(0, contentH - height)
+    const top = Math.max(0, Math.min(maxTop, rawTop))
     return { top, height, bottom: top + height }
   }
 
@@ -660,7 +679,9 @@ export class PretextArticleEngine {
     this.canvas.style.top = `${top}px`
     this.canvas.style.zIndex = '0'
     this.wrap.style.position = 'relative'
+    this.wrap.style.height = `${cssH}px`
     this.wrap.style.minHeight = `${cssH}px`
+    this.wrap.style.overflow = 'clip'
     this.metrics = { ...this.metrics, width: cssW }
   }
 

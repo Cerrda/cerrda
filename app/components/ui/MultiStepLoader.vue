@@ -95,9 +95,16 @@ async function processCurrentStep() {
 
   const duration = currentStep.duration ?? props.defaultDuration
   const work = executeStepAction(index)
+  const maxWait = Math.max(duration + 2500, 4000)
+  const bounded = Promise.race([
+    work,
+    new Promise<void>((resolve) => {
+      setTimeout(resolve, maxWait)
+    }),
+  ])
 
   if (currentStep.async) {
-    await work
+    await bounded
     return
   }
 
@@ -105,9 +112,9 @@ async function processCurrentStep() {
     const minTime = new Promise<void>((resolve) => {
       currentTimer = setTimeout(resolve, duration)
     })
-    await Promise.all([minTime, work])
+    await Promise.all([minTime, bounded])
   } else {
-    await work
+    await bounded
   }
 
   if (id !== runId) return
@@ -158,17 +165,14 @@ onUnmounted(() => {
 
 <template>
   <Transition
-    enter-active-class="transition-opacity duration-300"
-    enter-from-class="opacity-0"
-    enter-to-class="opacity-100"
     leave-active-class="transition-opacity duration-500"
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
     <div
       v-if="loading && steps.length > 0"
-      class="fixed inset-0 z-[200] flex size-full items-center justify-center overflow-hidden bg-background"
-      style="background-color: var(--background, #1a1520)"
+      class="cerrda-boot-loader fixed inset-0 z-[200] flex size-full items-center justify-center overflow-hidden bg-background"
+      style="position: fixed; inset: 0; z-index: 200; background-color: var(--background, #1a1520)"
       data-theme-burn="loader"
     >
       <Ripple
@@ -183,11 +187,13 @@ onUnmounted(() => {
       <button
         v-show="!preventClose"
         type="button"
-        class="absolute top-4 right-4 z-[101] inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-primary-foreground transition-colors hover:bg-primary/90"
+        class="cerrda-loader-close absolute top-4 right-4 z-[101] inline-flex h-9 items-center justify-center rounded-md bg-primary px-3 text-primary-foreground transition-colors hover:bg-primary/90"
         @click="close"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
           fill="none"
           viewBox="0 0 24 24"
           stroke-width="1.5"
@@ -198,12 +204,12 @@ onUnmounted(() => {
         </svg>
       </button>
 
-      <div class="relative z-10 h-96">
-        <div class="relative mx-auto mt-40 flex max-w-xl flex-col justify-start">
+      <div class="cerrda-loader-panel relative z-10 h-96">
+        <div class="cerrda-loader-list relative mx-auto mt-40 flex max-w-xl flex-col justify-start">
           <div v-for="(step, index) in steps" :key="index">
             <div
               v-if="step"
-              class="mb-4 flex items-center gap-2 text-left transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+              class="cerrda-loader-row mb-4 flex items-center gap-2 text-left transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
               :style="{
                 opacity: index === currentState ? 1 : Math.max(1 - Math.abs(index - currentState) * 0.2, 0),
                 transform: `translateY(${-(currentState * 40)}px)`,
@@ -214,6 +220,8 @@ onUnmounted(() => {
                   index < currentState || (index === steps.length - 1 && index === currentState && isLastStepComplete)
                 "
                 xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 class="size-6 shrink-0 text-primary"
@@ -227,6 +235,8 @@ onUnmounted(() => {
               <svg
                 v-else-if="index === currentState && (!isLastStepComplete || index !== steps.length - 1)"
                 xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 class="size-6 shrink-0 animate-spin text-primary"
@@ -240,20 +250,18 @@ onUnmounted(() => {
               <svg
                 v-else
                 xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
                 stroke="currentColor"
                 class="size-6 shrink-0 text-foreground/50"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
 
-              <span :class="cn('text-lg text-foreground', index > currentState && 'opacity-50')">
+              <span :class="cn('cerrda-loader-text text-lg text-foreground', index > currentState && 'opacity-50')">
                 {{ step.text }}
               </span>
             </div>

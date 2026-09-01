@@ -166,6 +166,10 @@ html.light {
     pointer-events: none;
   }
 
+  html.booting:has([data-theme-burn='loader'])::after {
+    content: none;
+  }
+
   .app-shell {
     opacity: 1;
   }

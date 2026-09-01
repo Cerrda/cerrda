@@ -1,23 +1,16 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue'
 import type { MultiStepLoaderStep } from '~/components/ui/MultiStepLoader.vue'
-import {
-  readBootSession,
-  useAppBoot,
-  waitForFlag,
-  waitForSilkCompiled,
-  writeBootSession,
-} from '~/composables/useAppBoot'
+import { useAppBoot, waitForAppStyles, waitForFlag, waitForSilkCompiled } from '~/composables/useAppBoot'
 import { navSectionFromPath } from '~/data/site'
 import { settleFirstPaint, startPreloadBundle, type PreloadBundle } from '~/lib/boot/preload'
 
 const route = useRoute()
-const { ready, lightSpeedCompiled, particlesReady } = useAppBoot()
+const { ready, particlesReady } = useAppBoot()
 
 const spaAlreadyShown =
-  import.meta.client &&
-  (Boolean((window as Window & { __cerrdaBootShown?: boolean }).__cerrdaBootShown) || readBootSession())
-const isHome = () => route.path === '/' || Boolean(navSectionFromPath(route.path))
+  import.meta.client && Boolean((window as Window & { __cerrdaBootShown?: boolean }).__cerrdaBootShown)
+const isLanding = () => route.path === '/' || Boolean(navSectionFromPath(route.path))
 
 let finishing = false
 let bundle: PreloadBundle | null = null
@@ -26,15 +19,16 @@ function stepDuration() {
   return 420
 }
 
-function markDocumentBooted() {
+async function markDocumentBooted() {
   if (!import.meta.client) return
+  await waitForAppStyles()
   document.documentElement.classList.add('booted')
   document.documentElement.classList.remove('booting')
 }
 
 async function finishBoot() {
   if (finishing) {
-    markDocumentBooted()
+    await markDocumentBooted()
     loading.value = false
     return
   }
@@ -43,11 +37,10 @@ async function finishBoot() {
   ready.value = true
   if (import.meta.client) {
     ;(window as Window & { __cerrdaBootShown?: boolean }).__cerrdaBootShown = true
-    writeBootSession()
   }
   await nextTick()
   await settleFirstPaint()
-  markDocumentBooted()
+  await markDocumentBooted()
   loading.value = false
 }
 
@@ -64,23 +57,20 @@ function makeSteps(activeBundle: PreloadBundle): MultiStepLoaderStep[] {
       duration,
       action: async () => {
         await activeBundle.silk
-        await waitForSilkCompiled()
+        await waitForSilkCompiled(3500)
       },
     },
     {
       text: '编译三维光轨引擎',
       duration,
-      action: async () => {
-        await activeBundle.engine
-        if (isHome()) await waitForFlag(lightSpeedCompiled, 8000)
-      },
+      action: () => activeBundle.engine,
     },
     {
       text: '缓存图像与粒子层',
       duration,
       action: async () => {
         await Promise.all([activeBundle.assets, activeBundle.modules])
-        if (isHome()) await waitForFlag(particlesReady, 8000)
+        if (isLanding()) await waitForFlag(particlesReady, 2500)
       },
     },
     {
@@ -107,17 +97,18 @@ const loading = ref(!spaAlreadyShown)
 
 if (spaAlreadyShown) {
   ready.value = true
-  markDocumentBooted()
+  void markDocumentBooted()
 } else if (import.meta.client) {
   bundle = startPreloadBundle()
   steps.value = makeSteps(bundle)
 }
 
 onMounted(() => {
+  document.getElementById('cerrda-boot-ssr')?.remove()
   if (spaAlreadyShown) return
   window.setTimeout(() => {
     if (!ready.value) void finishBoot()
-  }, 16000)
+  }, 8000)
 })
 </script>
 
