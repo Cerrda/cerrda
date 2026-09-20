@@ -5,40 +5,38 @@
     :duration="1.1"
     :y-offset="24"
   >
-    <div class="hero-particle-field relative aspect-[431/425] h-[20rem] w-auto sm:h-[24rem] lg:h-[28rem]">
-      <ClientOnly>
-        <ParticleImage
-          :image-src="editorialSrc"
-          :alt="brandEditorial.title"
-          class="absolute inset-0"
-          image-fit="contain"
-          particle-gap="5"
-          particle-size="2.5"
-          gravity="0.06"
-          mouse-force="32"
-          init-position="misplaced"
-          init-direction="none"
-          :noise="1.5"
-          :density-focus-x="0.5"
-          :density-focus-y="0.48"
-          :density-power="0"
-          :density-edge-keep="1"
-          :density-luma-weight="0"
-          :density-top-boost="0"
-          :density-bottom-taper="0"
-          :accent-chance="0.18"
-          :accent-palette="['#e8c4d4', '#f0d8e4', '#edd8c8']"
-          :accent-palette-light="['#b44868', '#c45d78', '#a83d5c']"
-        />
-        <template #fallback>
-          <img
-            :src="editorialSrc"
+    <Float :amplitude="[5, 9]" :rotation="1.15" :speed="0.42">
+      <div class="hero-particle-field relative aspect-[431/425] h-[20rem] w-auto sm:h-[24rem] lg:h-[28rem]">
+        <ClientOnly>
+          <ParticleImage
+            :image-src="editorialSrc"
             :alt="brandEditorial.title"
-            class="absolute inset-0 size-full object-contain"
+            class="absolute inset-0"
+            image-fit="contain"
+            particle-gap="5"
+            particle-size="2.5"
+            gravity="0.06"
+            mouse-force="32"
+            init-position="misplaced"
+            init-direction="none"
+            :noise="1.5"
+            :density-focus-x="0.5"
+            :density-focus-y="0.48"
+            :density-power="0"
+            :density-edge-keep="1"
+            :density-luma-weight="0"
+            :density-top-boost="0"
+            :density-bottom-taper="0"
+            :accent-chance="0.18"
+            :accent-palette="['#e8c4d4', '#f0d8e4', '#edd8c8']"
+            :accent-palette-light="['#b44868', '#c45d78', '#a83d5c']"
           />
-        </template>
-      </ClientOnly>
-    </div>
+          <template #fallback>
+            <img :src="editorialSrc" :alt="brandEditorial.title" class="absolute inset-0 size-full object-contain" />
+          </template>
+        </ClientOnly>
+      </div>
+    </Float>
   </BlurReveal>
 </template>
 

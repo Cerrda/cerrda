@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import NumberFlow, { continuous } from '@number-flow/vue'
 import { PhArrowRight } from '@phosphor-icons/vue'
+import { useElementVisibility } from '@vueuse/core'
 import { Motion } from 'motion-v'
 import { articleMeta, careerTimeline, contactChannels, morphingRoles, packages, siteProfile, skills } from '~/data/site'
 
@@ -13,6 +15,17 @@ let copiedResetTimer: ReturnType<typeof setTimeout> | undefined
 
 const featuredArticle = computed(() => articleMeta[0])
 const archiveArticles = computed(() => articleMeta.slice(1))
+const articleCountEl = useTemplateRef<HTMLElement>('articleCountEl')
+const articleCountInView = useElementVisibility(articleCountEl, {
+  threshold: 0,
+  rootMargin: '0px 0px -50% 0px',
+})
+const displayedArticleCount = ref(0)
+
+watch(articleCountInView, (visible) => {
+  if (!visible || displayedArticleCount.value === articleMeta.length) return
+  displayedArticleCount.value = articleMeta.length
+})
 
 function articleIndex(n: number) {
   return String(n).padStart(2, '0')
@@ -185,7 +198,10 @@ onBeforeUnmount(() => {
           <Motion
             v-for="(pkg, index) in packages"
             :key="pkg.name"
-            :class="catalogItemClass(index, packages.length)"
+            :class="[
+              catalogItemClass(index, packages.length),
+              'transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1.5',
+            ]"
             :initial="{ opacity: 0, y: 24 }"
             :while-in-view="{ opacity: 1, y: 0 }"
             :transition="{ delay: Math.min(index * 0.08, 0.2), duration: 0.7, ease: [0.32, 0.72, 0, 1] }"
@@ -270,7 +286,10 @@ onBeforeUnmount(() => {
           <Motion
             v-for="(skill, index) in skills"
             :key="skill.name"
-            :class="catalogItemClass(index, skills.length, 'end')"
+            :class="[
+              catalogItemClass(index, skills.length, 'end'),
+              'transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1.5',
+            ]"
             :initial="{ opacity: 0, y: 24 }"
             :while-in-view="{ opacity: 1, y: 0 }"
             :transition="{ delay: Math.min(index * 0.08, 0.2), duration: 0.7, ease: [0.32, 0.72, 0, 1] }"
@@ -343,8 +362,16 @@ onBeforeUnmount(() => {
                 工程实践记录。覆盖 Vue 指令体系、中后台性能、图标工具链，以及 Agent Skill 的设计与上架。
               </p>
             </div>
-            <p class="font-display text-5xl leading-none text-primary/25 md:text-6xl">
-              {{ articleIndex(articleMeta.length) }}
+            <p ref="articleCountEl" class="font-display text-5xl leading-none text-primary/40 md:text-6xl">
+              <NumberFlow
+                :value="displayedArticleCount"
+                :format="{ minimumIntegerDigits: 2, maximumFractionDigits: 0, useGrouping: false }"
+                :plugins="[continuous]"
+                :animated="true"
+                :respect-motion-preference="false"
+                locales="en-US"
+                class="[--number-flow-mask-width:0em]"
+              />
             </p>
           </div>
         </BlurReveal>
@@ -356,7 +383,7 @@ onBeforeUnmount(() => {
           :while-in-view="{ opacity: 1, y: 0 }"
           :transition="{ duration: 0.85, ease: [0.32, 0.72, 0, 1] }"
           :viewport="{ once: true, amount: 0.25 }"
-          class="mt-12"
+          class="mt-12 transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1.5"
         >
           <CssLiquidGlass class="rounded-[2rem]" container-class="rounded-[2rem]" :radius="32">
             <NuxtLink
@@ -414,12 +441,15 @@ onBeforeUnmount(() => {
           <Motion
             v-for="(article, index) in archiveArticles"
             :key="article.id"
-            :initial="{ y: 16 }"
-            :while-in-view="{ y: 0 }"
+            :initial="{ opacity: 0, y: 18 }"
+            :while-in-view="{ opacity: 1, y: 0 }"
             :transition="{ delay: Math.min(index * 0.04, 0.32), duration: 0.65, ease: [0.32, 0.72, 0, 1] }"
             :viewport="{ once: true, amount: 0.15 }"
           >
-            <CardSpotlight class="transition duration-500 hover:border-primary/30" :gradient-size="320">
+            <CardSpotlight
+              class="transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-primary/30"
+              :gradient-size="320"
+            >
               <NuxtLink
                 :to="`/articles/${article.slug}`"
                 class="flex flex-col gap-4 p-5 md:flex-row md:items-center md:gap-6 md:p-6"
@@ -515,11 +545,11 @@ onBeforeUnmount(() => {
             class="relative flex h-full min-h-[16rem] flex-col justify-center overflow-hidden rounded-[2rem] p-8 md:min-h-[18rem] md:p-10"
           >
             <div
-              class="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-primary/15 blur-3xl"
+              class="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-primary/15 blur-3xl contact-orb"
               aria-hidden="true"
             />
             <div
-              class="pointer-events-none absolute -bottom-24 left-1/3 size-64 rounded-full bg-accent/40 blur-3xl dark:bg-primary/10"
+              class="pointer-events-none absolute -bottom-24 left-1/3 size-64 rounded-full bg-accent/40 blur-3xl contact-orb contact-orb-slow dark:bg-primary/10"
               aria-hidden="true"
             />
 

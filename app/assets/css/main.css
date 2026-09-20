@@ -277,6 +277,7 @@ html[data-theme-vt] .overlay-scrollbar {
     pointer-events: none;
     position: absolute;
     border-radius: 9999px;
+    will-change: transform;
   }
 
   .article-orb-tr {
@@ -285,6 +286,7 @@ html[data-theme-vt] .overlay-scrollbar {
     width: 14rem;
     height: 14rem;
     background: radial-gradient(circle, color-mix(in oklch, var(--primary) 22%, transparent) 0%, transparent 72%);
+    animation: orb-drift 16s ease-in-out infinite;
     transition: opacity 0.7s ease;
   }
 
@@ -298,9 +300,54 @@ html[data-theme-vt] .overlay-scrollbar {
     width: 16rem;
     height: 16rem;
     background: radial-gradient(circle, color-mix(in oklch, var(--accent) 55%, transparent) 0%, transparent 70%);
+    animation: orb-drift-alt 20s ease-in-out infinite;
   }
 
   html.dark .article-orb-bl {
     background: radial-gradient(circle, color-mix(in oklch, var(--primary) 16%, transparent) 0%, transparent 70%);
+  }
+
+  .contact-orb {
+    animation: orb-drift 18s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .contact-orb-slow {
+    animation: orb-drift-alt 24s ease-in-out infinite;
+  }
+
+  @keyframes orb-drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    40% {
+      transform: translate3d(-7%, 9%, 0) scale(1.08);
+    }
+    72% {
+      transform: translate3d(5%, -6%, 0) scale(0.96);
+    }
+  }
+
+  @keyframes orb-drift-alt {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    32% {
+      transform: translate3d(8%, -7%, 0) scale(1.06);
+    }
+    68% {
+      transform: translate3d(-6%, 5%, 0) scale(0.94);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .article-orb-tr,
+    .article-orb-bl,
+    .contact-orb,
+    .contact-orb-slow {
+      animation: none;
+    }
   }
 }

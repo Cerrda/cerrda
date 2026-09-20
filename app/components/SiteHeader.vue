@@ -50,7 +50,7 @@ function onBrandClick(event: MouseEvent) {
               :key="item.id"
               :to="`/${item.id}`"
               class="rounded-full px-3.5 py-2 text-[15px] text-muted-foreground transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-accent/70 hover:text-foreground"
-              :class="route.path === `/${item.id}` ? 'text-foreground' : ''"
+              :class="route.path === `/${item.id}` ? 'bg-accent/70 text-foreground' : ''"
               :aria-current="route.path === `/${item.id}` ? 'page' : undefined"
             >
               {{ item.label }}

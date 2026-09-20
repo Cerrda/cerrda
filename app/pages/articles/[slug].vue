@@ -63,7 +63,11 @@ const juejinUrl = computed(() => `https://juejin.cn/post/${meta.value?.id}`)
           {{ meta?.date }}
         </p>
         <div class="mt-4 flex flex-wrap gap-2">
-          <span v-for="tag in meta?.tags || []" :key="tag" class="rounded-full bg-secondary px-2.5 py-1 text-[11px]">
+          <span
+            v-for="tag in meta?.tags"
+            :key="tag"
+            class="rounded-full bg-secondary px-2.5 py-1 text-[11px]"
+          >
             {{ tag }}
           </span>
         </div>

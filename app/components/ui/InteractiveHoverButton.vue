@@ -1,68 +1,49 @@
 <script lang="ts" setup>
+import { PhArrowRight } from '@phosphor-icons/vue'
 import { cn } from '~/lib/utils'
-import { ref } from 'vue'
 
 interface Props {
   text?: string
   class?: string
 }
+
 const props = withDefaults(defineProps<Props>(), {
   text: 'Button',
 })
-
-const buttonRef = ref<HTMLButtonElement>()
 </script>
 
 <template>
   <button
-    ref="buttonRef"
+    type="button"
     :class="
       cn(
-        `group bg-card relative w-auto cursor-pointer overflow-hidden rounded-full border border-primary/25 p-2 px-6 text-center font-semibold`,
+        `group relative w-auto cursor-pointer overflow-hidden rounded-full border border-primary/25 bg-card p-2 px-6 text-center font-semibold transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]`,
         props.class,
       )
     "
   >
     <div class="flex items-center gap-2">
-      <div class="ihb-dot bg-primary size-2 rounded-lg group-[.bg-primary]:bg-primary-foreground" />
+      <div class="ihb-dot size-2 rounded-lg bg-primary group-[.bg-primary]:bg-primary-foreground" />
       <span
-        class="inline-block whitespace-nowrap transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0"
+        class="inline-block whitespace-nowrap transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-12 group-hover:opacity-0"
       >
         {{ text }}
       </span>
     </div>
 
     <div
-      class="text-primary-foreground absolute top-0 z-10 flex size-full translate-x-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 group-hover:-translate-x-5 group-hover:opacity-100 group-[.bg-primary]:text-primary"
+      class="absolute top-0 z-10 flex size-full translate-x-12 items-center justify-center gap-2 text-primary-foreground opacity-0 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-x-5 group-hover:opacity-100 group-[.bg-primary]:text-primary"
     >
       <span class="whitespace-nowrap">{{ text }}</span>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="lucide lucide-arrow-right"
-      >
-        <path d="M5 12h14" />
-        <path d="m12 5 7 7-7 7" />
-      </svg>
+      <PhArrowRight :size="18" weight="bold" />
     </div>
   </button>
 </template>
 
 <style scoped>
-/*
-  Inspira / Magic UI 原意是 Tailwind v3 的 scale(100.8)（放大 100.8 倍）。
-  v4 里 scale-100 是 100%，scale-[100.8] 是无单位 100.8，无法插值，圆点几乎不放大。
-*/
 .ihb-dot {
   scale: 1;
-  transition: scale 300ms;
+  transition: scale 500ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .group:hover .ihb-dot {
