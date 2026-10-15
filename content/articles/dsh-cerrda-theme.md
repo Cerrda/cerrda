@@ -17,7 +17,7 @@ DeepSeek Harness（下文简称 DSH）把 Agent 工作流做成了浏览器里�
 
 `dsh-cerrda-theme` 就是这件事。它是一个 **部署级静态 Web 插件**：一行命令装上，重启 DSH 后自动生效，**不用在 GUI 里点审批**，进程挂了再起来也不会丢。
 
-![01-hero.jpg](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/9a9044b724f0417ea0d1114bb0718675~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=vyipYNf2EajWfSrt4V36obSm2hI%3D)
+![01-hero.jpg](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/9a9044b724f0417ea0d1114bb0718675~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792459263&x-signature=GmfPSFqnz9Ky6SezdLK0gNBnAWg%3D)
 *首页：「探索未至之境」叠在 Silk 暗色绸面背景上，侧边栏和输入栏都是半透明玻璃。*
 
 ***
@@ -34,7 +34,7 @@ DeepSeek Harness（下文简称 DSH）把 Agent 工作流做成了浏览器里�
 
 丝绸背景是会动的：
 
-![12-silk-bg.gif](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/e2ba609beff74717a58e3beadf60636d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=Zv9UVXeFLyyWjL77hHMpmO5E40A%3D)
+![12-silk-bg.gif](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/e2ba609beff74717a58e3beadf60636d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792459263&x-signature=Fz0vHQQVNAYWH00fGCdbtzWGFMM%3D)
 
 *Silk 背景：WebGL2 fragment shader，hue 310 / 低饱和，叠在 UI 下面，opacity 约 0.5。*
 
@@ -44,7 +44,7 @@ DeepSeek Harness（下文简称 DSH）把 Agent 工作流做成了浏览器里�
 
 空首页好看只是第一眼。Agent 真正干活时，界面会堆满 Think、Pwsh、Read、工具卡片和 Markdown。主题要过的关是：**信息密度上去之后，还能不能分得清层级。**
 
-![06-tools.jpg](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/a750ff06e88d4944920209d6104a4899~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=xU%2Bzx8jTQVIb2yoiQWMUDD1Ez9Q%3D)
+![06-tools.jpg](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/a750ff06e88d4944920209d6104a4899~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792459263&x-signature=l%2FlbDvh4Zx7Jyip8F9M0B72ooVY%3D)
 
 *工具卡片走紧凑但留白的节奏。失败的调用会用玫瑰描边点出来，不会淹没在暗色里。*
 
@@ -52,19 +52,19 @@ DeepSeek Harness（下文简称 DSH）把 Agent 工作流做成了浏览器里�
 
 Markdown 标题用 Fraunces，列表标记是玫瑰色，行内代码带着一层很淡的粉底。长回答读起来不像终端 dump，更像一篇排过版的技术笔记：
 
-![05-conversation.jpg](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/ae7375e1dd314bffa60c725b14cae1ae~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=iZn3NL1qYbr8PKapr9COw6D34FI%3D)
+![05-conversation.jpg](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/ae7375e1dd314bffa60c725b14cae1ae~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792459263&x-signature=zCZKkoZZ0SwdqrUb22ffkc%2F%2F3rY%3D)
 
 轨迹视图也一起收进同一套语言——表格、回合胶囊、事件类型标签都是玻璃底 + 玫瑰强调：
 
-![10-trajectory.jpg](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/2c7fa84095a54a0fb4a39f1db0c105cb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=0RuW%2BougJSyH2nG9aCGKjNmsej8%3D)
+![10-trajectory.jpg](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/2c7fa84095a54a0fb4a39f1db0c105cb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792459263&x-signature=POgy76J0g1KWB3MDnPG9XWmUKeE%3D)
 
 设置弹窗用弹簧入场（轻微 `rotateX` + scale），遮罩带模糊。主题把「跟随系统」外观也强制映射成同一套暗色 token——所以你切浅色，cerrda 仍然是这身玫瑰深紫，不会出现一半亮一半暗的拼盘。
 
-![08-settings.jpg](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/4c2e576c3d7d46c9b529f69bc07d850b~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=4bq11ZshtyNA4Yv3uyn58LK9tTA%3D)
+![08-settings.jpg](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/4c2e576c3d7d46c9b529f69bc07d850b~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792459263&x-signature=b%2FjtAVUMFtNNAppW5Dj0lbzjdU8%3D)
 
 插件列表页同样套了这层玻璃。主题自己就是用 DSH 的插件机制装进去的，所以在「插件」里能看到它和 `agent`、`session`、`api-gateway` 并列：
 
-![09-plugins.jpg](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/c06dc3038f64458e8a7910c123009f84~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787623716&x-signature=o1yBfvfKcN9Uh7vYdf0K4yut1xk%3D)
+![09-plugins.jpg](https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/c06dc3038f64458e8a7910c123009f84~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792459263&x-signature=MORECfj48GUnG8U7%2BPPD6GOfQf0%3D)
 
 ***
 

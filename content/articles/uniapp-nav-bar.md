@@ -26,7 +26,7 @@ slug: uniapp-nav-bar
 
 当用户向下滚动页面时，导航栏会从完全透明逐渐变为设定的背景色，整个过渡非常丝滑自然。
 
-<p align="center"><img src="https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/8f8c823dd5b643ad98994394ba20456e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787731561&x-signature=831F%2B0YdYLMXWjkqi1a2Vd0koHk%3D" alt="PixPin_2025-11-26_15-18-08.webp"></p>
+<p align="center"><img src="https://p3-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/8f8c823dd5b643ad98994394ba20456e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792569961&x-signature=K5okZBc1ytvtVjoP4qfQLIkAsXk%3D" alt="PixPin_2025-11-26_15-18-08.webp"></p>
 
 ## 🔍 实现原理
 

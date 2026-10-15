@@ -30,10 +30,12 @@
     "7597704040216215578": "v-ellipsis-tooltip",
     "7576843726010662938": "uniapp-nav-bar",
     "7576276707330981894": "fnm-windows",
-    "7674840998541443118": "dsh-cerrda-theme"
+    "7674840998541443118": "dsh-cerrda-theme",
+    "7695972603000815635": "iphone-18-pro"
   },
   "skillHashes": {
     "faker-mock-setup": "cc0b511d7c04f9b4",
-    "scrapling-config-crawl": "49cebd8ee41ee959"
+    "scrapling-config-crawl": "49cebd8ee41ee959",
+    "liquid-glass": "797e8e41b0d90ad4"
   }
 }

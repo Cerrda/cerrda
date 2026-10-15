@@ -1,0 +1,215 @@
+<h1>她说喜欢iphone 18 pro 勃艮第红，我直接下单并附赠一个同款情侣点餐小程序。</h1>
+<p>她说喜欢 iPhone 18 Pro 勃艮第红。我直接下了单。盒子还在路上的时候，我把同一种红做成了一间厨房：只给两个人用的微信小程序，一个人做饭，一个人点餐。</p>
+<p>它叫 EatEat。没有支付，没有配送，没有陌生人，也没有推荐流。界面上的话像贴在冰箱上的纸条，写「早上」「这一餐」「记下」，不写「用户」和「履约」。</p>
+<p>完整界面在 Pencil 里：<a href="https://app.pen.dev/s/CTmaggYbSW84Htz7g7M9ClVp5TvDQIpqz0vaoSDf6Ss">EatEat 设计稿</a>。代码在 GitHub：<a href="https://github.com/Cerrda/eat-eat">Cerrda/eat-eat</a>。</p>
+<h2>先选一边</h2>
+<p>打开之后先认人。认的是当前微信，不另做账号，不绑手机号。还没有厨房时，只问一件事：你来做饭，还是你来点餐。</p>
+<p><img src="/articles/assets/iphone-18-pro/role.png" alt="role.png" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
+<p>选定之后生成一间待加入的厨房。邀请页给出 6 位邀请码，主按钮是转发给微信好友。码 48 小时有效，换一个新码，旧码和已经发出的卡片一起失效。对方点开卡片，角色自动取互补的那一边。</p>
+<p><img src="/articles/assets/iphone-18-pro/invite.png" alt="invite.png" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
+<p>一个厨房里固定一个做饭的人（Cooker）和一个点餐的人（Eater）。称呼默认是「厨神」和「食神」，设置里可以改成 2 到 8 个字。</p>
+<h2>菜单</h2>
+<p>点餐的人看到的是已经上架的菜。只能点今天、明天、后天，餐次只有早上、中午、晚上。一笔订单是某一天的某一个餐次，里面 1 到 6 道菜。</p>
+<p><img src="/articles/assets/iphone-18-pro/menu.png" alt="menu.png" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
+<p>菜单顶上是日期和早中晚。搜菜名，按家常、汤羹、面食筛。不想选的时候，可以让它随便留几道，其余继续随机。选好的菜停在底部，再去确认。</p>
+<p><img src="/articles/assets/iphone-18-pro/roll.png" alt="roll.png" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
+<p>点出去之后进入待接单。做饭的人可以接，也可以拒绝。拒绝必须留一句话。</p>
+<h2>做饭的这一边</h2>
+<p>做饭的人首页是待做，按用餐时间排。接单或拒绝都在这张纸条上。做过的那一餐不在待做里划掉，要另外记下来。</p>
+<p><img src="/articles/assets/iphone-18-pro/todo.png" alt="todo.png" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
+<p>菜由做饭的人自己写。没有封面不能上架，封面从相册选，或当场拍。没上架的菜，点餐端看不见。</p>
+<p><img src="/articles/assets/iphone-18-pro/dishes.png" alt="dishes.png" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
+<p>做完之后记一笔。照片和一句话，两边看到的是同一条时间线。点餐的人可以翻，不能改，也不能删。</p>
+<p><img src="/articles/assets/iphone-18-pro/journal.png" alt="journal.png" referrerpolicy="no-referrer" loading="lazy" decoding="async"></p>
+<h2>仓库里实际在用的技术栈</h2>
+<p>项目从 Vitesse uni-app 长出来，目标平台是微信小程序 <code>mp-weixin</code>。页面跑在微信开发者工具里。</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>用什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>界面</td>
+<td>Vue 3.4、<code>&lt;script setup&gt;</code>、TypeScript</td>
+</tr>
+<tr>
+<td>框架</td>
+<td>uni-app 3，<code>@dcloudio/uni-mp-weixin</code></td>
+</tr>
+<tr>
+<td>构建</td>
+<td>Vite 5、pnpm、<code>@uni-helper/unh</code></td>
+</tr>
+<tr>
+<td>样式</td>
+<td>UnoCSS 66，<code>@uni-helper/unocss-preset-uni</code>，尺寸用 <code>rpx</code></td>
+</tr>
+<tr>
+<td>工程</td>
+<td>文件路由、布局、组件自动注册、<code>unplugin-auto-import</code></td>
+</tr>
+<tr>
+<td>质量</td>
+<td>ESLint 9、vue-tsc、Vitest</td>
+</tr>
+<tr>
+<td>字体</td>
+<td>马善政、霞鹜文楷、龙藏，纸色底 <code>#FBF3EA</code></td>
+</tr>
+<tr>
+<td>上传</td>
+<td><code>uni-mini-ci</code>，脚本里先构建再传微信</td>
+</tr>
+</tbody></table>
+<p>目录大致是这样：</p>
+<pre><code class="language-text">src/                      小程序
+  pages/                  绑定、点餐、做饭
+  components/             菜单、待做、订单、纸页、底栏
+  api/                    云对象的类型和调用
+  composables/            分页、顶部安全区
+  utils/                  账号、草稿、角标、云文件
+uniCloud-alipay/          阿里云 uniCloud
+  cloudfunctions/eat/     云对象
+  database/               表结构和索引
+design/design.pen         Pencil 设计稿
+.agents/skills/           给代理用的 skills
+.cursor/mcp.json          本机接上的 MCP
+</code></pre>
+<p>页面样式写在 <code>class</code> 上。<code>&lt;style&gt;</code> 里只留原子类写不了的部分：<code>@font-face</code>、<code>page</code>，以及必须具名的 <code>hover-class</code>。文本一律用 <code>textarea</code>。微信小程序里给 <code>input</code> 设的字体会作用不到已经输入的字，单行也收成一行高的 <code>textarea</code>。</p>
+<p>状态放在页面和 composable 里。<code>src/composables/usePaged.ts</code> 管列表分页，<code>src/utils/tabs.ts</code> 管做饭端和点餐端两套底栏。</p>
+<h2>Skills</h2>
+<p><code>.agents/skills</code> 是代理动手时要读的说明书，锁在 <code>skills-lock.json</code> 里。按来源分成三组。</p>
+<p><strong>uni-helper 的工程技能</strong>，对应小程序怎么写：</p>
+<ul>
+<li><code>vue</code>、<code>vue-best-practices</code>：Composition API 和 Vue 3 的写法</li>
+<li><code>uni-app</code>、<code>uni-helper</code>：跨端框架，以及 pages、layouts、manifest、组件自动注册</li>
+<li><code>vite</code>、<code>unocss</code>：构建和原子类</li>
+<li><code>vueuse-functions</code>：组合式工具</li>
+<li><code>pinia</code>：状态库参考。这份 skill 已装进仓库，这版页面状态仍写在 composable 里</li>
+</ul>
+<p><strong>微信开发者工具</strong>，入口是 <code>wechatide-skill</code>，下面再分场景：</p>
+<table>
+<thead>
+<tr>
+<th>子技能</th>
+<th>负责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>installer</code></td>
+<td>检查、下载、更新开发者工具</td>
+</tr>
+<tr>
+<td><code>initializer</code></td>
+<td>打开项目窗口、登录、读 AppID</td>
+</tr>
+<tr>
+<td><code>project-manager</code></td>
+<td>已导入项目列表</td>
+</tr>
+<tr>
+<td><code>project-config</code></td>
+<td><code>project.config.json</code>，例如域名校验、热重载</td>
+</tr>
+<tr>
+<td><code>compiler</code></td>
+<td>编译、打开指定页、构建 npm、刷新模拟器</td>
+</tr>
+<tr>
+<td><code>automator</code></td>
+<td>点击、输入、滚动、断言</td>
+</tr>
+<tr>
+<td><code>debugger</code></td>
+<td>console、network、截图、清缓存</td>
+</tr>
+<tr>
+<td><code>previewer</code></td>
+<td>预览二维码、上传体验版</td>
+</tr>
+<tr>
+<td><code>cloudbase-operator</code></td>
+<td>云环境、云函数、云数据库、云存储</td>
+</tr>
+</tbody></table>
+<p><strong>设计口味</strong>，来自 taste-skill 和 motion-design，用来把这间厨房定成纸面和勃艮第红：</p>
+<ul>
+<li><code>minimalist-ui</code>、<code>high-end-visual-design</code>、<code>design-taste-frontend</code></li>
+<li><code>imagegen-frontend-mobile</code>、<code>image-to-code</code>、<code>brandkit</code></li>
+<li><code>motion-design</code></li>
+<li>同目录里还有 <code>design-taste-frontend-v1</code>、<code>gpt-taste</code>、<code>industrial-brutalist-ui</code>、<code>redesign-existing-projects</code>、<code>full-output-enforcement</code>，作为备用口味和输出约束</li>
+</ul>
+<p>会改到页面上能看见的东西时，先改 <code>design/design.pen</code>，确认之后再写 <code>src</code> 里的页面。</p>
+<h2>MCP</h2>
+<p><code>.cursor/mcp.json</code> 接了三个服务，和上面的 skills 对得上。</p>
+<table>
+<thead>
+<tr>
+<th>MCP</th>
+<th>命令</th>
+<th>在这个项目里做什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>pencil</code></td>
+<td>pen.dev 桌面端</td>
+<td>读写 <code>design/design.pen</code>。设计稿是加密的，只通过这个 MCP 打开</td>
+</tr>
+<tr>
+<td><code>wechat-devtools</code></td>
+<td><code>wechatide mcp</code></td>
+<td>编译、模拟器、自动化、console、截图、预览上传</td>
+</tr>
+<tr>
+<td><code>uni-doc</code></td>
+<td><code>uni-mcp</code></td>
+<td>查 uni-app 官方文档</td>
+</tr>
+</tbody></table>
+<p>看页面、点按钮、对截图，走微信开发者工具，不把 H5 开发服务器当成验收结果。设计稿的地址是：</p>
+<p><a href="https://app.pen.dev/s/CTmaggYbSW84Htz7g7M9ClVp5TvDQIpqz0vaoSDf6Ss">https://app.pen.dev/s/CTmaggYbSW84Htz7g7M9ClVp5TvDQIpqz0vaoSDf6Ss</a></p>
+<p>上面的菜单、随便点、邀请、待做、菜品和记下这餐，都是从这份稿子里截出来的。</p>
+<h2>后端是 uniCloud</h2>
+<p>服务端在 <code>uniCloud-alipay</code>，用的是阿里云。一个云对象 <code>eat</code>，运行时 Node.js 18，入口 <code>cloudfunctions/eat/index.obj.js</code>。前端通过 <code>uniCloud.importObject(&#39;eat&#39;)</code> 调用，类型收在 <code>src/api/eat.ts</code>。</p>
+<p>云对象把绑定、菜单、订单和记录收成一组方法，例如 <code>createInvite</code>、<code>acceptInvite</code>、<code>listMenu</code>、<code>createOrder</code>、<code>acceptOrder</code>、<code>rejectOrder</code>、<code>createRecord</code>。每个方法先认当前会话，再进 <code>lib/service.js</code>。数据库读写在 <code>lib/store.js</code>，微信登录用 <code>lib/wx.js</code> 拿 code 换身份。</p>
+<p>表跟厨房走，客户端 schema 的读写权限是关的，数据只从云对象进出：</p>
+<table>
+<thead>
+<tr>
+<th>集合</th>
+<th>放什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>eat-users</code> / <code>eat-sessions</code></td>
+<td>微信身份和当前登录</td>
+</tr>
+<tr>
+<td><code>eat-kitchens</code></td>
+<td>这一对人的厨房</td>
+</tr>
+<tr>
+<td><code>eat-invites</code></td>
+<td>6 位邀请码</td>
+</tr>
+<tr>
+<td><code>eat-categories</code> / <code>eat-dishes</code></td>
+<td>分类和菜，含封面、用料、步骤、上下架</td>
+</tr>
+<tr>
+<td><code>eat-orders</code></td>
+<td>某一天某一个餐次的点餐</td>
+</tr>
+<tr>
+<td><code>eat-records</code></td>
+<td>做过的那一餐，照片和文字</td>
+</tr>
+</tbody></table>
+<p>订单提交、记录发布时会复制当时的菜名和封面。之后改菜、下架、删除，已经记下的那一餐保持原样。</p>
+<h2>开源</h2>
+<p>仓库公开在：</p>
+<p><a href="https://github.com/Cerrda/eat-eat">https://github.com/Cerrda/eat-eat</a></p>
+<p>协议是 MIT。本地开发是 <code>pnpm dev</code>，检查用 <code>pnpm type-check</code>、<code>pnpm lint</code> 和 <code>pnpm test</code>。上传微信体验版走 <code>pnpm upload:mp-weixin</code>。</p>
+<p>手机到了是勃艮第红。小程序里的按钮也是这一种红。她打开菜单，点后天早上的两道菜，我在待做里接单。</p>

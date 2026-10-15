@@ -4,10 +4,17 @@
     "href": "https://skills.sh/cerrda/skills/faker-mock-setup",
     "install": "npx skills add https://github.com/cerrda/skills --skill faker-mock-setup",
     "summary": "按 OpenAPI 或函数名生成页面级 Faker overrideResponse Mock，把前端联调从口头约定变成可安装、可复用的 Agent 工作流。",
+    "points": ["由函数名或 URL 推导 ApiId", "生成页面级 setup{ApiId}MockHandler", "面向 Vue / Vite + MSW 联调"]
+  },
+  {
+    "name": "liquid-glass",
+    "href": "https://skills.sh/cerrda/skills/liquid-glass",
+    "install": "npx skills add https://github.com/Cerrda/skills --skill liquid-glass",
+    "summary": "按被折射的内容和性能预算选定一种液态玻璃方案，再按对应 reference 实现。",
     "points": [
-      "由函数名或 URL 推导 ApiId",
-      "生成页面级 setup{ApiId}MockHandler",
-      "面向 Vue / Vite + MSW 联调"
+      "按内容、块数和浏览器从五档方案里命中一个",
+      "要边缘折射时用物理位移图，不照搬渐变图",
+      "折射失败就降到磨砂，并先拧模糊、DPR 和采样"
     ]
   },
   {
@@ -15,10 +22,6 @@
     "href": "https://skills.sh/cerrda/skills/scrapling-config-crawl",
     "install": "npx skills add https://github.com/cerrda/skills --skill scrapling-config-crawl",
     "summary": "按 config.py 的 id 生成 scrapling 采集脚本，将增量写入、翻页校验与合规边界固化为可安装 Skill。仅面向依法公开数据。",
-    "points": [
-      "list / data 增量写入与附件分流",
-      "强制复用项目 utils，避免脚本各自为政",
-      "仅面向依法公开数据"
-    ]
+    "points": ["list / data 增量写入与附件分流", "强制复用项目 utils，避免脚本各自为政", "仅面向依法公开数据"]
   }
 ]

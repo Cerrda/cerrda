@@ -19,7 +19,7 @@ slug: faker-mock-setup-skill
 
 ## 先看一张图：它解决什么
 
-![默认 Mock vs 自定义 Faker Mock](https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/afe5550cfbec4893b590ef302f9320c2~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787645907&x-signature=Zz4BUdswByoqO9PuT%2Blu%2FWld4I0%3D)
+![默认 Mock vs 自定义 Faker Mock](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/afe5550cfbec4893b590ef302f9320c2~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792484307&x-signature=okG0mIxdqEaxOw4rVef0Z%2FVN9yg%3D)
 
 |      | 默认 Mock（gen 出来的） | 自定义 Faker Mock（本 Skill）             |
 | ---- | ---------------- | ----------------------------------- |
@@ -46,7 +46,7 @@ export const setupXxxMockHandler = async () => {
 
 ## 架构直觉：MSW + Faker + OpenAPI
 
-![MSW 拦截与 Faker 造数转存失败，建议直接上传图片文件](https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/5ced91e4343f456ba7410a8cd7de729b~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787645907&x-signature=cqX4%2Ft4hkj8k1m5RvtGalMEvNqM%3D)
+![MSW 拦截与 Faker 造数转存失败，建议直接上传图片文件](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/5ced91e4343f456ba7410a8cd7de729b~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792484307&x-signature=9SPyIw4EIC1zbDj%2B5gNfNrKcBeY%3D)
 链路可以记成三步：
 
 1.  **OpenAPI gen**：`mock: true` 时产出 `*.mock.ts`（`{ApiId}MockHandler`）
@@ -65,7 +65,7 @@ export const setupXxxMockHandler = async () => {
 
 ## 怎么装：从 GitHub 到 Agent
 
-![安装链路：GitHub → skills CLI → Agent](https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/0cc2f3e2e7e44723bab18f13a835625f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787645907&x-signature=40y0cqha4QjFWIZlkw%2FuYSOQrtc%3D)
+![安装链路：GitHub → skills CLI → Agent](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/0cc2f3e2e7e44723bab18f13a835625f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792484307&x-signature=73ygL3xKbZDVr2scF%2BMEcb0DIb4%3D)
 skills.sh **没有单独「投稿审核」**。公开仓库 + 有人执行 `npx skills add`，遥测就会进入索引。
 
 ```bash

@@ -9,12 +9,16 @@
   "articles": {
     "added": [
       {
-        "id": "7674840998541443118",
-        "slug": "deepseek-harness-dsh",
-        "title": "给 DeepSeek Harness（DSH） 换上液态玻璃丝绸暗色主题"
+        "id": "7695972603000815635",
+        "slug": "iphone-18-pro",
+        "title": "她说喜欢iphone 18 pro 勃艮第红，我直接下单并附赠一个同款情侣点餐小程序"
       }
     ],
     "updatedBody": [
+      {
+        "id": "7674840998541443118",
+        "slug": "dsh-cerrda-theme"
+      },
       {
         "id": "7672698563611197490",
         "slug": "scrapling-config-crawl-skill"
@@ -58,7 +62,9 @@
     "errors": []
   },
   "skills": {
-    "added": [],
+    "added": [
+      "liquid-glass"
+    ],
     "updated": [],
     "unchanged": [
       "faker-mock-setup",
@@ -67,26 +73,41 @@
     "errors": []
   },
   "packages": {
-    "added": [
-      "dsh-cerrda-theme"
-    ],
+    "added": [],
     "versionBumps": [],
     "unchanged": [
       "vite-plugin-fetch-dts",
-      "openapi-v3-request-generator"
-    ],
-    "discovered": [
+      "openapi-v3-request-generator",
       "dsh-cerrda-theme"
     ],
+    "discovered": [],
     "errors": []
   },
   "copyQueue": [
     {
       "kind": "article",
       "reason": "added",
+      "id": "7695972603000815635",
+      "slug": "iphone-18-pro",
+      "sourceFile": "content/articles/iphone-18-pro.md",
+      "remote": {
+        "title": "她说喜欢iphone 18 pro 勃艮第红，我直接下单并附赠一个同款情侣点餐小程序",
+        "brief": "她说喜欢 iPhone 18 Pro 勃艮第红。我直接下了单。盒子还在路上的时候，我把同一种红做成了一间厨房：只给两个人用的微信小程序，一个人做饭，一个人点餐。",
+        "tags": [
+          "AI编程",
+          "微信小程序",
+          "Vue.js"
+        ],
+        "date": "2026-10-13"
+      },
+      "local": null
+    },
+    {
+      "kind": "article",
+      "reason": "updatedBody",
       "id": "7674840998541443118",
-      "slug": "deepseek-harness-dsh",
-      "sourceFile": "content/articles/deepseek-harness-dsh.md",
+      "slug": "dsh-cerrda-theme",
+      "sourceFile": "content/articles/dsh-cerrda-theme.md",
       "remote": {
         "title": "给 DeepSeek Harness（DSH） 换上液态玻璃丝绸暗色主题",
         "brief": "如果你每天对着它写代码、排问题，难免会想：能不能再「好看」一点——不是换张壁纸那种好看，而是配色、字体、玻璃、背景动起来都像一套完整的产品设计。",
@@ -97,7 +118,14 @@
         ],
         "date": "2026-08-18"
       },
-      "local": null
+      "local": {
+        "title": "给 DeepSeek Harness（DSH） 换上液态玻璃丝绸暗色主题",
+        "description": "把 cerrda 玫瑰深紫液态玻璃主题做成 DSH 部署级插件，装上重启即可生效。",
+        "tags": [
+          "前端",
+          "设计"
+        ]
+      }
     },
     {
       "kind": "article",
@@ -169,20 +197,12 @@
       }
     },
     {
-      "kind": "package",
+      "kind": "skill",
       "reason": "added",
-      "name": "dsh-cerrda-theme",
+      "name": "liquid-glass",
       "remote": {
-        "version": "0.2.0",
-        "description": "Deployment-level static web plugin for DSH: cerrda dark re-theme of the DeepSeek Harness Web GUI (rose/purple oklch, Liquid Glass composer, Silk WebGL2 background, Sora/Fraunces/JetBrains Mono). Install with: dsh plugin --profile web add dsh-cerrda-theme",
-        "keywords": [
-          "dsh",
-          "dsh-plugin",
-          "deepseek-harness",
-          "theme",
-          "cerrda"
-        ],
-        "excerpt": ""
+        "description": "Choose and implement an Apple-style liquid-glass effect by trading refraction quality against GPU and main-thread cost. Covers CSS backdrop-filter, Vue Bits SVG feDisplacementMap (and a physics displacement-map fix for its jagged edges and color shift), iyinchao four-pass WebGL2/WebGPU SDF glass, R3F Fluid Glass with FBO and MeshTransmissionMaterial, and DOM-capture shader overlays. Use when the user asks for liquid glass, 液态玻璃, 毛玻璃折射, glassmorphism, feDisplacementMap, MeshTransmissionMaterial, or a refractive lens, nav bar, or button.",
+        "excerpt": "# Liquid Glass 选型与实现 先根据「玻璃后面是什么」和性能预算选定**一个**方案，再阅读对应 reference 实现。整页 HTML 放进 Canvas 只在内容本身就是 Three 场景时才合适。 实现来源：[iyinchao/liquid-glass-studio](https://github.com/iyinchao/liquid-glass-studio)、[Vue Bits Glass Surface](https://vue-bits.dev/components/glass-surface)、[React Bits Fluid Glass](https://reactbits.dev/components/fluid-glass) / [MeshTransmissionMaterial](https://drei.docs.pmnd.rs/shaders/mesh-transmission-material)。 ## 先填约束 能从页面结构推断的不要追问。缺了就会选错方案时，只问这一项： 1. 被折射的内容：普通 HTML、静态图或视频、已有 Canvas/WebGL，还是已经在 Three 场景里 2. 玻璃块数量：一个英雄区，还是导航、按钮、卡片很多块 3. 是否跟着指针、滚动，或背景每帧在变（视频、动画） 4. 浏览器：必须包含 Safari / Firefox，还是 Chromium / Electron 即可 5. 效果下限：磨砂即可、要边缘折射、要色散 + 菲涅尔 + 高光、要 3D 体积透镜 ## 选型 按顺序匹配，命中即停。 | 顺序 | 条件 | 方案 id | 实现 | | --- | --- | --- | --- | | 1 | 磨砂即可；或玻璃块大约 ≥ 5；或必须 Safari/Firefox，且不能把内容搬进 Canvas | `css-backdrop` | [references/css-backdrop.md](references/css-backdrop.md) | | 2 | 内容是普通 HTML，玻璃块大约 1–3，尺寸不随动画连续变化，可只支持 Chromium，要边缘折射 | `svg-displacement` | [references/svg-displacement.md](references/svg-displacement.md) | | 3 | 背景是图片或一张画布，要 2D 液态玻璃（折射、色散、菲涅尔、高光、圆角或形状融合），页面控件不必进入折射 | `studio-multipass` | [references/studio-multipass.md](references/studio-multipass.md) | | 4 | 被看穿的内容已经是 Three 场景里的网格、文字或图片，要透镜、方块或底部玻璃条 | `fluid-glass` | [references/fluid-glass.md](references/fluid-glass.md) | | 5 | 控件必须是真实 HTML，背后页面会动，又要折射，WebGL 可用 | `dom-capture` | [references/dom-capture.md](references/dom-capture.md) | 取舍： - 要折射真实 HTML，又要 Safari：做不到折射。用 `css-backdrop`，并说明折射需要 Chromium，或把背景搬进 Canvas（`studio-multipass` / `fluid-glass`）。 - `fluid-glass` 适合 **3D 场景透镜**。整页按钮、表单、列表留在 DOM 里。 - [liquid-glass-studio](https://github.com/iyinchao/liquid-glass-studio) 的折射、色散、菲涅尔、高光最完整，采样源是**纹理**。DOM 盖在 canvas 上不会被折射。 - [Glass Surface](https://vue-bits.dev/components/glass-surface) 能包住任意 HTML，但渐变位移图平滑不足、…"
       },
       "local": null
     }

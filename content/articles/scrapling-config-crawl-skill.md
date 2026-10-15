@@ -17,7 +17,7 @@ slug: scrapling-config-crawl-skill
 
 ## 免责声明（请先读）
 
-![juejin-crawl-disclaimer.png](https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/7f21977a1dbf47a0935a06642a74dded~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787712417&x-signature=EpaeV6Io4T6LLoTGlIdBYYwsxNE%3D)
+![juejin-crawl-disclaimer.png](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/7f21977a1dbf47a0935a06642a74dded~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792550817&x-signature=G9dJa7cOkE5xw8WC00E3Qsa1QD8%3D)
 
 本 Skill 与文中示例仅面向**依法公开**的网页信息采集与工程化实践分享。
 
@@ -34,7 +34,7 @@ slug: scrapling-config-crawl-skill
 
 ## 它解决什么
 
-![juejin-crawl-pipeline.png](https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/0eb8eb422ed940a2ae87a9e31bcef047~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787712417&x-signature=XhqMSmI3kC98p2gpwt1jf%2F5L8sA%3D)
+![juejin-crawl-pipeline.png](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/0eb8eb422ed940a2ae87a9e31bcef047~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792550817&x-signature=g7bxD3A6mdtHzIQ7jQ7TtQXTFk0%3D)
 
 | 痛点           | Skill 怎么压住                                        |
 | ------------ | ------------------------------------------------- |
@@ -62,7 +62,7 @@ Task Progress:
 
 ## list vs data：两条采集路径
 
-![juejin-list-vs-data.png](https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/7131aa65f7b44a7ebf1e67eb3a3a9341~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787712417&x-signature=WVUY2muoZSluLxvXZqGZHWbaK%2Bg%3D)
+![juejin-list-vs-data.png](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/7131aa65f7b44a7ebf1e67eb3a3a9341~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792550817&x-signature=ssowamhif3qRbRNyfsTaqoYzwSo%3D)
 
 | page\_type | 入口 URL 含义 | 增量对比         | 入库方式                                  |
 | ---------- | --------- | ------------ | ------------------------------------- |
@@ -84,7 +84,7 @@ id 支持组合写法，避免一次只跑一个站：
 
 ## 怎么装：从 GitHub 到 Agent
 
-![juejin-crawl-install.png](https://p6-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/100b81754492440aab34dc6d0db49cbf~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1787712417&x-signature=IdSxVtF0tKSIKo5KlrTAuHstT2w%3D)
+![juejin-crawl-install.png](https://p9-xtjj-sign.byteimg.com/tos-cn-i-73owjymdk6/100b81754492440aab34dc6d0db49cbf~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgQ2VycmRh:q75.awebp?rk3s=f64ab15b&x-expires=1792550817&x-signature=F5Pzyz5TE6zPfE%2Bd6%2Bd6WXJjk4A%3D)
 skills.sh **没有单独「投稿审核」**。公开仓库 + 有人执行 `npx skills add`，遥测就会进入索引。
 
 本仓库已支持**多 Skill 并列**（例如还有 `faker-mock-setup`），按需安装即可：

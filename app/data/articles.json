@@ -1,5 +1,13 @@
 [
   {
+    "slug": "iphone-18-pro",
+    "id": "7695972603000815635",
+    "title": "她喜欢 iPhone 18 Pro 勃艮第红，我做了同款情侣点餐小程序",
+    "description": "用 Vue 3、uni-app 和 uniCloud 做了只给两人用的微信点餐小程序 EatEat，颜色跟勃艮第红走同一套。",
+    "date": "2026-10-13",
+    "tags": ["uni-app", "Vue.js"]
+  },
+  {
     "slug": "dsh-cerrda-theme",
     "id": "7674840998541443118",
     "title": "给 DeepSeek Harness（DSH） 换上液态玻璃丝绸暗色主题",
